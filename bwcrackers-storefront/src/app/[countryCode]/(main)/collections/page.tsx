@@ -12,14 +12,14 @@ export const metadata: Metadata = {
 
 // Static images for collection cards
 const collectionImages = [
-  "/images/products/product-1.jpeg",
-  "/images/products/product-17.jpeg",
-  "/images/products/product-33.jpeg",
-  "/images/products/product-8.jpeg",
-  "/images/products/product-22.jpeg",
-  "/images/products/product-28.jpeg",
-  "/images/products/product-15.jpeg",
-  "/images/products/product-24.jpeg",
+  "/images/products/bw-1-2-3-4-kuruvi.jpeg",
+  "/images/products/bw-17-baby-rocket.jpeg",
+  "/images/products/bw-157-sunrises-22-items.jpeg",
+  "/images/products/bw-7-2-sound-crackers.jpeg",
+  "/images/products/bw-22-7-magic-pencil.jpeg",
+  "/images/products/bw-28-bat-and-ball.jpeg",
+  "/images/products/bw-15-red-bijili.jpeg",
+  "/images/products/bw-24-ultra-pencil-3pcs.jpeg",
 ]
 
 const categoryColors = [

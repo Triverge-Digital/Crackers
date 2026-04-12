@@ -1,0 +1,227 @@
+{
+  "description": "Text extracted from each product image by visual analysis. Each entry contains the original filename, the primary product name visible on packaging, brand name, and any other relevant text.",
+  "images": [
+    {
+      "file": "WhatsApp Image 2026-04-01 at 01.59.50.jpeg",
+      "product_text": "4 Shot",
+      "brand": "Selvi Fireworks Industries, Sivakasi",
+      "notes": "Gold/black box, fountain/shot type product"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 01.59.50 (1).jpeg",
+      "product_text": "Baby Rocket",
+      "brand": "Glasco Fireworks, Sivakasi",
+      "notes": "Yellow box with child's face, rocket product"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 01.59.51.jpeg",
+      "product_text": "Whizling Wheel",
+      "brand": "Sri Vijai Fancy Fireworks, Sivakasi",
+      "notes": "Spinning wheel/chakkar product"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 01.59.53.jpeg",
+      "product_text": "Ultra Colour Pencil",
+      "brand": "Mugesh's",
+      "notes": "Long box, color sparkler/pencil stick"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 01.59.55.jpeg",
+      "product_text": "Touch Me Falls",
+      "brand": "Iniya's, Sri Sakthivel Fireworks, Sivakasi",
+      "notes": "Gold box, fountain type"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 01.59.56.jpeg",
+      "product_text": "KitKat",
+      "brand": "Velkuli's",
+      "notes": "Blue box with Mario character, novelty cracker"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 01.59.56 (1).jpeg",
+      "product_text": "Photo Flash",
+      "brand": "Iniya's, Sri Sakthivel Fireworks, Sivakasi",
+      "notes": "White box with camera images, novelty cracker"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.00.jpeg",
+      "product_text": "Darbar",
+      "brand": "Fireworks Factory, Sivakasi",
+      "notes": "Red cylindrical fountain"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.00 (1).jpeg",
+      "product_text": "12 Star",
+      "brand": "Naachiar Fancy Fireworks, Sivakasi",
+      "notes": "Purple and white boxes, multi-shot aerial"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.00 (2).jpeg",
+      "product_text": "Ground Chakkar Special",
+      "brand": "Bheema",
+      "notes": "Yellow box with child character, spinning ground chakkar"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.00 (3).jpeg",
+      "product_text": "Colour Koti",
+      "brand": "Glasco Fireworks, Sivakasi",
+      "notes": "Copper/orange box, fountain product"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.00 (4).jpeg",
+      "product_text": "Ground Chakkar Deluxe",
+      "brand": "Glasco Fireworks, Sivakasi",
+      "notes": "Red/white box with girl, ground spinner"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.00 (5).jpeg",
+      "product_text": "Bijili Extra Power",
+      "brand": "Purdeep Fireworks",
+      "notes": "Blue/gold packets, bijili/strip crackers"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.00 (6).jpeg",
+      "product_text": "4x4 Wheel",
+      "brand": "Sigma Fireworks Factory",
+      "notes": "Orange star-shaped box with cars, spinning wheel"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.00 (7).jpeg",
+      "product_text": "Golden Globe 5 PCS",
+      "brand": "",
+      "notes": "Red box with parrot character, ground/night effect"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.00 (8).jpeg",
+      "product_text": "Sing Pop - 1 Piece",
+      "brand": "Shanmah Fancy Fireworks, Sivakasi",
+      "notes": "White ornate box, fountain product"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.00 (9).jpeg",
+      "product_text": "Helicopter Triple Colour Fountain",
+      "brand": "Sakthi Vinayaka",
+      "notes": "Blue/green box with helicopter, novelty cracker"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.00 (10).jpeg",
+      "product_text": "Shining Stars",
+      "brand": "Naachiar Fancy Fireworks",
+      "notes": "Pink box with girl, sparkler/candle type"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.01.jpeg",
+      "product_text": "Emoji Crackling Fountain",
+      "brand": "Naachiar",
+      "notes": "Red box with emoji/smiley character"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.01 (1).jpeg",
+      "product_text": "I Cone",
+      "brand": "Jaipandian Pyro Tech, Sivakasi",
+      "notes": "Purple box, cone/fountain type"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.01 (2).jpeg",
+      "product_text": "Peacock Crackling",
+      "brand": "Starvell Fancy Pyro Link, Sivakasi",
+      "notes": "Maroon box with peacock design"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.01 (3).jpeg",
+      "product_text": "Mariana 15 Shots",
+      "brand": "Bheema",
+      "notes": "Blue box with lotus flower, multi-shot"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.01 (4).jpeg",
+      "product_text": "Millionaire",
+      "brand": "Iniya's, Sri Sakthivel Fireworks, Sivakasi",
+      "notes": "Yellow box with Joker character, night effect"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.01 (5).jpeg",
+      "product_text": "Asarafi Small",
+      "brand": "Selvi Fireworks Industries, Sivakasi",
+      "notes": "Small blue box, sound cracker"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.01 (6).jpeg",
+      "product_text": "Lakshmi Crackers (bulk)",
+      "brand": "",
+      "notes": "Bulk blue wrapped packets on shelf, sound crackers"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.01 (7).jpeg",
+      "product_text": "Minions / Be Star Panda - Sparklers",
+      "brand": "Iniyan",
+      "notes": "Multiple sparkler/pencil boxes held together"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.02.jpeg",
+      "product_text": "Madurai Mali",
+      "brand": "Starvell Fancy Pyro Link, Sivakasi",
+      "notes": "Pink pillow-shaped packet, night crackling effect"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.02 (1).jpeg",
+      "product_text": "Selfie Stick",
+      "brand": "Iniya's, Sri Sakthivel Fireworks, Sivakasi",
+      "notes": "Red box with anime girl, sparkler/color pencil"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.02 (2).jpeg",
+      "product_text": "SPT Golden Duck",
+      "brand": "SPT Fireworks",
+      "notes": "Yellow duck-shaped novelty cracker"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.02 (3).jpeg",
+      "product_text": "Bat and Ball (MRF)",
+      "brand": "Redsun",
+      "notes": "Cricket bat and ball shaped cracker in plastic wrap"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.02 (4).jpeg",
+      "product_text": "Ground Chakkar Special",
+      "brand": "Glasco Fireworks, Sivakasi",
+      "notes": "Green/purple box on shelf, multiple boxes visible"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.02 (5).jpeg",
+      "product_text": "Epic!",
+      "brand": "Bheema Fireworks, Sivakasi",
+      "notes": "Pink box with Angry Birds character, fountain"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.02 (6).jpeg",
+      "product_text": "Cocktail Fountain",
+      "brand": "Bheema Fireworks, Sivakasi",
+      "notes": "Red box with people images, fountain"
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.47.jpeg",
+      "product_text": "B&W Crackers - Brand Banner",
+      "brand": "B&W Crackers",
+      "notes": "Promotional banner showing 80% discount, Diwali offer. NOT a product image."
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.48.jpeg",
+      "product_text": "B&W Crackers - Combo Offer Rs.3000 (44 Items)",
+      "brand": "B&W Crackers",
+      "notes": "Price list poster showing combo pack contents. NOT a product image but contains full product listing."
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.00.48 (1).jpeg",
+      "product_text": "B&W Crackers - Combo Offer Rs.5000 (50 Items)",
+      "brand": "B&W Crackers",
+      "notes": "Price list poster showing combo pack contents. NOT a product image but contains full product listing."
+    },
+    {
+      "file": "WhatsApp Image 2026-04-01 at 02.01.42.jpeg",
+      "product_text": "10K Sounds Crackers",
+      "brand": "V.K.S., Vaikundam Pyro",
+      "notes": "Large red/yellow box, bulk sound crackers package"
+    }
+  ]
+}

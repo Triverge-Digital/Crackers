@@ -344,63 +344,48 @@ export default async function seedDemoData({ container }: ExecArgs) {
 
   logger.info("Seeding product data...");
 
-  // Product data from Excel price list
+// Product data from Excel price list - images matched by visual analysis
   const productsData = [
-    // Single Sound Crackers
-    { code: "1", title: '2 3/4" Kuruvi', mrp: 40, discountPrice: 8, unit: "1 PKT", category: "Single Sound Crackers", image: "/images/products/product-1.jpeg" },
-    { code: "2", title: '3 1/2" Lakshmi', mrp: 80, discountPrice: 16, unit: "1 PKT", category: "Single Sound Crackers", image: "/images/products/product-2.jpeg" },
-    { code: "3", title: '4" Lakshmi', mrp: 100, discountPrice: 20, unit: "1 PKT", category: "Single Sound Crackers", image: "/images/products/product-3.jpeg" },
-    { code: "4", title: '4" Deluxe Lakshmi', mrp: 150, discountPrice: 30, unit: "1 PKT", category: "Single Sound Crackers", image: "/images/products/product-4.jpeg" },
-    { code: "5", title: '4" Gold Lakshmi', mrp: 175, discountPrice: 35, unit: "1 PKT", category: "Single Sound Crackers", image: "/images/products/product-5.jpeg" },
-    { code: "6", title: '5" Mega Lakshmi', mrp: 190, discountPrice: 38, unit: "1 PKT", category: "Single Sound Crackers", image: "/images/products/product-6.jpeg" },
-    { code: "7", title: "2 Sound Crackers", mrp: 175, discountPrice: 35, unit: "1 PKT", category: "Single Sound Crackers", image: "/images/products/product-7.jpeg" },
-    { code: "8", title: "Elephant Crackers", mrp: 250, discountPrice: 50, unit: "1 PKT", category: "Single Sound Crackers", image: "/images/products/product-8.jpeg" },
-    { code: "9", title: "28 Chorsa", mrp: 70, discountPrice: 14, unit: "1 PKT", category: "Single Sound Crackers", image: "/images/products/product-9.jpeg" },
-    { code: "10", title: "28 Giant", mrp: 120, discountPrice: 24, unit: "1 PKT", category: "Single Sound Crackers", image: "/images/products/product-10.jpeg" },
-    { code: "11", title: "56 Giant", mrp: 200, discountPrice: 40, unit: "1 PKT", category: "Single Sound Crackers", image: "/images/products/product-11.jpeg" },
-
-    // Deluxe Crackers
-    { code: "12", title: "24 Deluxe", mrp: 250, discountPrice: 50, unit: "1 PKT", category: "Deluxe Crackers", image: "/images/products/product-12.jpeg" },
-    { code: "13", title: "50 Deluxe", mrp: 500, discountPrice: 100, unit: "1 PKT", category: "Deluxe Crackers", image: "/images/products/product-13.jpeg" },
-    { code: "14", title: "100 Deluxe", mrp: 1100, discountPrice: 220, unit: "1 PKT", category: "Deluxe Crackers", image: "/images/products/product-14.jpeg" },
-
-    // Bijili Crackers
-    { code: "15", title: "Red Bijili", mrp: 160, discountPrice: 32, unit: "1 PKT", category: "Bijili Crackers", image: "/images/products/product-15.jpeg" },
-    { code: "16", title: "Stripped Bijili", mrp: 170, discountPrice: 34, unit: "1 PKT", category: "Bijili Crackers", image: "/images/products/product-16.jpeg" },
-
-    // Rockets
-    { code: "17", title: "Baby Rocket", mrp: 300, discountPrice: 60, unit: "1 BOX", category: "Rockets", image: "/images/products/product-17.jpeg" },
-    { code: "18", title: "Rocket Bomb", mrp: 450, discountPrice: 90, unit: "1 BOX", category: "Rockets", image: "/images/products/product-18.jpeg" },
-    { code: "19", title: "Lunik Rocket", mrp: 700, discountPrice: 140, unit: "1 BOX", category: "Rockets", image: "/images/products/product-19.jpeg" },
-    { code: "20", title: "Musical Rocket", mrp: 900, discountPrice: 180, unit: "1 BOX", category: "Rockets", image: "/images/products/product-20.jpeg" },
-    { code: "21", title: "2 Sound Rocket", mrp: 1000, discountPrice: 200, unit: "1 BOX", category: "Rockets", image: "/images/products/product-21.jpeg" },
-
-    // Candles
-    { code: "22", title: '7" Magic Pencil', mrp: 125, discountPrice: 25, unit: "1 BOX", category: "Candles", image: "/images/products/product-22.jpeg" },
-    { code: "23", title: '12" Pencil', mrp: 275, discountPrice: 55, unit: "1 BOX", category: "Candles", image: "/images/products/product-23.jpeg" },
-
-    // Color Pencil
-    { code: "24", title: "Ultra Pencil (3pcs)", mrp: 400, discountPrice: 80, unit: "1 BOX", category: "Color Pencil", image: "/images/products/product-24.jpeg" },
-    { code: "25", title: "Navarag Pencil (5pcs)", mrp: 1000, discountPrice: 200, unit: "1 BOX", category: "Color Pencil", image: "/images/products/product-25.jpeg" },
-    { code: "26", title: "Popcorn Pencil (5pcs)", mrp: 1200, discountPrice: 240, unit: "1 BOX", category: "Color Pencil", image: "/images/products/product-26.jpeg" },
-    { code: "27", title: "Selfie Stick (5pcs)", mrp: 1000, discountPrice: 200, unit: "1 BOX", category: "Color Pencil", image: "/images/products/product-27.jpeg" },
-
-    // Night Crackling Effects
-    { code: "28", title: "Bat and Ball", mrp: 1400, discountPrice: 280, unit: "1 BOX", category: "Night Crackling Effects", image: "/images/products/product-28.jpeg" },
-    { code: "29", title: "Emu Egg", mrp: 1250, discountPrice: 250, unit: "1 BOX", category: "Night Crackling Effects", image: "/images/products/product-29.jpeg" },
-    { code: "30", title: "Tim Tam", mrp: 500, discountPrice: 100, unit: "1 BOX", category: "Night Crackling Effects", image: "/images/products/product-30.jpeg" },
-    { code: "31", title: "White House", mrp: 800, discountPrice: 160, unit: "1 BOX", category: "Night Crackling Effects", image: "/images/products/product-31.jpeg" },
-    { code: "32", title: "Color Celebrate (5pcs)", mrp: 1500, discountPrice: 300, unit: "1 BOX", category: "Night Crackling Effects", image: "/images/products/product-32.jpeg" },
-
-    // Premium Gift Boxes
-    { code: "157", title: "Sunrises (22 Items)", mrp: 1500, discountPrice: 300, unit: "1 BOX", category: "Premium Gift Boxes", image: "/images/products/product-33.jpeg" },
-    { code: "158", title: "Royal King (26 Items)", mrp: 1900, discountPrice: 380, unit: "1 BOX", category: "Premium Gift Boxes", image: "/images/products/product-34.jpeg" },
-    { code: "159", title: "Mumbai Indians (31 Items)", mrp: 2400, discountPrice: 480, unit: "1 BOX", category: "Premium Gift Boxes", image: "/images/products/product-35.jpeg" },
-    { code: "160", title: "Chennai Super Kings (42 Items)", mrp: 3500, discountPrice: 690, unit: "1 BOX", category: "Premium Gift Boxes", image: "/images/products/product-36.jpeg" },
-    { code: "161", title: "Andal Nachiyar (51 Items)", mrp: 4500, discountPrice: 890, unit: "1 BOX", category: "Premium Gift Boxes", image: "/images/products/product-37.jpeg" },
+    { code: "1", title: "2 3/4\" Kuruvi", mrp: 40, discountPrice: 8, unit: "1 PKT", category: "Single Sound Crackers", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988630/bwcrackers/bw-1-2-3-4-kuruvi.jpg" },
+    { code: "2", title: "3 1/2\" Lakshmi", mrp: 80, discountPrice: 16, unit: "1 PKT", category: "Single Sound Crackers", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988643/bwcrackers/bw-3-4-lakshmi.jpg" },
+    { code: "3", title: "4\" Lakshmi", mrp: 100, discountPrice: 20, unit: "1 PKT", category: "Single Sound Crackers", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988643/bwcrackers/bw-3-4-lakshmi.jpg" },
+    { code: "4", title: "4\" Deluxe Lakshmi", mrp: 150, discountPrice: 30, unit: "1 PKT", category: "Single Sound Crackers", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988643/bwcrackers/bw-3-4-lakshmi.jpg" },
+    { code: "5", title: "4\" Gold Lakshmi", mrp: 175, discountPrice: 35, unit: "1 PKT", category: "Single Sound Crackers", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988643/bwcrackers/bw-3-4-lakshmi.jpg" },
+    { code: "6", title: "5\" Mega Lakshmi", mrp: 190, discountPrice: 38, unit: "1 PKT", category: "Single Sound Crackers", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988643/bwcrackers/bw-3-4-lakshmi.jpg" },
+    { code: "7", title: "2 Sound Crackers", mrp: 175, discountPrice: 35, unit: "1 PKT", category: "Single Sound Crackers", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988645/bwcrackers/bw-7-2-sound-crackers.jpg" },
+    { code: "8", title: "Elephant Crackers", mrp: 250, discountPrice: 50, unit: "1 PKT", category: "Single Sound Crackers", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988646/bwcrackers/bw-8-elephant-crackers.jpg" },
+    { code: "9", title: "28 Chorsa", mrp: 70, discountPrice: 14, unit: "1 PKT", category: "Single Sound Crackers", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988643/bwcrackers/bw-3-4-lakshmi.jpg" },
+    { code: "10", title: "28 Giant", mrp: 120, discountPrice: 24, unit: "1 PKT", category: "Single Sound Crackers", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988643/bwcrackers/bw-3-4-lakshmi.jpg" },
+    { code: "11", title: "56 Giant", mrp: 200, discountPrice: 40, unit: "1 PKT", category: "Single Sound Crackers", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988643/bwcrackers/bw-3-4-lakshmi.jpg" },
+    { code: "12", title: "24 Deluxe", mrp: 250, discountPrice: 50, unit: "1 PKT", category: "Deluxe Crackers", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988648/bwcrackers/bw-12-24-deluxe.jpg" },
+    { code: "13", title: "50 Deluxe", mrp: 500, discountPrice: 100, unit: "1 PKT", category: "Deluxe Crackers", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988643/bwcrackers/bw-3-4-lakshmi.jpg" },
+    { code: "14", title: "100 Deluxe", mrp: 1100, discountPrice: 220, unit: "1 PKT", category: "Deluxe Crackers", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988643/bwcrackers/bw-3-4-lakshmi.jpg" },
+    { code: "15", title: "Red Bijili", mrp: 160, discountPrice: 32, unit: "1 PKT", category: "Bijili Crackers", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988650/bwcrackers/bw-15-red-bijili.jpg" },
+    { code: "16", title: "Stripped Bijili", mrp: 170, discountPrice: 34, unit: "1 PKT", category: "Bijili Crackers", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988652/bwcrackers/bw-16-stripped-bijili.jpg" },
+    { code: "17", title: "Baby Rocket", mrp: 300, discountPrice: 60, unit: "1 BOX", category: "Rockets", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988654/bwcrackers/bw-17-baby-rocket.jpg" },
+    { code: "18", title: "Rocket Bomb", mrp: 450, discountPrice: 90, unit: "1 BOX", category: "Rockets", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988657/bwcrackers/bw-18-rocket-bomb.jpg" },
+    { code: "19", title: "Lunik Rocket", mrp: 700, discountPrice: 140, unit: "1 BOX", category: "Rockets", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988659/bwcrackers/bw-19-lunik-rocket.jpg" },
+    { code: "20", title: "Musical Rocket", mrp: 900, discountPrice: 180, unit: "1 BOX", category: "Rockets", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988662/bwcrackers/bw-20-musical-rocket.jpg" },
+    { code: "21", title: "2 Sound Rocket", mrp: 1000, discountPrice: 200, unit: "1 BOX", category: "Rockets", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988664/bwcrackers/bw-21-2-sound-rocket.jpg" },
+    { code: "22", title: "7\" Magic Pencil", mrp: 125, discountPrice: 25, unit: "1 BOX", category: "Candles", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988666/bwcrackers/bw-22-7-magic-pencil.jpg" },
+    { code: "23", title: "12\" Pencil", mrp: 275, discountPrice: 55, unit: "1 BOX", category: "Candles", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988668/bwcrackers/bw-23-12-pencil.jpg" },
+    { code: "24", title: "Ultra Pencil (3pcs)", mrp: 400, discountPrice: 80, unit: "1 BOX", category: "Color Pencil", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988669/bwcrackers/bw-24-ultra-pencil-3pcs.jpg" },
+    { code: "25", title: "Navarag Pencil (5pcs)", mrp: 1000, discountPrice: 200, unit: "1 BOX", category: "Color Pencil", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988671/bwcrackers/bw-25-navarag-pencil-5pcs.jpg" },
+    { code: "26", title: "Popcorn Pencil (5pcs)", mrp: 1200, discountPrice: 240, unit: "1 BOX", category: "Color Pencil", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988675/bwcrackers/bw-26-popcorn-pencil-5pcs.jpg" },
+    { code: "27", title: "Selfie Stick (5pcs)", mrp: 1000, discountPrice: 200, unit: "1 BOX", category: "Color Pencil", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988677/bwcrackers/bw-27-selfie-stick-5pcs.jpg" },
+    { code: "28", title: "Bat and Ball", mrp: 1400, discountPrice: 280, unit: "1 BOX", category: "Night Crackling Effects", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988679/bwcrackers/bw-28-bat-and-ball.jpg" },
+    { code: "29", title: "Emu Egg", mrp: 1250, discountPrice: 250, unit: "1 BOX", category: "Night Crackling Effects", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988681/bwcrackers/bw-29-emu-egg.jpg" },
+    { code: "30", title: "Tim Tam", mrp: 500, discountPrice: 100, unit: "1 BOX", category: "Night Crackling Effects", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988682/bwcrackers/bw-30-tim-tam.jpg" },
+    { code: "31", title: "White House", mrp: 800, discountPrice: 160, unit: "1 BOX", category: "Night Crackling Effects", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988684/bwcrackers/bw-31-white-house.jpg" },
+    { code: "32", title: "Color Celebrate (5pcs)", mrp: 1500, discountPrice: 300, unit: "1 BOX", category: "Night Crackling Effects", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988686/bwcrackers/bw-32-color-celebrate-5pcs.jpg" },
+    { code: "157", title: "Sunrises (22 Items)", mrp: 1500, discountPrice: 300, unit: "1 BOX", category: "Premium Gift Boxes", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988688/bwcrackers/bw-157-sunrises-22-items.jpg" },
+    { code: "158", title: "Royal King (26 Items)", mrp: 1900, discountPrice: 380, unit: "1 BOX", category: "Premium Gift Boxes", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988689/bwcrackers/bw-158-royal-king-26-items.jpg" },
+    { code: "159", title: "Mumbai Indians (31 Items)", mrp: 2400, discountPrice: 480, unit: "1 BOX", category: "Premium Gift Boxes", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988691/bwcrackers/bw-159-mumbai-indians-31-items.jpg" },
+    { code: "160", title: "Chennai Super Kings (42 Items)", mrp: 3500, discountPrice: 690, unit: "1 BOX", category: "Premium Gift Boxes", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988692/bwcrackers/bw-160-chennai-super-kings-42-items.jpg" },
+    { code: "161", title: "Andal Nachiyar (51 Items)", mrp: 4500, discountPrice: 890, unit: "1 BOX", category: "Premium Gift Boxes", image: "https://res.cloudinary.com/dgkqsmgmy/image/upload/v1775988693/bwcrackers/bw-161-andal-nachiyar-51-items.jpg" }
   ];
 
-  const handle = (title: string) =>
+    const handle = (title: string) =>
     title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")

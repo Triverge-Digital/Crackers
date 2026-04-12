@@ -92,6 +92,16 @@ pnpm-lock.yaml
 docker-compose.override.yml
 
 # -----------------------------
+# Scripts output (contains credentials)
+# -----------------------------
+scripts/cloudinary-urls.json
+scripts/deploy-render.sh
+scripts/deploy-vercel.sh
+scripts/deploy.sh
+scripts/node_modules/
+scripts/package-lock.json
+
+# -----------------------------
 # Misc
 # -----------------------------
 *.tgz

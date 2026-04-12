@@ -5,19 +5,19 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 
 const images = [
   {
-    url: "/images/products/product-33.jpeg",
+    url: "/images/products/bw-157-sunrises-22-items.jpeg",
     title: "Fireworks Extravaganza",
     gradient: "from-purple-500/90 to-pink-500/90",
     icon: Sparkles,
   },
   {
-    url: "/images/products/product-35.jpeg",
+    url: "/images/products/bw-159-mumbai-indians-31-items.jpeg",
     title: "80% OFF Special",
     gradient: "from-pink-500/90 to-red-500/90",
     icon: Star,
   },
   {
-    url: "/images/products/product-37.jpeg",
+    url: "/images/products/bw-161-andal-nachiyar-51-items.jpeg",
     title: "Premium Gift Boxes",
     gradient: "from-orange-500/90 to-yellow-500/90",
     icon: Flame,

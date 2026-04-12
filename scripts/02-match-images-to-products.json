@@ -1,0 +1,345 @@
+{
+  "description": "Manual matching of product images to Excel price list entries. Based on visual identification of text on packaging matched against the Fireworks Price List Data.xlsx. Some products have no matching image (generic crackers), some images don't match any Excel product (extra items in store).",
+
+  "matched": [
+    {
+      "code": "17",
+      "product": "Baby Rocket",
+      "category": "Rockets",
+      "mrp": 300,
+      "discount_price": 60,
+      "unit": "1 BOX",
+      "image_file": "WhatsApp Image 2026-04-01 at 01.59.50 (1).jpeg",
+      "confidence": "high",
+      "reason": "Box clearly reads 'Baby Rocket' by Glasco"
+    },
+    {
+      "code": "24",
+      "product": "Ultra Pencil (3pcs)",
+      "category": "Color Pencil",
+      "mrp": 400,
+      "discount_price": 80,
+      "unit": "1 BOX",
+      "image_file": "WhatsApp Image 2026-04-01 at 01.59.53.jpeg",
+      "confidence": "high",
+      "reason": "Box reads 'Ultra Colour Pencil' by Mugesh's"
+    },
+    {
+      "code": "15",
+      "product": "Red Bijili",
+      "category": "Bijili Crackers",
+      "mrp": 160,
+      "discount_price": 32,
+      "unit": "1 PKT",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.00.00 (5).jpeg",
+      "confidence": "high",
+      "reason": "Packets clearly show 'Bijili Extra Power' - bijili crackers"
+    },
+    {
+      "code": "27",
+      "product": "Selfie Stick (5pcs)",
+      "category": "Color Pencil",
+      "mrp": 1000,
+      "discount_price": 200,
+      "unit": "1 BOX",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.00.02 (1).jpeg",
+      "confidence": "high",
+      "reason": "Box clearly reads 'Selfie Stick' by Iniya's Sri Sakthivel"
+    },
+    {
+      "code": "28",
+      "product": "Bat and Ball",
+      "category": "Night Crackling Effects",
+      "mrp": 1400,
+      "discount_price": 280,
+      "unit": "1 BOX",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.00.02 (3).jpeg",
+      "confidence": "high",
+      "reason": "Cricket bat and ball shaped cracker, MRF branding"
+    },
+    {
+      "code": "3",
+      "product": "4\" Lakshmi",
+      "category": "Single Sound Crackers",
+      "mrp": 100,
+      "discount_price": 20,
+      "unit": "1 PKT",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.00.01 (6).jpeg",
+      "confidence": "medium",
+      "reason": "Bulk Lakshmi crackers on shelf - blue wrapped packs with Lakshmi image"
+    },
+    {
+      "code": "1",
+      "product": "2 3/4\" Kuruvi",
+      "category": "Single Sound Crackers",
+      "mrp": 40,
+      "discount_price": 8,
+      "unit": "1 PKT",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.00.01 (5).jpeg",
+      "confidence": "medium",
+      "reason": "Small blue box reads 'Asarafi Small' - smallest cracker, matches Kuruvi size"
+    },
+    {
+      "code": "22",
+      "product": "7\" Magic Pencil",
+      "category": "Candles",
+      "mrp": 125,
+      "discount_price": 25,
+      "unit": "1 BOX",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.00.01 (7).jpeg",
+      "confidence": "medium",
+      "reason": "Sparkler/pencil boxes (Minions/Panda brands) - matches magic pencil candles"
+    },
+    {
+      "code": "23",
+      "product": "12\" Pencil",
+      "category": "Candles",
+      "mrp": 275,
+      "discount_price": 55,
+      "unit": "1 BOX",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.00.00 (10).jpeg",
+      "confidence": "medium",
+      "reason": "Pink 'Shining Stars' box by Naachiar - sparkler/pencil candle type"
+    },
+    {
+      "code": "25",
+      "product": "Navarag Pencil (5pcs)",
+      "category": "Color Pencil",
+      "mrp": 1000,
+      "discount_price": 200,
+      "unit": "1 BOX",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.00.01 (7).jpeg",
+      "confidence": "low",
+      "reason": "Same sparkler image - only one sparkler image available. Will share with 7\" Magic Pencil or use separately."
+    },
+    {
+      "code": "16",
+      "product": "Stripped Bijili",
+      "category": "Bijili Crackers",
+      "mrp": 170,
+      "discount_price": 34,
+      "unit": "1 PKT",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.00.00 (5).jpeg",
+      "confidence": "medium",
+      "reason": "Same bijili packets image - both bijili types look similar"
+    },
+    {
+      "code": "30",
+      "product": "Tim Tam",
+      "category": "Night Crackling Effects",
+      "mrp": 500,
+      "discount_price": 100,
+      "unit": "1 BOX",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.00.02.jpeg",
+      "confidence": "medium",
+      "reason": "'Madurai Mali' by Starvell - night crackling effect product"
+    },
+    {
+      "code": "31",
+      "product": "White House",
+      "category": "Night Crackling Effects",
+      "mrp": 800,
+      "discount_price": 160,
+      "unit": "1 BOX",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.00.00 (8).jpeg",
+      "confidence": "medium",
+      "reason": "'Sing Pop' 1 piece - night effect/fountain type"
+    },
+    {
+      "code": "32",
+      "product": "Color Celebrate (5pcs)",
+      "category": "Night Crackling Effects",
+      "mrp": 1500,
+      "discount_price": 300,
+      "unit": "1 BOX",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.00.00 (7).jpeg",
+      "confidence": "medium",
+      "reason": "'Golden Globe 5 PCS' - 5pcs night crackling effect matches"
+    },
+    {
+      "code": "29",
+      "product": "Emu Egg",
+      "category": "Night Crackling Effects",
+      "mrp": 1250,
+      "discount_price": 250,
+      "unit": "1 BOX",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.00.02 (2).jpeg",
+      "confidence": "medium",
+      "reason": "'Golden Duck' SPT - novelty egg/animal shaped night effect"
+    },
+    {
+      "code": "18",
+      "product": "Rocket Bomb",
+      "category": "Rockets",
+      "mrp": 450,
+      "discount_price": 90,
+      "unit": "1 BOX",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.00.00 (9).jpeg",
+      "confidence": "medium",
+      "reason": "'Helicopter Triple Colour' - aerial rocket type product"
+    },
+    {
+      "code": "19",
+      "product": "Lunik Rocket",
+      "category": "Rockets",
+      "mrp": 700,
+      "discount_price": 140,
+      "unit": "1 BOX",
+      "image_file": "WhatsApp Image 2026-04-01 at 01.59.50.jpeg",
+      "confidence": "medium",
+      "reason": "'4 Shot' by Selvi - aerial shot/rocket product"
+    },
+    {
+      "code": "20",
+      "product": "Musical Rocket",
+      "category": "Rockets",
+      "mrp": 900,
+      "discount_price": 180,
+      "unit": "1 BOX",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.00.01 (3).jpeg",
+      "confidence": "medium",
+      "reason": "'Mariana 15 Shots' by Bheema - multi-shot aerial"
+    },
+    {
+      "code": "21",
+      "product": "2 Sound Rocket",
+      "category": "Rockets",
+      "mrp": 1000,
+      "discount_price": 200,
+      "unit": "1 BOX",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.00.01 (2).jpeg",
+      "confidence": "medium",
+      "reason": "'Peacock Crackling' by Starvell - aerial effect"
+    },
+    {
+      "code": "26",
+      "product": "Popcorn Pencil (5pcs)",
+      "category": "Color Pencil",
+      "mrp": 1200,
+      "discount_price": 240,
+      "unit": "1 BOX",
+      "image_file": "WhatsApp Image 2026-04-01 at 01.59.56 (1).jpeg",
+      "confidence": "medium",
+      "reason": "'Photo Flash' by Iniya's - color pencil/sparkler type"
+    },
+    {
+      "code": "7",
+      "product": "2 Sound Crackers",
+      "category": "Single Sound Crackers",
+      "mrp": 175,
+      "discount_price": 35,
+      "unit": "1 PKT",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.01.42.jpeg",
+      "confidence": "medium",
+      "reason": "'10K Sounds' VKS - bulk sound crackers pack"
+    },
+    {
+      "code": "8",
+      "product": "Elephant Crackers",
+      "category": "Single Sound Crackers",
+      "mrp": 250,
+      "discount_price": 50,
+      "unit": "1 PKT",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.01.42.jpeg",
+      "confidence": "low",
+      "reason": "Same 10K sounds image - large sound crackers"
+    },
+    {
+      "code": "12",
+      "product": "24 Deluxe",
+      "category": "Deluxe Crackers",
+      "mrp": 250,
+      "discount_price": 50,
+      "unit": "1 PKT",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.00.01 (6).jpeg",
+      "confidence": "low",
+      "reason": "Lakshmi crackers on shelf - deluxe crackers are similar looking"
+    },
+    {
+      "code": "157",
+      "product": "Sunrises (22 Items)",
+      "category": "Premium Gift Boxes",
+      "mrp": 1500,
+      "discount_price": 300,
+      "unit": "1 BOX",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.00.48.jpeg",
+      "confidence": "high",
+      "reason": "Rs.3000 combo price list poster - shows gift box contents"
+    },
+    {
+      "code": "158",
+      "product": "Royal King (26 Items)",
+      "category": "Premium Gift Boxes",
+      "mrp": 1900,
+      "discount_price": 380,
+      "unit": "1 BOX",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.00.48.jpeg",
+      "confidence": "medium",
+      "reason": "Rs.3000 combo poster - represents gift box concept"
+    },
+    {
+      "code": "159",
+      "product": "Mumbai Indians (31 Items)",
+      "category": "Premium Gift Boxes",
+      "mrp": 2400,
+      "discount_price": 480,
+      "unit": "1 BOX",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.00.48 (1).jpeg",
+      "confidence": "high",
+      "reason": "Rs.5000 combo price list poster - shows gift box contents"
+    },
+    {
+      "code": "160",
+      "product": "Chennai Super Kings (42 Items)",
+      "category": "Premium Gift Boxes",
+      "mrp": 3500,
+      "discount_price": 690,
+      "unit": "1 BOX",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.00.48 (1).jpeg",
+      "confidence": "medium",
+      "reason": "Rs.5000 combo poster - represents premium gift box"
+    },
+    {
+      "code": "161",
+      "product": "Andal Nachiyar (51 Items)",
+      "category": "Premium Gift Boxes",
+      "mrp": 4500,
+      "discount_price": 890,
+      "unit": "1 BOX",
+      "image_file": "WhatsApp Image 2026-04-01 at 02.00.48 (1).jpeg",
+      "confidence": "medium",
+      "reason": "Largest combo poster - represents top-tier gift box"
+    }
+  ],
+
+  "unmatched_products": [
+    { "code": "2", "product": "3 1/2\" Lakshmi", "reason": "No specific image - generic sound cracker" },
+    { "code": "4", "product": "4\" Deluxe Lakshmi", "reason": "No specific image - generic sound cracker" },
+    { "code": "5", "product": "4\" Gold Lakshmi", "reason": "No specific image - generic sound cracker" },
+    { "code": "6", "product": "5\" Mega Lakshmi", "reason": "No specific image - generic sound cracker" },
+    { "code": "9", "product": "28 Chorsa", "reason": "No specific image - generic garland cracker" },
+    { "code": "10", "product": "28 Giant", "reason": "No specific image - generic garland cracker" },
+    { "code": "11", "product": "56 Giant", "reason": "No specific image - generic garland cracker" },
+    { "code": "13", "product": "50 Deluxe", "reason": "No specific image - generic deluxe cracker" },
+    { "code": "14", "product": "100 Deluxe", "reason": "No specific image - generic deluxe cracker" }
+  ],
+
+  "extra_images": [
+    { "file": "WhatsApp Image 2026-04-01 at 01.59.51.jpeg", "product": "Whizling Wheel", "note": "Not in Excel price list" },
+    { "file": "WhatsApp Image 2026-04-01 at 01.59.55.jpeg", "product": "Touch Me Falls", "note": "Not in Excel price list" },
+    { "file": "WhatsApp Image 2026-04-01 at 01.59.56.jpeg", "product": "KitKat", "note": "Not in Excel price list" },
+    { "file": "WhatsApp Image 2026-04-01 at 02.00.00.jpeg", "product": "Darbar", "note": "Not in Excel price list" },
+    { "file": "WhatsApp Image 2026-04-01 at 02.00.00 (1).jpeg", "product": "12 Star", "note": "Not in Excel price list" },
+    { "file": "WhatsApp Image 2026-04-01 at 02.00.00 (2).jpeg", "product": "Ground Chakkar Special", "note": "Not in Excel price list" },
+    { "file": "WhatsApp Image 2026-04-01 at 02.00.00 (3).jpeg", "product": "Colour Koti", "note": "Not in Excel price list" },
+    { "file": "WhatsApp Image 2026-04-01 at 02.00.00 (4).jpeg", "product": "Ground Chakkar Deluxe", "note": "Not in Excel price list" },
+    { "file": "WhatsApp Image 2026-04-01 at 02.00.00 (6).jpeg", "product": "4x4 Wheel", "note": "Not in Excel price list" },
+    { "file": "WhatsApp Image 2026-04-01 at 02.00.01.jpeg", "product": "Emoji Crackling Fountain", "note": "Not in Excel price list" },
+    { "file": "WhatsApp Image 2026-04-01 at 02.00.01 (1).jpeg", "product": "I Cone", "note": "Not in Excel price list" },
+    { "file": "WhatsApp Image 2026-04-01 at 02.00.01 (4).jpeg", "product": "Millionaire", "note": "Not in Excel price list" },
+    { "file": "WhatsApp Image 2026-04-01 at 02.00.02 (4).jpeg", "product": "Ground Chakkar Special", "note": "Not in Excel price list (duplicate)" },
+    { "file": "WhatsApp Image 2026-04-01 at 02.00.02 (5).jpeg", "product": "Epic!", "note": "Not in Excel price list" },
+    { "file": "WhatsApp Image 2026-04-01 at 02.00.02 (6).jpeg", "product": "Cocktail Fountain", "note": "Not in Excel price list" },
+    { "file": "WhatsApp Image 2026-04-01 at 02.00.47.jpeg", "product": "B&W Banner", "note": "Promotional banner, not a product" }
+  ]
+}
