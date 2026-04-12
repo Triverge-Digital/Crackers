@@ -2,13 +2,19 @@ FROM node:20-slim
 
 WORKDIR /app
 
-# Copy only backend
-COPY bwcrackers/package.json bwcrackers/package-lock.json* ./
+# Copy lockfile + package.json (cached layer)
+COPY bwcrackers/package.json bwcrackers/package-lock.json ./
 
-RUN npm install
+# Fast install using lockfile - skips resolution
+RUN npm ci --loglevel=error
 
-COPY bwcrackers/ .
+# Copy source
+COPY bwcrackers/src ./src
+COPY bwcrackers/medusa-config.ts ./
+COPY bwcrackers/tsconfig.json ./
+COPY bwcrackers/instrumentation.ts ./
 
+# Build
 RUN npx medusa build
 
 EXPOSE 9000

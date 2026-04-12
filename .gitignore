@@ -77,14 +77,8 @@ Thumbs.db
 # -----------------------------
 # Package managers
 # -----------------------------
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
-
-# (⚠️ Uncomment ONLY if you don’t want lockfiles — usually you SHOULD keep them)
-# !package-lock.json
-# !yarn.lock
-# !pnpm-lock.yaml
+# Keep lockfiles committed for faster CI builds
+scripts/package-lock.json
 
 # -----------------------------
 # Docker
