@@ -1,0 +1,10 @@
+node_modules
+.medusa
+.cache
+.git
+.vscode
+coverage
+dist
+build
+uploads
+.DS_Store

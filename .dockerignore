@@ -1,0 +1,20 @@
+# Storefront (not deployed to Railway)
+bwcrackers-storefront
+
+# Scripts
+scripts/node_modules
+scripts/cloudinary-urls.json
+
+# Git
+.git
+
+# OS
+.DS_Store
+
+# Backend heavy dirs (Railway reinstalls these)
+bwcrackers/node_modules
+bwcrackers/.medusa
+bwcrackers/.cache
+bwcrackers/dist
+bwcrackers/build
+bwcrackers/uploads
