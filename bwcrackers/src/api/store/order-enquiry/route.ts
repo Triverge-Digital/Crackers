@@ -1,8 +1,9 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { ORDER_ENQUIRY_MODULE } from "../../../modules/order-enquiry"
+import OrderEnquiryModuleService from "../../../modules/order-enquiry/service"
 
 export async function POST(req: MedusaRequest, res: MedusaResponse) {
-  const orderEnquiryService = req.scope.resolve(ORDER_ENQUIRY_MODULE)
+  const orderEnquiryService: OrderEnquiryModuleService = req.scope.resolve(ORDER_ENQUIRY_MODULE)
 
   const {
     customer_name,
@@ -36,7 +37,6 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     })
   }
 
-  // Validate phone is Indian format
   const phoneClean = phone.replace(/\s+/g, "")
   if (!/^\+91\d{10}$/.test(phoneClean)) {
     return res.status(400).json({
@@ -63,7 +63,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
 }
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
-  const orderEnquiryService = req.scope.resolve(ORDER_ENQUIRY_MODULE)
+  const orderEnquiryService: OrderEnquiryModuleService = req.scope.resolve(ORDER_ENQUIRY_MODULE)
 
   const enquiries = await orderEnquiryService.listOrderEnquiries(
     {},
