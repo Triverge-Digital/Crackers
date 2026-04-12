@@ -42,7 +42,7 @@ out/
 # -----------------------------
 # Medusa specific
 # -----------------------------
-.medusa/
+# .medusa/
 uploads/
 .medusa-server/
 .medusa-cache/
