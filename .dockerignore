@@ -1,20 +1,23 @@
-# Storefront (not deployed to Railway)
+# Exclude storefront (deployed separately on Vercel)
 bwcrackers-storefront
 
-# Scripts
-scripts/node_modules
-scripts/cloudinary-urls.json
+# Exclude scripts
+scripts
 
-# Git
-.git
+# Exclude docs
+DEPLOYMENT.md
+README.md
 
-# OS
-.DS_Store
-
-# Backend heavy dirs (Railway reinstalls these)
+# Exclude heavy dirs
 bwcrackers/node_modules
 bwcrackers/.medusa
 bwcrackers/.cache
-bwcrackers/dist
 bwcrackers/build
+bwcrackers/dist
 bwcrackers/uploads
+bwcrackers/integration-tests
+
+# OS / IDE
+.DS_Store
+.vscode
+.git
