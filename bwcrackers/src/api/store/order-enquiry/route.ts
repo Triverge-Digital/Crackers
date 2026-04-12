@@ -53,7 +53,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     state: state || null,
     pincode: pincode || null,
     notes: notes || null,
-    items,
+    items: items as any,
     subtotal,
     currency_code: currency_code || "inr",
     status: "pending",

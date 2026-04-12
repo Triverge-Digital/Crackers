@@ -17,42 +17,7 @@ import {
   createTaxRegionsWorkflow,
   linkSalesChannelsToApiKeyWorkflow,
   linkSalesChannelsToStockLocationWorkflow,
-  updateStoresStep,
-  updateStoresWorkflow,
 } from "@medusajs/medusa/core-flows";
-import {
-  createWorkflow,
-  transform,
-  WorkflowResponse,
-} from "@medusajs/framework/workflows-sdk";
-
-const updateStoreCurrencies = createWorkflow(
-  "update-store-currencies",
-  (input: {
-    supported_currencies: { currency_code: string; is_default?: boolean }[];
-    store_id: string;
-  }) => {
-    const normalizedInput = transform({ input }, (data) => {
-      return {
-        selector: { id: data.input.store_id },
-        update: {
-          supported_currencies: data.input.supported_currencies.map(
-            (currency) => {
-              return {
-                currency_code: currency.currency_code,
-                is_default: currency.is_default ?? false,
-              };
-            }
-          ),
-        },
-      };
-    });
-
-    const stores = updateStoresStep(normalizedInput);
-
-    return new WorkflowResponse(stores);
-  }
-);
 
 export default async function seedDemoData({ container }: ExecArgs) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER);
@@ -85,26 +50,15 @@ export default async function seedDemoData({ container }: ExecArgs) {
     defaultSalesChannel = salesChannelResult;
   }
 
-  await updateStoreCurrencies(container).run({
-    input: {
-      store_id: store.id,
-      supported_currencies: [
-        {
-          currency_code: "inr",
-          is_default: true,
-        },
-      ],
-    },
-  });
-
-  await updateStoresWorkflow(container).run({
-    input: {
-      selector: { id: store.id },
-      update: {
-        default_sales_channel_id: defaultSalesChannel[0].id,
+  await storeModuleService.updateStores(store.id, {
+    supported_currencies: [
+      {
+        currency_code: "inr",
+        is_default: true,
       },
-    },
-  });
+    ],
+    default_sales_channel_id: defaultSalesChannel[0].id,
+  } as any);
   logger.info("Seeding region data...");
   const { result: regionResult } = await createRegionsWorkflow(container).run({
     input: {
@@ -149,14 +103,9 @@ export default async function seedDemoData({ container }: ExecArgs) {
   });
   const stockLocation = stockLocationResult[0];
 
-  await updateStoresWorkflow(container).run({
-    input: {
-      selector: { id: store.id },
-      update: {
-        default_location_id: stockLocation.id,
-      },
-    },
-  });
+  await storeModuleService.updateStores(store.id, {
+    default_location_id: stockLocation.id,
+  } as any);
 
   await link.create({
     [Modules.STOCK_LOCATION]: {
