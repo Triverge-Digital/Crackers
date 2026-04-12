@@ -23,4 +23,5 @@ build
 !.yarn/sdks
 !.yarn/versions
 
-.medusa
+# Keep .medusa build output committed for Railway deploy (no build step needed)
+# .medusa

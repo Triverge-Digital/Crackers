@@ -10,7 +10,6 @@ README.md
 
 # Exclude heavy dirs
 bwcrackers/node_modules
-bwcrackers/.medusa
 bwcrackers/.cache
 bwcrackers/build
 bwcrackers/dist
