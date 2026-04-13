@@ -56,51 +56,51 @@ const categories = [
 
 export function CategoryShowcase() {
   return (
-    <section className="py-16 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-96 h-96 bg-yellow-300 rounded-full blur-3xl opacity-20 animate-pulse"></div>
-      <div
-        className="absolute bottom-0 right-0 w-96 h-96 bg-orange-300 rounded-full blur-3xl opacity-20 animate-pulse"
-        style={{ animationDelay: "1s" }}
-      ></div>
+    <section className="py-24 celebration-bg relative overflow-hidden">
+      {/* Background accents */}
+      <div className="absolute top-0 right-0 w-full h-[500px] bg-brand-gold-400/5 blur-[120px] pointer-events-none"></div>
 
-      <div className="container mx-auto px-4 relative">
-        <div className="text-center mb-12">
-          <h2 className="text-5xl md:text-6xl text-white font-bold mb-4 drop-shadow-lg">
-            OUR PRODUCTS
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-3 glass-gold px-6 py-2 rounded-full mb-6 border border-brand-gold-400/20">
+            <span className="text-display text-brand-gold-200 tracking-[0.2em]">Crafted Collections</span>
+          </div>
+          <h2 className="text-h2 text-white mb-6">
+            Master the <span className="text-gold italic">Art of Celebration</span>
           </h2>
-          <div className="h-1 w-32 bg-gradient-to-r from-yellow-300 via-orange-300 to-pink-300 mx-auto rounded-full"></div>
-          <p className="text-xl text-white/90 mt-4 max-w-2xl mx-auto">
-            Explore our wide range of premium quality crackers for every
-            celebration
+          <p className="text-xl text-white/50 max-w-2xl mx-auto font-light leading-relaxed">
+            From whispering sparklers to thundering rockets, explore 
+            categories designed to make every moment unforgettable.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {categories.map((category, index) => (
             <LocalizedClientLink
               key={index}
               href={`/store`}
-              className={`group relative overflow-hidden rounded-3xl bg-gradient-to-br ${category.color} p-8 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer border-4 border-white hover:scale-105`}
+              className="glass-card group p-10 rounded-[2.5rem] border border-white/5 hover:border-brand-gold-400/30 transition-all duration-500 cursor-pointer relative overflow-hidden animate-fade-in-top"
+              style={{ animationDelay: `${index * 100}ms` }}
             >
-              <div className="absolute top-0 right-0 text-6xl opacity-20 transform rotate-12">
+              <div className="absolute top-0 right-0 text-7xl opacity-5 transform rotate-12 group-hover:rotate-45 transition-transform duration-700 pointer-events-none">
                 {category.emoji}
               </div>
 
               <div className="relative z-10">
-                <div className="text-4xl mb-4">{category.emoji}</div>
-                <h3 className="text-2xl font-bold mb-3 text-white drop-shadow-md">
+                <div className="w-16 h-16 rounded-2xl glass-gold flex items-center justify-center mb-8 transform group-hover:scale-110 transition-transform duration-500 border border-brand-gold-400/20">
+                  <span className="text-3xl">{category.emoji}</span>
+                </div>
+
+                <h3 className="text-2xl font-black mb-4 text-white group-hover:text-gold transition-colors tracking-tight">
                   {category.name}
                 </h3>
-                <p className="text-white/90 leading-relaxed mb-4">
+                <p className="text-white/40 leading-relaxed mb-8 font-light line-clamp-2">
                   {category.description}
                 </p>
 
-                <div className="flex items-center gap-2 text-sm group-hover:translate-x-2 transition-transform duration-300">
-                  <span className="text-white flex items-center gap-1">
-                    <Sparkles className="h-4 w-4" />
-                    Explore Collection
-                  </span>
-                  <span className="text-white">→</span>
+                <div className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-brand-gold-400 group-hover:gap-4 transition-all">
+                  Show Catalog
+                  <span className="text-lg">→</span>
                 </div>
               </div>
             </LocalizedClientLink>

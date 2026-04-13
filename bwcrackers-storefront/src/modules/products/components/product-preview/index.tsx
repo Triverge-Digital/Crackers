@@ -2,7 +2,7 @@ import { Text } from "@medusajs/ui"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { Star, ShoppingCart, Flame } from "lucide-react"
+import { Star, ShoppingCart, Flame, Sparkles } from "lucide-react"
 import Thumbnail from "../thumbnail"
 import PreviewPrice from "./price"
 
@@ -21,7 +21,7 @@ export default async function ProductPreview({
 
   const rating = 4 + Math.floor(Math.random() * 2) // 4 or 5 stars
   const category =
-    product.categories?.[0]?.name || product.collection?.title || "Crackers"
+    product.categories?.[0]?.name || product.collection?.title || "Premium"
 
   return (
     <LocalizedClientLink
@@ -30,76 +30,88 @@ export default async function ProductPreview({
     >
       <div
         data-testid="product-wrapper"
-        className="bg-white rounded-2xl border-2 border-gray-100 hover:border-orange-200 hover:shadow-xl transition-all duration-300 overflow-hidden h-full flex flex-col"
+        className="glass-card rounded-2xl border border-white/5 hover:border-brand-gold-400/50 hover:shadow-glow-gold transition-all duration-500 overflow-hidden h-full flex flex-col group/card"
       >
-        {/* Thumbnail with badges */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-orange-50 to-red-50">
+        {/* Thumbnail with celebration overlay */}
+        <div className="relative overflow-hidden bg-brand-royal-900/50 aspect-[4/5] sm:aspect-square">
           <Thumbnail
             thumbnail={product.thumbnail}
             images={product.images}
-            size="small"
+            size="full"
             isFeatured={isFeatured}
+            className="group-hover/card:scale-110 transition-transform duration-700 object-cover"
           />
 
-          {/* Trending badge */}
+          {/* Premium Badge */}
           {isFeatured && (
-            <div className="absolute top-3 left-3 bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
-              <Flame className="h-3 w-3" />
-              Trending
+            <div className="absolute top-3 left-3 bg-gradient-to-r from-brand-gold-500 to-brand-accent-orange text-brand-royal-950 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest shadow-premium flex items-center gap-1.5 animate-pulse">
+              <Flame className="h-3 w-3 fill-current" />
+              Hot Pick
             </div>
           )}
 
-          {/* Hover overlay */}
-          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-            <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-4 py-2 rounded-full font-bold text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-              View Details
-            </span>
+          {/* Hover overlay with glassmorphism */}
+          <div className="absolute inset-0 bg-brand-royal-950/40 backdrop-blur-[2px] opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 flex items-center justify-center p-6 text-center">
+            <div className="border border-brand-gold-400/30 p-4 rounded-xl transform translate-y-4 group-hover/card:translate-y-0 transition-transform duration-500">
+               <span className="text-gold font-bold text-sm uppercase tracking-widest block mb-2">
+                 Quick View
+               </span>
+               <div className="h-0.5 w-12 bg-brand-gold-400 mx-auto rounded-full"></div>
+            </div>
           </div>
         </div>
 
-        {/* Product Info */}
-        <div className="p-4 flex flex-col flex-1">
-          <div className="mb-2 flex-1">
-            {/* Category badge */}
-            <span className="inline-block text-xs border border-orange-300 text-orange-700 px-2 py-0.5 rounded-full mb-2">
-              {category}
-            </span>
+        {/* Product Info with Premium Styling */}
+        <div className="p-5 flex flex-col flex-1 relative overflow-hidden">
+           {/* Subtle background glow */}
+           <div className="absolute top-0 right-0 w-20 h-20 bg-brand-gold-400/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 decoration-clone"></div>
+           
+          <div className="mb-3 flex-1">
+            {/* Elegant Category tag */}
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-[10px] font-black text-brand-gold-400 uppercase tracking-[0.2em]">
+                {category}
+              </span>
+              <div className="h-px flex-1 bg-white/10"></div>
+            </div>
 
             <Text
-              className="font-semibold text-sm text-gray-900 line-clamp-2 min-h-[2.5rem] group-hover:text-orange-600 transition-colors mb-2"
+              className="font-serif text-lg text-white group-hover/card:text-brand-gold-200 transition-colors line-clamp-2 leading-snug mb-3 tracking-tight"
               data-testid="product-title"
             >
               {product.title}
             </Text>
 
-            {/* Star rating */}
+            {/* Star rating - Minimalist gold */}
             <div className="flex items-center gap-1 mb-2">
               {Array.from({ length: 5 }).map((_, i) => (
                 <Star
                   key={i}
-                  className={`h-4 w-4 ${
+                  className={`h-3 w-3 ${
                     i < rating
-                      ? "fill-orange-400 text-orange-400"
-                      : "text-gray-300"
+                      ? "fill-brand-gold-400 text-brand-gold-400"
+                      : "text-white/20"
                   }`}
                 />
               ))}
-              <span className="text-sm text-gray-500 ml-1">({rating}.0)</span>
+              <span className="text-[10px] text-white/40 font-bold ml-2 uppercase tracking-widest">
+                Safe & Quality
+              </span>
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-            <div>
+          <div className="flex items-center justify-between pt-4 border-t border-white/10 mt-auto">
+            <div className="flex flex-col">
+              <span className="text-[9px] text-white/40 uppercase font-black tracking-widest mb-0.5">Starting from</span>
               {cheapestPrice && (
-                <span className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+                <div className="text-2xl font-black text-gold tracking-tighter">
                   <PreviewPrice price={cheapestPrice} />
-                </span>
+                </div>
               )}
             </div>
-            <span className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1 hover:from-orange-600 hover:to-red-600 transition-colors">
-              <ShoppingCart className="h-3 w-3" />
-              Buy
-            </span>
+            <button className="h-10 w-10 rounded-full bg-brand-gold-400 hover:bg-white text-brand-royal-950 flex items-center justify-center transition-all shadow-glow-gold hover:scale-110 active:scale-95 group/btn">
+              <ShoppingCart className="h-5 w-5 transform group-hover/btn:rotate-12 transition-transform" />
+            </button>
           </div>
         </div>
       </div>

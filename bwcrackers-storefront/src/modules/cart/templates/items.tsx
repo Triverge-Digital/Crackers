@@ -12,41 +12,33 @@ type ItemsTemplateProps = {
 const ItemsTemplate = ({ cart }: ItemsTemplateProps) => {
   const items = cart?.items
   return (
-    <div>
-      <Table>
-        <Table.Header className="border-t-0">
-          <Table.Row className="text-gray-500 font-semibold text-sm">
-            <Table.HeaderCell className="!pl-4">Item</Table.HeaderCell>
-            <Table.HeaderCell></Table.HeaderCell>
-            <Table.HeaderCell>Qty</Table.HeaderCell>
-            <Table.HeaderCell className="hidden small:table-cell">
-              Unit Price
-            </Table.HeaderCell>
-            <Table.HeaderCell className="!pr-4 text-right">
-              Total
-            </Table.HeaderCell>
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {items
-            ? items
-                .sort((a, b) => {
-                  return (a.created_at ?? "") > (b.created_at ?? "") ? -1 : 1
-                })
-                .map((item) => {
-                  return (
-                    <Item
-                      key={item.id}
-                      item={item}
-                      currencyCode={cart?.currency_code}
-                    />
-                  )
-                })
-            : repeat(5).map((i) => {
-                return <SkeletonLineItem key={i} />
-              })}
-        </Table.Body>
-      </Table>
+    <div className="w-full">
+      <div className="grid grid-cols-[1fr_80px_100px_120px] gap-6 px-6 pb-6 border-b border-white/5 items-center">
+        <div className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em]">Artifact</div>
+        <div className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] text-center">Qty</div>
+        <div className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] text-center hidden small:block">Unit Price</div>
+        <div className="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] text-right">Investment</div>
+      </div>
+      
+      <div className="pt-6 space-y-8">
+        {items
+          ? items
+              .sort((a, b) => {
+                return (a.created_at ?? "") > (b.created_at ?? "") ? -1 : 1
+              })
+              .map((item) => {
+                return (
+                  <Item
+                    key={item.id}
+                    item={item}
+                    currencyCode={cart?.currency_code}
+                  />
+                )
+              })
+          : repeat(5).map((i) => {
+              return <SkeletonLineItem key={i} />
+            })}
+      </div>
     </div>
   )
 }

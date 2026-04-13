@@ -46,42 +46,60 @@ const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
               <Transition
                 show={open}
                 as={Fragment}
-                enter="transition ease-out duration-150"
-                enterFrom="opacity-0"
-                enterTo="opacity-100 backdrop-blur-2xl"
-                leave="transition ease-in duration-150"
-                leaveFrom="opacity-100 backdrop-blur-2xl"
-                leaveTo="opacity-0"
+                enter="transition ease-out duration-500"
+                enterFrom="opacity-0 -translate-x-full"
+                enterTo="opacity-100 translate-x-0"
+                leave="transition ease-in duration-300"
+                leaveFrom="opacity-100 translate-x-0"
+                leaveTo="opacity-0 -translate-x-full"
               >
-                <PopoverPanel className="flex flex-col absolute w-full pr-4 sm:pr-0 sm:w-1/3 2xl:w-1/4 sm:min-w-min h-[calc(100vh-1rem)] z-[51] inset-x-0 text-sm text-ui-fg-on-color m-2 backdrop-blur-2xl">
+                <PopoverPanel className="fixed inset-y-0 left-0 w-full sm:w-[480px] z-[100] outline-none">
                   <div
                     data-testid="nav-menu-popup"
-                    className="flex flex-col h-full bg-[rgba(3,7,18,0.5)] rounded-rounded justify-between p-6"
+                    className="flex flex-col h-full bg-brand-royal-950/90 backdrop-blur-3xl border-r border-white/5 p-12 lg:p-20 relative overflow-hidden"
                   >
-                    <div className="flex justify-end" id="xmark">
-                      <button data-testid="close-menu-button" onClick={close}>
+                     {/* Decorative background pulse */}
+                    <div className="absolute top-1/4 -left-1/4 w-[400px] h-[400px] bg-brand-gold-400/5 rounded-full blur-[100px] animate-pulse pointer-events-none"></div>
+
+                    <div className="flex justify-between items-center mb-24" id="xmark">
+                      <div className="flex flex-col leading-none">
+                        <span className="text-gold font-black text-2xl font-serif tracking-tight">
+                          B&W
+                        </span>
+                        <span className="text-white/40 text-[9px] uppercase tracking-[0.2em] font-bold">
+                          Navigation
+                        </span>
+                      </div>
+                      <button 
+                        data-testid="close-menu-button" 
+                        onClick={close}
+                        className="h-12 w-12 rounded-full glass-gold flex items-center justify-center border border-brand-gold-400/20 text-brand-gold-400 hover:scale-110 transition-transform"
+                      >
                         <XMark />
                       </button>
                     </div>
-                    <ul className="flex flex-col gap-6 items-start justify-start">
-                      {Object.entries(SideMenuItems).map(([name, href]) => {
+
+                    <ul className="flex flex-col gap-10 items-start justify-start flex-1">
+                      {Object.entries(SideMenuItems).map(([name, href], i) => {
                         return (
-                          <li key={name}>
+                          <li key={name} className="animate-fade-in-right" style={{ animationDelay: `${i * 100}ms` }}>
                             <LocalizedClientLink
                               href={href}
-                              className="text-3xl leading-10 hover:text-ui-fg-disabled"
+                              className="text-4xl lg:text-5xl font-black text-white/40 hover:text-gold transition-all font-serif tracking-tighter flex items-center gap-6 group"
                               onClick={close}
                               data-testid={`${name.toLowerCase()}-link`}
                             >
+                              <span className="text-gold text-lg lg:text-xl italic opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 transition-all font-sans">0{i+1}</span>
                               {name}
                             </LocalizedClientLink>
                           </li>
                         )
                       })}
                     </ul>
-                    <div className="flex flex-col gap-y-6">
+
+                    <div className="flex flex-col gap-y-12">
                       <div
-                        className="flex justify-between"
+                        className="flex justify-between items-center group cursor-pointer"
                         onMouseEnter={toggleState.open}
                         onMouseLeave={toggleState.close}
                       >
@@ -93,15 +111,20 @@ const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
                         )}
                         <ArrowRightMini
                           className={clx(
-                            "transition-transform duration-150",
+                            "transition-transform duration-300 text-brand-gold-400",
                             toggleState.state ? "-rotate-90" : ""
                           )}
                         />
                       </div>
-                      <Text className="flex justify-between txt-compact-small">
-                        © {new Date().getFullYear()} BW Crackers. All rights
-                        reserved.
-                      </Text>
+                      
+                      <div className="pt-8 border-t border-white/5 space-y-2">
+                        <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.3em]">
+                          © {new Date().getFullYear()} B&W Crackers. 
+                        </p>
+                        <p className="text-white/10 text-[9px] uppercase font-bold tracking-[0.2em]">
+                          The Art of Celestial Celebration.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </PopoverPanel>

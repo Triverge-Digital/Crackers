@@ -10,112 +10,107 @@ export default async function Footer() {
   const productCategories = await listCategories()
 
   return (
-    <footer className="bg-gradient-to-br from-gray-900 to-gray-800 text-white py-12 mt-16">
-      <div className="content-container">
-        <div className="grid md:grid-cols-4 gap-8">
-          <div>
-            <LocalizedClientLink href="/" className="block">
-              <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
-                BW Crackers
-              </h3>
+    <footer className="bg-brand-royal-950 text-white py-24 border-t border-white/5 relative overflow-hidden">
+      {/* Decorative background glow */}
+      <div className="absolute bottom-0 right-0 w-[600px] h-[400px] bg-brand-gold-400/5 rounded-full blur-[120px] pointer-events-none"></div>
+
+      <div className="content-container relative z-10">
+        <div className="grid md:grid-cols-4 gap-12 lg:gap-24">
+          <div className="col-span-1 md:col-span-1">
+            <LocalizedClientLink href="/" className="group inline-block mb-10">
+              <div className="flex flex-col leading-none">
+                <span className="text-gold font-black text-3xl font-serif tracking-tight group-hover:scale-105 transition-transform">
+                  B&W
+                </span>
+                <span className="text-white/70 text-[10px] uppercase tracking-[0.2em] font-bold">
+                  Crackers
+                </span>
+              </div>
             </LocalizedClientLink>
-            <p className="text-gray-400 text-sm">
-              Light up your celebrations with our premium quality firecrackers.
-              Quality guaranteed with 100% safety certification.
+            <p className="text-white/40 text-sm leading-relaxed font-light">
+              Crafting celestial moments since 2010. We bring the magic of 
+              the stars to your celebrations with premium quality fireworks 
+              from Sivakasi.
             </p>
           </div>
+
           <div>
-            <h4 className="font-semibold mb-4">Quick Links</h4>
-            <ul className="space-y-2 text-sm text-gray-400">
-              <li>
-                <LocalizedClientLink
-                  href="/"
-                  className="hover:text-orange-400 transition-colors"
-                >
-                  Home
-                </LocalizedClientLink>
-              </li>
-              <li>
-                <LocalizedClientLink
-                  href="/store"
-                  className="hover:text-orange-400 transition-colors"
-                >
-                  All Products
-                </LocalizedClientLink>
-              </li>
-              <li>
-                <LocalizedClientLink
-                  href="/collections"
-                  className="hover:text-orange-400 transition-colors"
-                >
-                  Collections
-                </LocalizedClientLink>
-              </li>
-              <li>
-                <LocalizedClientLink
-                  href="/about"
-                  className="hover:text-orange-400 transition-colors"
-                >
-                  About
-                </LocalizedClientLink>
-              </li>
-              <li>
-                <LocalizedClientLink
-                  href="/cart"
-                  className="hover:text-orange-400 transition-colors"
-                >
-                  Cart
-                </LocalizedClientLink>
-              </li>
+            <h4 className="text-display text-brand-gold-400 mb-8">Navigation</h4>
+            <ul className="space-y-4 text-sm font-medium">
+              {["Home", "Store", "Collections", "About", "Cart"].map((item) => (
+                <li key={item}>
+                  <LocalizedClientLink
+                    href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
+                    className="text-white/50 hover:text-white transition-colors flex items-center gap-2 group"
+                  >
+                    <div className="h-0.5 w-0 bg-brand-gold-400 transition-all group-hover:w-3"></div>
+                    {item}
+                  </LocalizedClientLink>
+                </li>
+              ))}
             </ul>
           </div>
+
           <div>
-            <h4 className="font-semibold mb-4">Categories</h4>
-            <ul className="space-y-2 text-sm text-gray-400">
+            <h4 className="text-display text-brand-gold-400 mb-8">Collections</h4>
+            <ul className="space-y-4 text-sm font-medium">
               {productCategories?.slice(0, 6).map((c) => {
                 if (c.parent_category) return null
                 return (
                   <li key={c.id}>
                     <LocalizedClientLink
                       href={`/categories/${c.handle}`}
-                      className="hover:text-orange-400 transition-colors"
+                      className="text-white/50 hover:text-white transition-colors flex items-center gap-2 group"
                     >
+                      <div className="h-0.5 w-0 bg-brand-gold-400 transition-all group-hover:w-3"></div>
                       {c.name}
                     </LocalizedClientLink>
                   </li>
                 )
               })}
               {(!productCategories || productCategories.length === 0) && (
-                <>
-                  <li className="hover:text-orange-400 cursor-pointer">
-                    Sparklers
+                ["Sparklers", "Aerial Fireworks", "Sound Crackers", "VIP Combo Packs"].map((item) => (
+                  <li key={item}>
+                    <span className="text-white/50 hover:text-white transition-colors flex items-center gap-2 group cursor-pointer">
+                      <div className="h-0.5 w-0 bg-brand-gold-400 transition-all group-hover:w-3"></div>
+                      {item}
+                    </span>
                   </li>
-                  <li className="hover:text-orange-400 cursor-pointer">
-                    Aerial Fireworks
-                  </li>
-                  <li className="hover:text-orange-400 cursor-pointer">
-                    Sound Crackers
-                  </li>
-                  <li className="hover:text-orange-400 cursor-pointer">
-                    Combo Packs
-                  </li>
-                </>
+                ))
               )}
             </ul>
           </div>
+
           <div>
-            <h4 className="font-semibold mb-4">Contact</h4>
-            <ul className="space-y-2 text-sm text-gray-400">
-              <li>Email: info@bwcrackers.com</li>
-              <li>Phone: +91 98765 43210</li>
-              <li>Address: Sivakasi, Tamil Nadu, India</li>
+            <h4 className="text-display text-brand-gold-400 mb-8">Connectivity</h4>
+            <ul className="space-y-4 text-sm font-light text-white/50 leading-relaxed">
+              <li className="flex flex-col">
+                <span className="text-white/20 text-[10px] uppercase font-black tracking-widest mb-1">Inquiry</span>
+                info@bwcrackers.com
+              </li>
+              <li className="flex flex-col">
+                <span className="text-white/20 text-[10px] uppercase font-black tracking-widest mb-1">Hotline</span>
+                +91 98765 43210
+              </li>
+              <li className="flex flex-col">
+                <span className="text-white/20 text-[10px] uppercase font-black tracking-widest mb-1">Heritage</span>
+                Sivakasi, Tamil Nadu, India
+              </li>
             </ul>
           </div>
         </div>
-        <div className="border-t border-gray-700 mt-8 pt-8 text-center text-sm text-gray-400">
-          <p>
-            &copy; {new Date().getFullYear()} BW Crackers. All rights reserved.
+
+        <div className="mt-24 pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-white/30 text-[10px] font-bold uppercase tracking-[0.3em]">
+            &copy; {new Date().getFullYear()} B&W Crackers. The Art of Celebration.
           </p>
+          <div className="flex gap-6">
+            {["Instagram", "WhatsApp", "Facebook"].map((social) => (
+              <span key={social} className="text-white/20 hover:text-brand-gold-400 transition-colors text-[10px] font-black uppercase tracking-widest cursor-pointer">
+                {social}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     </footer>

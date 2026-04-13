@@ -2,13 +2,12 @@
 
 import {
   Sparkles,
-  Star,
   Zap,
   Flame,
   Gift,
   PartyPopper,
 } from "lucide-react"
-import { Button } from "@medusajs/ui"
+import { FadeIn } from "@modules/common/components/animations"
 
 export function FestivalBanner() {
   const onShopNow = () => {
@@ -17,100 +16,109 @@ export function FestivalBanner() {
   }
 
   return (
-    <section className="relative py-20 overflow-hidden bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600">
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00eiIvPjwvZz48L2c+PC9zdmc+')] opacity-30"></div>
+    <section className="relative py-24 overflow-hidden celebration-bg">
+      {/* Decorative gradients */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-accent-hot/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand-royal-700/20 rounded-full blur-[120px] translate-y-1/2 -translate-x-1/2"></div>
 
-      {/* Animated icons */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-10 left-10 animate-pulse">
-          <Star className="h-12 w-12 text-yellow-300 fill-yellow-300" />
-        </div>
-        <div
-          className="absolute top-20 right-20 animate-pulse"
-          style={{ animationDelay: "0.1s" }}
-        >
-          <Sparkles className="h-10 w-10 text-pink-300" />
-        </div>
-        <div
-          className="absolute bottom-20 left-1/4 animate-pulse"
-          style={{ animationDelay: "0.2s" }}
-        >
-          <Zap className="h-14 w-14 text-orange-300 fill-orange-300" />
-        </div>
-        <div
-          className="absolute top-1/2 right-10 animate-pulse"
-          style={{ animationDelay: "0.3s" }}
-        >
-          <Flame className="h-12 w-12 text-red-300 fill-red-300" />
-        </div>
-        <div className="absolute bottom-20 right-1/3 animate-pulse">
-          <Star className="h-10 w-10 text-purple-300 fill-purple-300" />
-        </div>
-        <div
-          className="absolute top-32 left-1/3 animate-pulse"
-          style={{ animationDelay: "0.15s" }}
-        >
-          <Gift className="h-10 w-10 text-yellow-300 fill-yellow-300" />
-        </div>
-        <div
-          className="absolute bottom-32 right-20 animate-pulse"
-          style={{ animationDelay: "0.25s" }}
-        >
-          <PartyPopper className="h-12 w-12 text-pink-300" />
-        </div>
-      </div>
-
-      <div className="container mx-auto px-4 relative">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-block mb-6">
-            <div className="bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 text-purple-900 px-8 py-4 rounded-full shadow-2xl animate-bounce border-4 border-white">
-              <span className="flex items-center gap-2 text-lg font-bold">
-                <Flame className="h-6 w-6" />
-                Limited Time Offer - Don&apos;t Miss Out!
-                <Flame className="h-6 w-6" />
-              </span>
-            </div>
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="glass-card rounded-[3rem] p-8 md:p-16 border border-white/10 relative overflow-hidden">
+          {/* Sparkle effects */}
+          <div className="absolute top-10 left-10 animate-sparkle">
+            <Sparkles className="h-8 w-8 text-brand-gold-400 opacity-50" />
+          </div>
+          <div className="absolute bottom-10 right-10 animate-sparkle [animation-delay:1.5s]">
+            <PartyPopper className="h-10 w-10 text-brand-accent-pink opacity-50" />
           </div>
 
-          <h2 className="text-6xl md:text-8xl text-white font-bold leading-tight mb-6 drop-shadow-2xl">
-            Celebrate Every
-            <span className="block bg-gradient-to-r from-yellow-300 via-orange-300 to-pink-300 bg-clip-text text-transparent">
-              Moment with Joy
-            </span>
-          </h2>
+          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-24">
+            <div className="flex-1 text-center lg:text-left">
+              <FadeIn delay={0.2} direction="right">
+                <div className="inline-flex items-center gap-2 glass-gold px-6 py-2 rounded-full mb-8 border border-brand-gold-400/30">
+                  <Gift className="h-5 w-5 text-brand-gold-400" />
+                  <span className="text-display text-brand-gold-200">
+                    VIP Gift Box Pre-Booking
+                  </span>
+                </div>
+              </FadeIn>
 
-          <p className="text-2xl text-white mb-8 drop-shadow-lg max-w-3xl mx-auto">
-            Premium quality crackers at unbeatable prices. Make your festivals
-            memorable with our exclusive collection of fireworks!
-          </p>
+              <FadeIn delay={0.4} direction="right">
+                <h2 className="text-h2 text-white mb-6">
+                  The Ultimate <br />
+                  <span className="text-gold">Festival Collection</span>
+                </h2>
+              </FadeIn>
 
-          <Button
-            onClick={onShopNow}
-            className="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 hover:from-yellow-500 hover:to-red-600 text-xl px-12 py-8 shadow-2xl text-purple-900 hover:scale-110 transition-all duration-300 border-4 border-white font-bold"
-          >
-            <Sparkles className="mr-2 h-6 w-6" />
-            Explore Our Collection
-          </Button>
+              <FadeIn delay={0.6} direction="right">
+                <p className="text-xl text-white/70 mb-10 leading-relaxed font-light">
+                  Don&apos;t wait for the rush. Secure our exclusive VIP Gift Boxes 
+                  and handpicked festive combos now. Premium quality crackers 
+                  with guaranteed safe delivery to your doorstep.
+                </p>
+              </FadeIn>
 
-          <div className="flex flex-wrap justify-center gap-6 pt-12">
-            <div className="bg-gradient-to-br from-yellow-400 to-orange-500 backdrop-blur-lg rounded-3xl p-8 border-4 border-white shadow-2xl hover:scale-105 transition-transform">
-              <div className="text-5xl mb-3">🎊</div>
-              <div className="text-3xl font-bold text-purple-900 mb-2">
-                500+
-              </div>
-              <div className="text-sm text-purple-800 font-medium">
-                Varieties
-              </div>
+              <FadeIn delay={0.8} direction="right">
+                <div className="flex flex-wrap justify-center lg:justify-start gap-6">
+                  <button
+                    onClick={onShopNow}
+                    className="premium-btn text-lg px-12 py-5"
+                  >
+                    <Sparkles size={20} className="mr-2 inline" />
+                    Pre-Book Now
+                  </button>
+                  <div className="flex items-center gap-4 text-white/50 font-bold uppercase tracking-widest text-sm">
+                    <Flame size={18} className="text-brand-accent-orange" />
+                    Limited Units Available
+                  </div>
+                </div>
+              </FadeIn>
             </div>
-            <div className="bg-gradient-to-br from-pink-400 to-red-500 backdrop-blur-lg rounded-3xl p-8 border-4 border-white shadow-2xl hover:scale-105 transition-transform">
-              <div className="text-5xl mb-3">✨</div>
-              <div className="text-3xl font-bold text-white mb-2">100%</div>
-              <div className="text-sm text-pink-100 font-medium">Certified</div>
-            </div>
-            <div className="bg-gradient-to-br from-purple-400 to-indigo-500 backdrop-blur-lg rounded-3xl p-8 border-4 border-white shadow-2xl hover:scale-105 transition-transform">
-              <div className="text-5xl mb-3">🎆</div>
-              <div className="text-3xl font-bold text-white mb-2">24/7</div>
-              <div className="text-sm text-purple-100 font-medium">Support</div>
+
+            <div className="flex-1 w-full lg:w-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {[
+                  {
+                    title: "VIP Combo",
+                    desc: "Handpicked mega crackers",
+                    icon: "🎆",
+                    color: "from-brand-gold-400 to-brand-accent-orange",
+                  },
+                  {
+                    title: "Family Box",
+                    desc: "Fun for all ages",
+                    icon: "🎊",
+                    color: "from-brand-royal-700 to-brand-accent-pink",
+                  },
+                  {
+                    title: "Safety First",
+                    desc: "100% Certified fireworks",
+                    icon: "🛡️",
+                    color: "from-emerald-400 to-teal-600",
+                  },
+                  {
+                    title: "Fast Delivery",
+                    desc: "Express shipping options",
+                    icon: "⚡",
+                    color: "from-blue-400 to-indigo-600",
+                  },
+                ].map((feature, i) => (
+                  <FadeIn key={feature.title} delay={0.2 * i} direction="left">
+                    <div
+                      className="glass-card p-6 rounded-2xl border border-white/5 hover:border-white/20 transition-all group"
+                    >
+                      <div className="text-4xl mb-4 group-hover:scale-110 transition-transform inline-block">
+                        {feature.icon}
+                      </div>
+                      <div className={`text-xl font-bold bg-gradient-to-r ${feature.color} bg-clip-text text-transparent mb-1`}>
+                        {feature.title}
+                      </div>
+                      <div className="text-sm text-white/50 font-medium">
+                        {feature.desc}
+                      </div>
+                    </div>
+                  </FadeIn>
+                ))}
+              </div>
             </div>
           </div>
         </div>

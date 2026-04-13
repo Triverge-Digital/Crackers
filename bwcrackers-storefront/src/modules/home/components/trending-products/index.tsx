@@ -10,19 +10,23 @@ interface TrendingProductsProps {
 
 export function TrendingProducts({ collections, region }: TrendingProductsProps) {
   return (
-    <section className="py-16 bg-gradient-to-br from-green-400 via-teal-400 to-blue-500 relative overflow-hidden">
-      <div className="absolute inset-0 bg-white/10"></div>
+    <section className="py-24 celebration-bg relative overflow-hidden">
+      {/* Background glow effects */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] bg-brand-gold-400/5 rounded-full blur-[120px] pointer-events-none"></div>
+      
       <div className="container mx-auto px-4 relative">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-orange-500 px-6 py-3 rounded-full mb-4 shadow-lg border-2 border-white">
-            <Flame className="h-5 w-5 text-white fill-white" />
-            <span className="text-sm font-semibold text-white">🔥 Hot Picks 🔥</span>
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-3 glass-gold px-6 py-2 rounded-full mb-6 border border-brand-gold-400/20 shadow-glow-gold animate-sparkle">
+            <Flame className="h-5 w-5 text-brand-gold-400 fill-brand-gold-400" />
+            <span className="text-display text-brand-gold-200">The Season&apos;s Favorites</span>
           </div>
-          <h2 className="text-4xl md:text-5xl text-white font-bold mb-4 drop-shadow-lg">
-            Trending Products
+          <h2 className="text-h2 text-white mb-6">
+            Trending <span className="text-gold">Firecrackers</span>
           </h2>
-          <p className="text-lg text-white/90 max-w-2xl mx-auto drop-shadow-md">
-            Check out our most popular firecrackers that are lighting up celebrations everywhere
+          <div className="h-1 w-24 bg-brand-gold-400 mx-auto rounded-full mb-6 opacity-30"></div>
+          <p className="text-xl text-white/60 max-w-2xl mx-auto font-light leading-relaxed">
+            Discover the most sought-after collections that are lighting up 
+            skies and creating memories across the nation.
           </p>
         </div>
 

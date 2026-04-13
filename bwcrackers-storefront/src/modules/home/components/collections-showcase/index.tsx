@@ -39,53 +39,58 @@ export function CollectionsShowcase({
   collections?: HttpTypes.StoreCollection[]
 }) {
   return (
-    <section className="py-16 bg-gradient-to-br from-red-500 via-orange-500 to-yellow-400 relative overflow-hidden">
-      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00eiIvPjwvZz48L2c+PC9zdmc+')] opacity-30"></div>
-      <div className="container mx-auto px-4 relative">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-white px-6 py-3 rounded-full mb-4 shadow-xl border-4 border-white/50">
-            <Sparkles className="h-5 w-5 text-orange-600" />
-            <span className="text-sm font-semibold text-orange-700">
-              Explore Categories
-            </span>
+    <section className="py-24 celebration-bg relative overflow-hidden border-t border-white/5">
+      {/* Background accents */}
+      <div className="absolute bottom-0 left-0 w-full h-[400px] bg-brand-royal-700/5 blur-[100px] pointer-events-none"></div>
+
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-3 glass-gold px-6 py-2 rounded-full mb-6 border border-brand-gold-400/20 shadow-glow-gold animate-sparkle">
+            <Sparkles className="h-5 w-5 text-brand-gold-400 fill-brand-gold-400" />
+            <span className="text-display text-brand-gold-200">Curated Galleries</span>
           </div>
-          <h2 className="text-5xl md:text-6xl text-white font-bold mb-4 drop-shadow-lg">
-            Our Collections
+          <h2 className="text-h2 text-white mb-6">
+            Bespoke <span className="text-gold italic">Collections</span>
           </h2>
-          <p className="text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
-            Browse through our curated collections of premium firecrackers for
-            every occasion
+          <p className="text-xl text-white/50 max-w-2xl mx-auto font-light leading-relaxed">
+            From majestic aerial displays to intimate family festivities, 
+            explore our world-class crackers by theme and occasion.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {defaultCollections.map((collection, index) => (
             <LocalizedClientLink
               key={index}
               href="/store"
-              className="group overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 hover:border-orange-200 rounded-2xl bg-white block"
+              className="group glass-card rounded-[2rem] overflow-hidden border border-white/5 hover:border-brand-gold-400/30 transition-all duration-500 cursor-pointer animate-fade-in-top"
+              style={{ animationDelay: `${index * 100}ms` }}
             >
-              <div className="relative h-64 overflow-hidden">
+              <div className="relative h-80 overflow-hidden">
                 <img
                   src={collection.image}
                   alt={collection.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 brightness-75 group-hover:brightness-100"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-                <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <h3 className="text-xl font-bold mb-1">{collection.name}</h3>
-                  <p className="text-sm text-gray-200 mb-3">
+                
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-brand-royal-950 via-brand-royal-950/20 to-transparent"></div>
+                
+                <div className="absolute inset-x-0 bottom-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                  <h3 className="text-2xl font-black text-white mb-2 tracking-tight group-hover:text-gold transition-colors font-serif">
+                    {collection.name}
+                  </h3>
+                  <p className="text-white/50 text-sm mb-6 font-light line-clamp-2">
                     {collection.description}
                   </p>
+                  
                   <div className="flex items-center justify-between">
-                    <span className="text-sm">
-                      {collection.itemCount} items
+                    <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">
+                      {collection.itemCount} Varieties
                     </span>
-                    <span
-                      className={`bg-gradient-to-r ${collection.color} hover:opacity-90 group-hover:translate-x-1 transition-transform px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1`}
-                    >
-                      View <ArrowRight className="h-4 w-4" />
-                    </span>
+                    <div className="h-8 w-8 rounded-full flex items-center justify-center bg-brand-gold-400 text-brand-royal-950 shadow-glow-gold hover:scale-110 transition-transform">
+                      <ArrowRight className="h-4 w-4" />
+                    </div>
                   </div>
                 </div>
               </div>

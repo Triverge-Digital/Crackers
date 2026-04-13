@@ -34,27 +34,24 @@ module.exports = {
           80: "#1F2937",
           90: "#111827",
         },
-        /* Firecracker-friendly brand palette */
+        /* Premium Celebration brand palette */
         brand: {
-          purple: {
-            700: "#7c3aed",
-            900: "#4c1d95",
+          royal: {
+            950: "#0f0724",
+            900: "#1d0e4a",
+            800: "#2d1b69",
+            700: "#4c1d95", // Original purple
           },
-          pink: {
-            500: "#ec4899",
-          },
-          orange: {
-            400: "#fb923c",
-            500: "#fb6b2b",
-          },
-          yellow: {
+          gold: {
+            200: "#fef08a",
             400: "#fbbf24",
+            500: "#eab308",
+            600: "#ca8a04",
           },
-          teal: {
-            400: "#2dd4bf",
-          },
-          green: {
-            500: "#10b981",
+          accent: {
+            pink: "#ec4899",
+            hot: "#ff0080",
+            orange: "#fb6b2b",
           },
           midnight: "#0b1220",
         },
@@ -65,7 +62,16 @@ module.exports = {
         base: "4px",
         rounded: "8px",
         large: "16px",
+        xl: "24px",
+        "2xl": "32px",
         circle: "9999px",
+      },
+      boxShadow: {
+        'gold-inner': 'inset 0 2px 4px 0 rgba(251, 191, 36, 0.06)',
+        'premium': '0 10px 40px -10px rgba(0, 0, 0, 0.5)',
+        'glow-purple': '0 0 20px rgba(124, 58, 237, 0.3)',
+        'glow-pink': '0 0 20px rgba(236, 72, 153, 0.3)',
+        'glow-gold': '0 0 20px rgba(251, 191, 36, 0.3)',
       },
       maxWidth: {
         "8xl": "100rem",
@@ -81,17 +87,19 @@ module.exports = {
       },
       fontSize: {
         "3xl": "2rem",
+        "10xl": "10rem",
       },
       fontFamily: {
         sans: [
+          "Outfit",
           "Inter",
           "-apple-system",
-          "BlinkMacSystemFont",
-          "Segoe UI",
-          "Roboto",
-          "Helvetica Neue",
-          "Ubuntu",
           "sans-serif",
+        ],
+        serif: [
+          "Playfair Display",
+          "Georgia",
+          "serif",
         ],
       },
       keyframes: {
@@ -119,16 +127,17 @@ module.exports = {
             transform: "translateY(0)",
           },
         },
-        "fade-out-top": {
-          "0%": {
-            height: "100%",
-          },
-          "99%": {
-            height: "0",
-          },
-          "100%": {
-            visibility: "hidden",
-          },
+        "float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-20px)" },
+        },
+        "sparkle": {
+          "0%, 100%": { opacity: 0.8, transform: "scale(1)" },
+          "50%": { opacity: 1, transform: "scale(1.2)" },
+        },
+        "shimmer": {
+          "0%": { backgroundPosition: "-200px 0" },
+          "100%": { backgroundPosition: "200px 0" },
         },
         "accordion-slide-up": {
           "0%": {
@@ -170,8 +179,9 @@ module.exports = {
         "fade-in-right":
           "fade-in-right 0.3s cubic-bezier(0.5, 0, 0.5, 1) forwards",
         "fade-in-top": "fade-in-top 0.2s cubic-bezier(0.5, 0, 0.5, 1) forwards",
-        "fade-out-top":
-          "fade-out-top 0.2s cubic-bezier(0.5, 0, 0.5, 1) forwards",
+        "float": "float 6s ease-in-out infinite",
+        "sparkle": "sparkle 3s ease-in-out infinite",
+        "shimmer": "shimmer 3s infinite linear",
         "accordion-open":
           "accordion-slide-down 300ms cubic-bezier(0.87, 0, 0.13, 1) forwards",
         "accordion-close":

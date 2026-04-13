@@ -19,43 +19,58 @@ const StoreTemplate = ({
   const sort = sortBy || "created_at"
 
   return (
-    <section className="py-16 bg-white min-h-screen">
-      <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 via-red-600 to-pink-600 bg-clip-text text-transparent mb-4">
-            All Products
-          </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Browse our complete collection of premium firecrackers and sparklers
+    <div className="celebration-bg min-h-screen relative overflow-hidden">
+      {/* Background glow effects */}
+      <div className="absolute top-0 right-1/4 w-[800px] h-[400px] bg-brand-gold-400/5 rounded-full blur-[150px] pointer-events-none"></div>
+
+      <div className="container mx-auto px-4 pt-44 pb-24 relative z-10">
+        {/* Cinematic Header */}
+        <div className="text-center mb-24">
+          <div className="inline-flex items-center gap-3 glass-gold px-6 py-2 rounded-full mb-8 border border-brand-gold-400/20 shadow-glow-gold animate-sparkle">
+            <span className="text-display text-brand-gold-200 tracking-[0.2em]">The Grand Catalog</span>
+          </div>
+          <h1 className="text-h1 text-white mb-8">
+            Explore <span className="text-gold italic">Pure Magic</span>
+          </h1>
+          <div className="h-1 w-24 bg-brand-gold-400 mx-auto rounded-full mb-8 opacity-30"></div>
+          <p className="text-2xl text-white/50 max-w-2xl mx-auto font-light leading-relaxed">
+            Discover a legacy of quality and a future of brilliance. Our 
+            entire collection of artisanal firecrackers, curated for your 
+            most precious moments.
           </p>
         </div>
 
         {/* Layout */}
-        <div className="flex flex-col small:flex-row gap-8">
-          {/* Sidebar */}
-          <div className="small:w-64 flex-shrink-0">
-            <div className="sticky top-24 bg-gray-50 p-6 rounded-xl border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Sort & Filter
+        <div className="flex flex-col lg:grid lg:grid-cols-[280px_1fr] gap-12 lg:gap-16 items-start">
+          {/*sidebar */}
+          <aside className="w-full lg:sticky lg:top-52 group">
+            <div className="glass-card p-8 rounded-[2rem] border border-white/10 shadow-glow-gold/5 relative overflow-hidden transition-all duration-500 hover:border-brand-gold-400/30">
+               <div className="absolute top-0 right-0 w-24 h-24 bg-brand-gold-400/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
+               
+              <h3 className="text-[10px] font-black text-brand-gold-400 uppercase tracking-[0.3em] mb-10">
+                Refine Selection
               </h3>
               <RefinementList sortBy={sort} />
             </div>
-          </div>
+          </aside>
 
           {/* Product Grid */}
           <div className="flex-1 min-w-0">
-            <Suspense fallback={<SkeletonProductGrid />}>
-              <PaginatedProducts
-                sortBy={sort}
-                page={pageNumber}
-                countryCode={countryCode}
-              />
-            </Suspense>
+            <div className="glass-card p-1 rounded-[2.5rem] border border-white/5 bg-white/[0.02] backdrop-blur-sm">
+               <div className="p-8">
+                <Suspense fallback={<SkeletonProductGrid />}>
+                  <PaginatedProducts
+                    sortBy={sort}
+                    page={pageNumber}
+                    countryCode={countryCode}
+                  />
+                </Suspense>
+               </div>
+            </div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
   )
 }
 

@@ -40,19 +40,36 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       })
   }
 
-  // TODO: Update this to grab the actual max inventory
   const maxQtyFromInventory = 10
   const maxQuantity = item.variant?.manage_inventory ? 10 : maxQtyFromInventory
 
+  if (type === "preview") {
+    return (
+      <div className="flex items-center gap-x-4 py-2 group">
+        <div className="w-12 h-12 glass-card rounded-xl overflow-hidden border border-white/5 relative">
+          <Thumbnail
+            thumbnail={item.thumbnail}
+            images={item.variant?.product?.images}
+            size="square"
+          />
+        </div>
+        <div className="flex flex-col flex-1 gap-y-1">
+          <span className="text-white text-xs font-bold truncate group-hover:text-gold transition-colors">{item.product_title}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-[9px] text-white/30 uppercase font-bold tracking-widest">{item.quantity}x</span>
+            <LineItemPrice item={item} style="tight" currencyCode={currencyCode} className="text-gold font-bold text-[10px]" />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <Table.Row className="w-full" data-testid="product-row">
-      <Table.Cell className="!pl-0 p-4 w-24">
+    <div className="grid grid-cols-[1fr_80px_100px_120px] gap-6 items-center group relative overflow-hidden" data-testid="product-row">
+      <div className="flex items-center gap-x-6">
         <LocalizedClientLink
           href={`/products/${item.product_handle}`}
-          className={clx("flex", {
-            "w-16": type === "preview",
-            "small:w-24 w-12": type === "full",
-          })}
+          className="w-20 h-20 glass-card rounded-2xl overflow-hidden border border-white/5 relative shrink-0"
         >
           <Thumbnail
             thumbnail={item.thumbnail}
@@ -60,84 +77,66 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
             size="square"
           />
         </LocalizedClientLink>
-      </Table.Cell>
+        <div className="flex flex-col gap-y-1 overflow-hidden">
+          <h3 className="text-white font-black text-sm tracking-tight truncate group-hover:text-gold transition-colors">
+            {item.product_title}
+          </h3>
+          <LineItemOptions variant={item.variant} className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-black" data-testid="product-variant" />
+          <DeleteButton 
+            id={item.id} 
+            className="text-[9px] text-white/10 hover:text-brand-accent-hot transition-colors uppercase font-black tracking-widest mt-2 block w-fit" 
+            data-testid="product-delete-button" 
+          >
+            Relinquish
+          </DeleteButton>
+        </div>
+      </div>
 
-      <Table.Cell className="text-left">
-        <Text
-          className="txt-medium-plus text-ui-fg-base"
-          data-testid="product-title"
-        >
-          {item.product_title}
-        </Text>
-        <LineItemOptions variant={item.variant} data-testid="product-variant" />
-      </Table.Cell>
-
-      {type === "full" && (
-        <Table.Cell>
-          <div className="flex gap-2 items-center w-28">
-            <DeleteButton id={item.id} data-testid="product-delete-button" />
-            <CartItemSelect
-              value={item.quantity}
-              onChange={(value) => changeQuantity(parseInt(value.target.value))}
-              className="w-14 h-10 p-4"
-              data-testid="product-select-button"
-            >
-              {/* TODO: Update this with the v2 way of managing inventory */}
-              {Array.from(
-                {
-                  length: Math.min(maxQuantity, 10),
-                },
-                (_, i) => (
-                  <option value={i + 1} key={i}>
-                    {i + 1}
-                  </option>
-                )
-              )}
-
-              <option value={1} key={1}>
-                1
+      <div className="flex justify-center">
+        <div className="relative">
+          <CartItemSelect
+            value={item.quantity}
+            onChange={(value) => changeQuantity(parseInt(value.target.value))}
+            className="w-14 h-10 bg-white/5 border border-white/10 rounded-xl text-white font-bold text-center appearance-none cursor-pointer hover:border-brand-gold-400/50 transition-colors"
+            data-testid="product-select-button"
+          >
+            {Array.from({ length: Math.min(maxQuantity, 10) }, (_, i) => (
+              <option value={i + 1} key={i}>
+                {i + 1}
               </option>
-            </CartItemSelect>
-            {updating && <Spinner />}
-          </div>
-          <ErrorMessage error={error} data-testid="product-error-message" />
-        </Table.Cell>
-      )}
-
-      {type === "full" && (
-        <Table.Cell className="hidden small:table-cell">
-          <LineItemUnitPrice
-            item={item}
-            style="tight"
-            currencyCode={currencyCode}
-          />
-        </Table.Cell>
-      )}
-
-      <Table.Cell className="!pr-0">
-        <span
-          className={clx("!pr-0", {
-            "flex flex-col items-end h-full justify-center": type === "preview",
-          })}
-        >
-          {type === "preview" && (
-            <span className="flex gap-x-1 ">
-              <Text className="text-ui-fg-muted">{item.quantity}x </Text>
-              <LineItemUnitPrice
-                item={item}
-                style="tight"
-                currencyCode={currencyCode}
-              />
-            </span>
+            ))}
+          </CartItemSelect>
+          {updating && (
+            <div className="absolute inset-0 flex items-center justify-center bg-brand-royal-950/50 rounded-xl backdrop-blur-sm">
+              <Spinner className="w-4 h-4 text-brand-gold-400" />
+            </div>
           )}
-          <LineItemPrice
-            item={item}
-            style="tight"
-            currencyCode={currencyCode}
-          />
-        </span>
-      </Table.Cell>
-    </Table.Row>
+        </div>
+      </div>
+
+      <div className="hidden small:flex justify-center text-white/30 text-xs font-bold">
+        <LineItemUnitPrice
+          item={item}
+          style="tight"
+          currencyCode={currencyCode}
+        />
+      </div>
+
+      <div className="text-right">
+        <LineItemPrice
+          item={item}
+          style="tight"
+          currencyCode={currencyCode}
+          className="text-gold font-black text-lg tracking-tighter"
+        />
+      </div>
+      
+      {error && (
+        <div className="col-span-4 mt-2">
+          <ErrorMessage error={error} data-testid="product-error-message" />
+        </div>
+      )}
+    </div>
   )
 }
 

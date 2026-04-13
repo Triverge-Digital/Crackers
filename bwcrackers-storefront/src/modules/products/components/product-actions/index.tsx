@@ -161,25 +161,27 @@ export default function ProductActions({
 
         <ProductPrice product={product} variant={selectedVariant} />
 
-        <Button
-          onClick={handleAddToCart}
-          disabled={
-            !inStock ||
-            !selectedVariant ||
-            !!disabled ||
-            isAdding ||
-            !isValidVariant
-          }
-          className="accent-btn w-full h-12 font-bold text-lg"
-          isLoading={isAdding}
-          data-testid="add-product-button"
-        >
-          {!selectedVariant && !options
-            ? "Select Options"
-            : !inStock || !isValidVariant
-            ? "Out of Stock"
-            : "🛒 Add to Cart"}
-        </Button>
+        <div className="pt-4">
+          <Button
+            onClick={handleAddToCart}
+            disabled={
+              !inStock ||
+              !selectedVariant ||
+              !!disabled ||
+              isAdding ||
+              !isValidVariant
+            }
+            className="premium-btn w-full h-16 text-xl tracking-[0.2em]"
+            isLoading={isAdding}
+            data-testid="add-product-button"
+          >
+            {!selectedVariant && !options
+              ? "Specify Preferences"
+              : !inStock || !isValidVariant
+              ? "Sold Out"
+              : "Acquire Now"}
+          </Button>
+        </div>
         <MobileActions
           product={product}
           variant={selectedVariant}
