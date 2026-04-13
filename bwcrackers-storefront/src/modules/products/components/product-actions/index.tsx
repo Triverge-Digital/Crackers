@@ -6,10 +6,10 @@ import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
 import Divider from "@modules/common/components/divider"
 import OptionSelect from "@modules/products/components/product-actions/option-select"
-import { ShoppingCart, Check } from "lucide-react"
+import { ShoppingCart, Check, Minus, Plus } from "lucide-react"
 import { isEqual } from "lodash"
 import { useParams, usePathname, useSearchParams } from "next/navigation"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState, useTransition } from "react"
 import ProductPrice from "../product-price"
 import MobileActions from "./mobile-actions"
 import { useRouter } from "next/navigation"
@@ -40,7 +40,9 @@ export default function ProductActions({
   const [options, setOptions] = useState<Record<string, string | undefined>>({})
   const [isAdding, setIsAdding] = useState(false)
   const [justAdded, setJustAdded] = useState(false)
+  const [quantity, setQuantity] = useState(1)
   const countryCode = useParams().countryCode as string
+  const addedTimerRef = useRef<NodeJS.Timeout>()
 
   // If there is only 1 variant, preselect the options
   useEffect(() => {
@@ -96,47 +98,53 @@ export default function ProductActions({
 
   // check if the selected variant is in stock
   const inStock = useMemo(() => {
-    // If we don't manage inventory, we can always add to cart
     if (selectedVariant && !selectedVariant.manage_inventory) {
       return true
     }
-
-    // If we allow back orders on the variant, we can add to cart
     if (selectedVariant?.allow_backorder) {
       return true
     }
-
-    // If there is inventory available, we can add to cart
     if (
       selectedVariant?.manage_inventory &&
       (selectedVariant?.inventory_quantity || 0) > 0
     ) {
       return true
     }
-
-    // Otherwise, we can't add to cart
     return false
   }, [selectedVariant])
 
-  const actionsRef = useRef<HTMLDivElement>(null)
+  const maxQuantity = useMemo(() => {
+    if (!selectedVariant?.manage_inventory) return 10
+    return Math.min(selectedVariant?.inventory_quantity || 10, 10)
+  }, [selectedVariant])
 
+  const actionsRef = useRef<HTMLDivElement>(null)
   const inView = useIntersection(actionsRef, "0px")
 
-  // add the selected variant to the cart
-  const handleAddToCart = async () => {
-    if (!selectedVariant?.id) return null
+  // add the selected variant to the cart - optimistic, fire-and-forget
+  const handleAddToCart = () => {
+    if (!selectedVariant?.id) return
 
+    // Instant UI feedback
+    setJustAdded(true)
     setIsAdding(true)
 
-    await addToCart({
+    if (addedTimerRef.current) clearTimeout(addedTimerRef.current)
+    addedTimerRef.current = setTimeout(() => setJustAdded(false), 2500)
+
+    // Fire API call in background - don't block UI
+    addToCart({
       variantId: selectedVariant.id,
-      quantity: 1,
+      quantity,
       countryCode,
     })
-
-    setIsAdding(false)
-    setJustAdded(true)
-    setTimeout(() => setJustAdded(false), 2000)
+      .catch(() => {
+        // Revert on error
+        setJustAdded(false)
+      })
+      .finally(() => {
+        setIsAdding(false)
+      })
   }
 
   return (
@@ -165,14 +173,52 @@ export default function ProductActions({
 
         <ProductPrice product={product} variant={selectedVariant} />
 
-        <div className="pt-4">
+        {/* Quantity Selector */}
+        <div className="pt-2">
+          <label className="text-[10px] text-white/40 font-black uppercase tracking-[0.25em] block mb-3 ml-1">
+            Quantity
+          </label>
+          <div className="inline-flex items-center border border-white/10 rounded-2xl overflow-hidden bg-white/5 hover:border-brand-gold-400/30 transition-colors">
+            <button
+              type="button"
+              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+              disabled={quantity <= 1}
+              className="h-12 w-12 flex items-center justify-center text-white/50 hover:text-brand-gold-400 hover:bg-white/5 transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+              aria-label="Decrease quantity"
+            >
+              <Minus className="h-4 w-4" />
+            </button>
+            <input
+              type="text"
+              inputMode="numeric"
+              value={quantity}
+              onChange={(e) => {
+                const num = parseInt(e.target.value)
+                if (!isNaN(num) && num >= 1 && num <= maxQuantity) {
+                  setQuantity(num)
+                }
+              }}
+              className="h-12 w-14 bg-transparent text-white font-bold text-center text-base border-x border-white/10 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+            <button
+              type="button"
+              onClick={() => setQuantity((q) => Math.min(maxQuantity, q + 1))}
+              disabled={quantity >= maxQuantity}
+              className="h-12 w-12 flex items-center justify-center text-white/50 hover:text-brand-gold-400 hover:bg-white/5 transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+              aria-label="Increase quantity"
+            >
+              <Plus className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+
+        <div className="pt-2">
           <Button
             onClick={handleAddToCart}
             disabled={
               !inStock ||
               !selectedVariant ||
               !!disabled ||
-              isAdding ||
               !isValidVariant
             }
             className={`w-full h-16 text-lg tracking-[0.15em] font-black uppercase transition-all duration-300 ${
@@ -180,7 +226,6 @@ export default function ProductActions({
                 ? "!bg-emerald-500 !text-white !shadow-[0_0_20px_rgba(16,185,129,0.4)]"
                 : "premium-btn"
             }`}
-            isLoading={isAdding}
             data-testid="add-product-button"
           >
             {!selectedVariant && !options ? (

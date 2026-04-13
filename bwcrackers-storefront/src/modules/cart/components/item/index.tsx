@@ -23,20 +23,26 @@ type ItemProps = {
 const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
   const [updating, setUpdating] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [optimisticQty, setOptimisticQty] = useState<number | null>(null)
 
-  const changeQuantity = async (quantity: number) => {
+  const displayQty = optimisticQty ?? item.quantity
+
+  const changeQuantity = (quantity: number) => {
     setError(null)
+    setOptimisticQty(quantity)
     setUpdating(true)
 
-    await updateLineItem({
+    updateLineItem({
       lineId: item.id,
       quantity,
     })
       .catch((err) => {
         setError(err.message)
+        setOptimisticQty(null) // revert on error
       })
       .finally(() => {
         setUpdating(false)
+        setOptimisticQty(null)
       })
   }
 
@@ -95,7 +101,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       <div className="flex justify-center">
         <div className="relative">
           <CartItemSelect
-            value={item.quantity}
+            value={displayQty}
             onChange={(qty) => changeQuantity(qty)}
             max={Math.min(maxQuantity, 10)}
             disabled={updating}
