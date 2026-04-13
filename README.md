@@ -324,3 +324,6 @@ net start postgresql-x64-15
 | Database    | PostgreSQL                       |
 | Storefront  | Next.js 15, React 19, Tailwind  |
 | Admin Panel | Medusa Admin (built-in)          |
+
+
+Build & push locally: docker build -t haridev111/bwcrackers-api:latest . && docker push haridev111/bwcrackers-api:latest
