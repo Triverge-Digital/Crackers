@@ -96,16 +96,10 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
         <div className="relative">
           <CartItemSelect
             value={item.quantity}
-            onChange={(value) => changeQuantity(parseInt(value.target.value))}
-            className="w-14 h-10 bg-white/5 border border-white/10 rounded-xl text-white font-bold text-center appearance-none cursor-pointer hover:border-brand-gold-400/50 transition-colors"
-            data-testid="product-select-button"
-          >
-            {Array.from({ length: Math.min(maxQuantity, 10) }, (_, i) => (
-              <option value={i + 1} key={i}>
-                {i + 1}
-              </option>
-            ))}
-          </CartItemSelect>
+            onChange={(qty) => changeQuantity(qty)}
+            max={Math.min(maxQuantity, 10)}
+            disabled={updating}
+          />
           {updating && (
             <div className="absolute inset-0 flex items-center justify-center bg-brand-royal-950/50 rounded-xl backdrop-blur-sm">
               <Spinner className="w-4 h-4 text-brand-gold-400" />

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { HttpTypes } from "@medusajs/types"
-import { convertToLocale } from "@lib/util/money"
+import { Send, Phone, MapPin, Mail, User, FileText, Map, Hash, Check } from "lucide-react"
 
 type PlaceOrderFormProps = {
   cart: HttpTypes.StoreCart
@@ -101,204 +101,228 @@ const PlaceOrderForm = ({ cart }: PlaceOrderFormProps) => {
   if (submitted) {
     return (
       <div className="text-center py-12">
-        <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-green-100 flex items-center justify-center">
-          <svg
-            className="w-10 h-10 text-green-600"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
+        <div className="w-20 h-20 mx-auto mb-8 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center">
+          <Check className="w-10 h-10 text-emerald-400" />
         </div>
-        <h3 className="text-2xl font-bold text-gray-900 mb-2">
+        <h3 className="text-2xl font-black text-white mb-3 font-serif">
           Order Placed Successfully!
         </h3>
-        <p className="text-gray-600 mb-2">
-          Thank you, <span className="font-semibold">{formData.customer_name}</span>!
+        <p className="text-white/60 mb-2">
+          Thank you, <span className="text-gold font-bold">{formData.customer_name}</span>!
         </p>
-        <p className="text-gray-500 text-sm max-w-md mx-auto">
+        <p className="text-white/40 text-sm max-w-md mx-auto leading-relaxed">
           We have received your order. Our team will contact you at{" "}
-          <span className="font-semibold">+91 {formData.phone}</span> to confirm
+          <span className="text-brand-gold-400 font-bold">+91 {formData.phone}</span> to confirm
           your order and arrange delivery.
         </p>
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg max-w-sm mx-auto">
-          <p className="text-sm text-blue-800">
-            No payment has been charged. Payment will be collected upon delivery
-            or as agreed with our team.
+        <div className="mt-8 p-5 glass-gold border border-brand-gold-400/20 rounded-2xl max-w-sm mx-auto">
+          <p className="text-[11px] text-brand-gold-400 font-bold uppercase tracking-widest leading-relaxed">
+            No payment charged. Payment upon delivery.
           </p>
         </div>
       </div>
     )
   }
 
+  const inputClass =
+    "w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder:text-white/20 focus:outline-none focus:border-brand-gold-400/50 focus:bg-white/[0.07] transition-all duration-300 text-sm"
+  const labelClass =
+    "text-[10px] text-brand-gold-400 font-black uppercase tracking-[0.25em] block mb-2 ml-1"
+
   return (
     <div>
       {/* Info banner */}
-      <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-        <p className="text-sm text-amber-800 font-medium">
-          No online payment required. Your details will be captured and our team
-          will contact you to confirm the order and arrange delivery.
+      <div className="mb-10 p-5 glass-gold border border-brand-gold-400/20 rounded-2xl">
+        <p className="text-sm text-white/60 font-medium text-center leading-relaxed">
+          No online payment required. Our team will contact you to confirm the order and arrange delivery.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Name */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Full Name <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="customer_name"
-            value={formData.customer_name}
-            onChange={handleChange}
-            placeholder="Enter your full name"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 outline-none transition text-gray-900"
-            required
-          />
-        </div>
+      <form onSubmit={handleSubmit} className="space-y-8">
+        {/* Row 1: Name + Phone */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className={labelClass}>
+              Full Name <span className="text-brand-accent-hot">*</span>
+            </label>
+            <div className="relative group">
+              <input
+                type="text"
+                name="customer_name"
+                value={formData.customer_name}
+                onChange={handleChange}
+                placeholder="Enter your full name"
+                className={inputClass}
+                required
+              />
+              <div className="absolute right-5 top-1/2 -translate-y-1/2 text-white/10 group-focus-within:text-brand-gold-400/30 transition-colors">
+                <User size={16} />
+              </div>
+            </div>
+          </div>
 
-        {/* Phone */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Phone Number <span className="text-red-500">*</span>
-          </label>
-          <div className="flex">
-            <span className="inline-flex items-center px-4 py-3 bg-gray-100 border border-r-0 border-gray-300 rounded-l-lg text-gray-600 font-medium text-sm">
-              +91
-            </span>
-            <input
-              type="tel"
-              name="phone"
-              value={formData.phone}
-              onChange={(e) => {
-                const val = e.target.value.replace(/\D/g, "").slice(0, 10)
-                setFormData((prev) => ({ ...prev, phone: val }))
-                setError("")
-              }}
-              placeholder="10-digit mobile number"
-              className="flex-1 px-4 py-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 outline-none transition text-gray-900"
-              maxLength={10}
-              required
-            />
+          <div>
+            <label className={labelClass}>
+              Phone Number <span className="text-brand-accent-hot">*</span>
+            </label>
+            <div className="relative group">
+              <div className="flex">
+                <span className="inline-flex items-center px-4 py-4 bg-white/5 border border-r-0 border-white/10 rounded-l-2xl text-white/40 font-bold text-sm">
+                  +91
+                </span>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, "").slice(0, 10)
+                    setFormData((prev) => ({ ...prev, phone: val }))
+                    setError("")
+                  }}
+                  placeholder="10-digit mobile"
+                  className={`${inputClass} !rounded-l-none`}
+                  maxLength={10}
+                  required
+                />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Email */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Email
-          </label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="your@email.com (optional)"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 outline-none transition text-gray-900"
-          />
-        </div>
-
-        {/* Address */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Delivery Address
-          </label>
-          <input
-            type="text"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-            placeholder="Street address, landmark"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 outline-none transition text-gray-900"
-          />
-        </div>
-
-        {/* City, State, Pincode */}
-        <div className="grid grid-cols-3 gap-3">
+        {/* Row 2: Email + Address */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              City
-            </label>
-            <input
-              type="text"
-              name="city"
-              value={formData.city}
-              onChange={handleChange}
-              placeholder="City"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 outline-none transition text-gray-900"
-            />
+            <label className={labelClass}>Email</label>
+            <div className="relative group">
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="your@email.com (optional)"
+                className={inputClass}
+              />
+              <div className="absolute right-5 top-1/2 -translate-y-1/2 text-white/10 group-focus-within:text-brand-gold-400/30 transition-colors">
+                <Mail size={16} />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label className={labelClass}>Delivery Address</label>
+            <div className="relative group">
+              <input
+                type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                placeholder="Street address, landmark"
+                className={inputClass}
+              />
+              <div className="absolute right-5 top-1/2 -translate-y-1/2 text-white/10 group-focus-within:text-brand-gold-400/30 transition-colors">
+                <MapPin size={16} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Row 3: City, State, Pincode */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div>
+            <label className={labelClass}>City</label>
+            <div className="relative group">
+              <input
+                type="text"
+                name="city"
+                value={formData.city}
+                onChange={handleChange}
+                placeholder="City"
+                className={inputClass}
+              />
+              <div className="absolute right-5 top-1/2 -translate-y-1/2 text-white/10 group-focus-within:text-brand-gold-400/30 transition-colors">
+                <Map size={16} />
+              </div>
+            </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              State
-            </label>
+            <label className={labelClass}>State</label>
             <input
               type="text"
               name="state"
               value={formData.state}
               onChange={handleChange}
               placeholder="State"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 outline-none transition text-gray-900"
+              className={inputClass}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Pincode
-            </label>
-            <input
-              type="text"
-              name="pincode"
-              value={formData.pincode}
-              onChange={(e) => {
-                const val = e.target.value.replace(/\D/g, "").slice(0, 6)
-                setFormData((prev) => ({ ...prev, pincode: val }))
-              }}
-              placeholder="6-digit"
-              maxLength={6}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 outline-none transition text-gray-900"
-            />
+            <label className={labelClass}>Pincode</label>
+            <div className="relative group">
+              <input
+                type="text"
+                name="pincode"
+                value={formData.pincode}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, "").slice(0, 6)
+                  setFormData((prev) => ({ ...prev, pincode: val }))
+                }}
+                placeholder="6-digit"
+                maxLength={6}
+                className={inputClass}
+              />
+              <div className="absolute right-5 top-1/2 -translate-y-1/2 text-white/10 group-focus-within:text-brand-gold-400/30 transition-colors">
+                <Hash size={16} />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Notes */}
+        {/* Row 4: Notes */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Notes / Special Requests
-          </label>
-          <textarea
-            name="notes"
-            value={formData.notes}
-            onChange={handleChange}
-            placeholder="Any special requests for your order..."
-            rows={3}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 outline-none transition resize-none text-gray-900"
-          />
+          <label className={labelClass}>Notes / Special Requests</label>
+          <div className="relative group">
+            <textarea
+              name="notes"
+              value={formData.notes}
+              onChange={handleChange}
+              placeholder="Any special requests for your order..."
+              rows={3}
+              className={`${inputClass} resize-none`}
+            />
+            <div className="absolute right-5 top-5 text-white/10 group-focus-within:text-brand-gold-400/30 transition-colors">
+              <FileText size={16} />
+            </div>
+          </div>
         </div>
 
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-700">{error}</p>
+          <div className="p-4 bg-brand-accent-hot/10 border border-brand-accent-hot/20 rounded-2xl">
+            <p className="text-sm text-brand-accent-hot font-medium">{error}</p>
           </div>
         )}
 
-        <button
-          type="submit"
-          disabled={submitting}
-          className="w-full py-4 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold text-lg rounded-xl shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {submitting ? "Placing Order..." : "Place Order"}
-        </button>
+        <div className="pt-4">
+          <button
+            type="submit"
+            disabled={submitting}
+            className="premium-btn w-full h-16 text-lg tracking-[0.2em] font-black uppercase group disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {submitting ? (
+              <span className="flex items-center justify-center gap-3">
+                <div className="h-5 w-5 rounded-full border-2 border-brand-royal-950/30 border-t-brand-royal-950 animate-spin" />
+                Placing Order...
+              </span>
+            ) : (
+              <span className="flex items-center justify-center gap-3">
+                Place Order
+                <Send className="h-5 w-5 transform group-hover:translate-x-1 group-hover:-translate-y-0.5 transition-transform" />
+              </span>
+            )}
+          </button>
+        </div>
 
-        <p className="text-xs text-gray-400 text-center mt-2">
-          By placing this order, you agree to be contacted by our team regarding
-          your order.
+        <p className="text-[10px] text-white/20 text-center uppercase tracking-widest font-bold">
+          By placing this order, you agree to be contacted regarding your order
         </p>
       </form>
     </div>

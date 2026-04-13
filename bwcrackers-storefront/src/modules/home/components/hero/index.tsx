@@ -26,7 +26,7 @@ export function HeroSection() {
               <div className="inline-flex items-center gap-3 glass-gold px-6 py-2 rounded-full shadow-glow-gold">
                 <span className="flex h-2 w-2 rounded-full bg-brand-gold-400 animate-ping"></span>
                 <span className="text-display text-brand-gold-200">
-                  Premium 2025 Collection Live
+                  Premium 2026 Collection Live
                 </span>
               </div>
             </FadeIn>

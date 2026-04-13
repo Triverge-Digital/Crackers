@@ -6,6 +6,7 @@ import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
 import Divider from "@modules/common/components/divider"
 import OptionSelect from "@modules/products/components/product-actions/option-select"
+import { ShoppingCart, Check } from "lucide-react"
 import { isEqual } from "lodash"
 import { useParams, usePathname, useSearchParams } from "next/navigation"
 import { useEffect, useMemo, useRef, useState } from "react"
@@ -38,6 +39,7 @@ export default function ProductActions({
 
   const [options, setOptions] = useState<Record<string, string | undefined>>({})
   const [isAdding, setIsAdding] = useState(false)
+  const [justAdded, setJustAdded] = useState(false)
   const countryCode = useParams().countryCode as string
 
   // If there is only 1 variant, preselect the options
@@ -133,6 +135,8 @@ export default function ProductActions({
     })
 
     setIsAdding(false)
+    setJustAdded(true)
+    setTimeout(() => setJustAdded(false), 2000)
   }
 
   return (
@@ -171,15 +175,29 @@ export default function ProductActions({
               isAdding ||
               !isValidVariant
             }
-            className="premium-btn w-full h-16 text-xl tracking-[0.2em]"
+            className={`w-full h-16 text-lg tracking-[0.15em] font-black uppercase transition-all duration-300 ${
+              justAdded
+                ? "!bg-emerald-500 !text-white !shadow-[0_0_20px_rgba(16,185,129,0.4)]"
+                : "premium-btn"
+            }`}
             isLoading={isAdding}
             data-testid="add-product-button"
           >
-            {!selectedVariant && !options
-              ? "Specify Preferences"
-              : !inStock || !isValidVariant
-              ? "Sold Out"
-              : "Acquire Now"}
+            {!selectedVariant && !options ? (
+              "Select Options"
+            ) : !inStock || !isValidVariant ? (
+              "Sold Out"
+            ) : justAdded ? (
+              <span className="flex items-center justify-center gap-2">
+                <Check className="h-5 w-5" />
+                Added to Cart
+              </span>
+            ) : (
+              <span className="flex items-center justify-center gap-2">
+                <ShoppingCart className="h-5 w-5" />
+                Add to Cart
+              </span>
+            )}
           </Button>
         </div>
         <MobileActions

@@ -1,72 +1,57 @@
 "use client"
 
-import { IconBadge, clx } from "@medusajs/ui"
-import {
-  SelectHTMLAttributes,
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from "react"
+import { Minus, Plus } from "lucide-react"
 
-import ChevronDown from "@modules/common/icons/chevron-down"
+type QuantityStepperProps = {
+  value: number
+  onChange: (value: number) => void
+  max?: number
+  disabled?: boolean
+}
 
-type NativeSelectProps = {
-  placeholder?: string
-  errors?: Record<string, unknown>
-  touched?: Record<string, unknown>
-} & Omit<SelectHTMLAttributes<HTMLSelectElement>, "size">
-
-const CartItemSelect = forwardRef<HTMLSelectElement, NativeSelectProps>(
-  ({ placeholder = "Select...", className, children, ...props }, ref) => {
-    const innerRef = useRef<HTMLSelectElement>(null)
-    const [isPlaceholder, setIsPlaceholder] = useState(false)
-
-    useImperativeHandle<HTMLSelectElement | null, HTMLSelectElement | null>(
-      ref,
-      () => innerRef.current
-    )
-
-    useEffect(() => {
-      if (innerRef.current && innerRef.current.value === "") {
-        setIsPlaceholder(true)
-      } else {
-        setIsPlaceholder(false)
-      }
-    }, [innerRef.current?.value])
-
-    return (
-      <div>
-        <IconBadge
-          onFocus={() => innerRef.current?.focus()}
-          onBlur={() => innerRef.current?.blur()}
-          className={clx(
-            "relative flex items-center txt-compact-small border text-ui-fg-base group",
-            className,
-            {
-              "text-ui-fg-subtle": isPlaceholder,
-            }
-          )}
-        >
-          <select
-            ref={innerRef}
-            {...props}
-            className="appearance-none bg-transparent border-none px-4 transition-colors duration-150 focus:border-gray-700 outline-none w-16 h-16 items-center justify-center"
-          >
-            <option disabled value="">
-              {placeholder}
-            </option>
-            {children}
-          </select>
-          <span className="absolute flex pointer-events-none justify-end w-8 group-hover:animate-pulse">
-            <ChevronDown />
-          </span>
-        </IconBadge>
-      </div>
-    )
-  }
-)
+const CartItemSelect = ({
+  value,
+  onChange,
+  max = 10,
+  disabled = false,
+}: QuantityStepperProps) => {
+  return (
+    <div className="flex items-center gap-0 border border-white/10 rounded-xl overflow-hidden bg-white/5 hover:border-brand-gold-400/30 transition-colors">
+      <button
+        type="button"
+        onClick={() => value > 1 && onChange(value - 1)}
+        disabled={disabled || value <= 1}
+        className="h-10 w-9 flex items-center justify-center text-white/50 hover:text-brand-gold-400 hover:bg-white/5 transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+        aria-label="Decrease quantity"
+      >
+        <Minus className="h-3.5 w-3.5" />
+      </button>
+      <input
+        type="text"
+        inputMode="numeric"
+        value={value}
+        onChange={(e) => {
+          const num = parseInt(e.target.value)
+          if (!isNaN(num) && num >= 1 && num <= max) {
+            onChange(num)
+          }
+        }}
+        disabled={disabled}
+        className="h-10 w-10 bg-transparent text-white font-bold text-center text-sm border-x border-white/10 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        data-testid="product-select-button"
+      />
+      <button
+        type="button"
+        onClick={() => value < max && onChange(value + 1)}
+        disabled={disabled || value >= max}
+        className="h-10 w-9 flex items-center justify-center text-white/50 hover:text-brand-gold-400 hover:bg-white/5 transition-all disabled:opacity-20 disabled:cursor-not-allowed"
+        aria-label="Increase quantity"
+      >
+        <Plus className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  )
+}
 
 CartItemSelect.displayName = "CartItemSelect"
 
