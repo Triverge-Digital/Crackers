@@ -1,20 +1,13 @@
-"use client"
-
 import {
   Sparkles,
-  Zap,
   Flame,
   Gift,
   PartyPopper,
 } from "lucide-react"
 import { FadeIn } from "@modules/common/components/animations"
+import { ScrollToProductsButton } from "@modules/common/components/scroll-to-products"
 
 export function FestivalBanner() {
-  const onShopNow = () => {
-    const productsSection = document.getElementById("featured-products")
-    productsSection?.scrollIntoView({ behavior: "smooth" })
-  }
-
   return (
     <section className="relative py-24 overflow-hidden celebration-bg">
       {/* Decorative gradients */}
@@ -51,21 +44,18 @@ export function FestivalBanner() {
 
               <FadeIn delay={0.6} direction="right">
                 <p className="text-xl text-white/70 mb-10 leading-relaxed font-light">
-                  Don&apos;t wait for the rush. Secure our exclusive VIP Gift Boxes 
-                  and handpicked festive combos now. Premium quality crackers 
+                  Don&apos;t wait for the rush. Secure our exclusive VIP Gift Boxes
+                  and handpicked festive combos now. Premium quality crackers
                   with guaranteed safe delivery to your doorstep.
                 </p>
               </FadeIn>
 
               <FadeIn delay={0.8} direction="right">
                 <div className="flex flex-wrap justify-center lg:justify-start gap-6">
-                  <button
-                    onClick={onShopNow}
-                    className="premium-btn text-lg px-12 py-5"
-                  >
+                  <ScrollToProductsButton className="premium-btn text-lg px-12 py-5">
                     <Sparkles size={20} className="mr-2 inline" />
                     Pre-Book Now
-                  </button>
+                  </ScrollToProductsButton>
                   <div className="flex items-center gap-4 text-white/50 font-bold uppercase tracking-widest text-sm">
                     <Flame size={18} className="text-brand-accent-orange" />
                     Limited Units Available
@@ -101,8 +91,8 @@ export function FestivalBanner() {
                     icon: "⚡",
                     color: "from-blue-400 to-indigo-600",
                   },
-                ].map((feature, i) => (
-                  <FadeIn key={feature.title} delay={0.2 * i} direction="left">
+                ].map((feature) => (
+                  <FadeIn key={feature.title} delay={0.2} direction="left">
                     <div
                       className="glass-card p-6 rounded-2xl border border-white/5 hover:border-white/20 transition-all group"
                     >

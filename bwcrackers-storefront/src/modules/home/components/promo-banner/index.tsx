@@ -1,15 +1,6 @@
-// modules/home/components/promo-banner.tsx
-'use client'
-
-import { Button } from "@medusajs/ui"
-
+import { ScrollToProductsDiv } from "@modules/common/components/scroll-to-products"
 
 export function PromoBanner() {
-  const onShopNow = () => {
-    const productsSection = document.getElementById("featured-products")
-    productsSection?.scrollIntoView({ behavior: "smooth" })
-  }
-
   return (
     <section className="py-24 celebration-bg relative overflow-hidden border-y border-white/5">
       {/* Decorative background glow */}
@@ -24,7 +15,7 @@ export function PromoBanner() {
             Celebration <span className="text-gold italic">Specials</span>
           </h2>
           <p className="text-xl text-white/50 max-w-2xl mx-auto font-light">
-            Luxury experiences shouldn&apos;t have to wait. Explore our 
+            Luxury experiences shouldn&apos;t have to wait. Explore our
             limited-time offers curated for the true connoisseur.
           </p>
         </div>
@@ -45,15 +36,14 @@ export function PromoBanner() {
               cta: "Shop The Collection",
               theme: "pink",
             },
-          ].map((promo, i) => (
-            <div
+          ].map((promo) => (
+            <ScrollToProductsDiv
               key={promo.title}
-              onClick={onShopNow}
               className="glass-card p-10 rounded-[2.5rem] border border-white/5 hover:border-brand-gold-400/30 transition-all duration-500 cursor-pointer group relative overflow-hidden"
             >
               {/* Card background accent */}
               <div className={`absolute top-0 right-0 w-32 h-32 bg-brand-${promo.theme === 'gold' ? 'gold-400' : 'accent-hot'}/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2`}></div>
-              
+
               <div className="text-5xl mb-6 transform group-hover:scale-110 transition-transform duration-500">
                 {promo.icon}
               </div>
@@ -63,15 +53,15 @@ export function PromoBanner() {
               <p className="text-white/60 text-lg mb-8 font-light">
                 {promo.desc}
               </p>
-              
+
               <div className="flex items-center gap-2 text-brand-gold-400 font-bold uppercase tracking-widest text-xs group-hover:gap-4 transition-all">
                 {promo.cta}
                 <div className="h-px w-8 bg-brand-gold-400"></div>
               </div>
-            </div>
+            </ScrollToProductsDiv>
           ))}
         </div>
       </div>
     </section>
   )
-}
+}

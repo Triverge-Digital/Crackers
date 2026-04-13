@@ -1,3 +1,4 @@
+import Image from "next/image"
 import { ArrowRight, Sparkles } from "lucide-react"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -67,10 +68,12 @@ export function CollectionsShowcase({
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <div className="relative h-80 overflow-hidden">
-                <img
+                <Image
                   src={collection.image}
                   alt={collection.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 brightness-75 group-hover:brightness-100"
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  className="object-cover group-hover:scale-110 transition-transform duration-700 brightness-75 group-hover:brightness-100"
                 />
                 
                 {/* Gradient Overlay */}

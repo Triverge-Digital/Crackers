@@ -1,5 +1,3 @@
-"use client"
-
 import { Sparkles } from "lucide-react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 

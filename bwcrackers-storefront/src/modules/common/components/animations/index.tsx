@@ -1,39 +1,70 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { useEffect, useRef, useState } from "react"
 
-export const FadeIn = ({ children, delay = 0, direction = "up" }: { children: React.ReactNode, delay?: number, direction?: "up" | "down" | "left" | "right" }) => {
-  const directions = {
-    up: { y: 20 },
-    down: { y: -20 },
-    left: { x: 20 },
-    right: { x: -20 },
+export const FadeIn = ({
+  children,
+  delay = 0,
+  direction = "up",
+  className = "",
+}: {
+  children: React.ReactNode
+  delay?: number
+  direction?: "up" | "down" | "left" | "right"
+  className?: string
+}) => {
+  const ref = useRef<HTMLDivElement>(null)
+  const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+          observer.unobserve(el)
+        }
+      },
+      { threshold: 0.1, rootMargin: "50px" }
+    )
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  const transforms: Record<string, string> = {
+    up: "translateY(20px)",
+    down: "translateY(-20px)",
+    left: "translateX(20px)",
+    right: "translateX(-20px)",
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, ...directions[direction] }}
-      whileInView={{ opacity: 1, x: 0, y: 0 }}
-      viewport={{ once: true }}
-      transition={{
-        duration: 0.8,
-        delay,
-        ease: [0.21, 0.47, 0.32, 0.98],
+    <div
+      ref={ref}
+      className={className}
+      style={{
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? "translate(0, 0)" : transforms[direction],
+        transition: `opacity 0.6s cubic-bezier(0.21, 0.47, 0.32, 0.98) ${delay}s, transform 0.6s cubic-bezier(0.21, 0.47, 0.32, 0.98) ${delay}s`,
+        willChange: isVisible ? "auto" : "opacity, transform",
       }}
     >
       {children}
-    </motion.div>
+    </div>
   )
 }
 
 export const PremiumWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
+    <div
+      style={{
+        animation: "fadeInScale 0.5s ease-out forwards",
+      }}
     >
       {children}
-    </motion.div>
+    </div>
   )
 }

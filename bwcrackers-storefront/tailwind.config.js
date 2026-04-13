@@ -91,12 +91,14 @@ module.exports = {
       },
       fontFamily: {
         sans: [
+          "var(--font-outfit)",
           "Outfit",
           "Inter",
           "-apple-system",
           "sans-serif",
         ],
         serif: [
+          "var(--font-playfair)",
           "Playfair Display",
           "Georgia",
           "serif",

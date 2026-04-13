@@ -25,6 +25,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
+    formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {
         protocol: "http",
@@ -56,6 +57,9 @@ const nextConfig = {
           ]
         : []),
     ],
+  },
+  experimental: {
+    optimizePackageImports: ["lucide-react", "@medusajs/ui", "lodash"],
   },
 }
 

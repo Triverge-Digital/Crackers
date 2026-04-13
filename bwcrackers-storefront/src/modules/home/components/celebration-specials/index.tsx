@@ -1,5 +1,3 @@
-"use client"
-
 import { Sparkles, Star } from "lucide-react"
 import { Fireworks } from "@modules/common/components/fireworks"
 import FeaturedProducts from "../featured-products"
@@ -14,7 +12,6 @@ interface CelebrationSpecialsProps {
 export function CelebrationSpecials({ collections, region }: CelebrationSpecialsProps) {
   return (
     <section className="py-32 celebration-bg relative overflow-hidden border-y border-white/5">
-      {/* Dynamic Fireworks Background - Isolated to this section */}
       {/* Atmospheric overlays */}
       <div className="absolute inset-0 bg-gradient-to-b from-brand-royal-950 via-transparent to-brand-royal-950 opacity-60 z-0"></div>
       <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(0,0,0,0.6)_100%)] z-0"></div>
@@ -50,7 +47,7 @@ export function CelebrationSpecials({ collections, region }: CelebrationSpecials
 
           <FadeIn delay={0.8}>
             <p className="text-2xl text-white/50 max-w-2xl mx-auto font-light leading-relaxed">
-              Witness the magic of our most prestigious collections. 
+              Witness the magic of our most prestigious collections.
               Handpicked to make your festivals truly majestic.
             </p>
           </FadeIn>
@@ -58,12 +55,11 @@ export function CelebrationSpecials({ collections, region }: CelebrationSpecials
 
         {/* Product Showcase */}
         <div className="relative group">
-          {/* Subtle glow behind products */}
           <div className="absolute -inset-4 bg-brand-gold-400/5 rounded-[4rem] blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-1000 -z-10"></div>
-          
+
           <FeaturedProducts collections={collections} region={region} />
         </div>
-        
+
         {/* VIP Callout */}
         <FadeIn delay={1.2}>
           <div className="mt-20 text-center">

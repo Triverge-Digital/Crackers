@@ -1,14 +1,8 @@
-"use client"
-
 import { Sparkles, ArrowRight } from "lucide-react"
 import { RealisticFlowerPot } from "@modules/common/components/flower-pot/realistic-flower-pot"
+import { ScrollToProductsButton } from "@modules/common/components/scroll-to-products"
 
 export function FullWidthPromo() {
-  const onShopNow = () => {
-    const productsSection = document.getElementById("featured-products")
-    productsSection?.scrollIntoView({ behavior: "smooth" })
-  }
-
   return (
     <section className="relative overflow-hidden py-24 celebration-bg">
       {/* Background patterns/glows */}
@@ -36,18 +30,15 @@ export function FullWidthPromo() {
           </h2>
 
           <p className="text-2xl text-white/70 mb-12 max-w-2xl font-light leading-relaxed">
-            Elevate your festivities with our hand-sourced, premium collection. 
+            Elevate your festivities with our hand-sourced, premium collection.
             Crafted for those who demand nothing but the absolute best.
           </p>
 
           <div className="flex flex-wrap gap-8 items-center">
-            <button
-              onClick={onShopNow}
-              className="premium-btn text-xl px-14 py-6"
-            >
+            <ScrollToProductsButton className="premium-btn text-xl px-14 py-6">
               Shop The Selection
               <ArrowRight className="ml-3 h-6 w-6 inline" />
-            </button>
+            </ScrollToProductsButton>
             <div className="flex -space-x-3">
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="h-12 w-12 rounded-full border-2 border-brand-royal-950 bg-brand-gold-500 flex items-center justify-center text-brand-royal-950 font-black text-xs shadow-xl">
@@ -66,7 +57,7 @@ export function FullWidthPromo() {
               { val: "80%", label: "Exclusive Discount", theme: "gold" },
               { val: "₹5,000", label: "VIP Min. Order", theme: "white" },
               { val: "Express", label: "Global Shipping", theme: "gold" },
-            ].map((stat, i) => (
+            ].map((stat) => (
               <div
                 key={stat.label}
                 className="glass-card p-8 rounded-3xl border border-white/5 group hover:border-brand-gold-400/30 transition-all duration-500"
@@ -84,4 +75,4 @@ export function FullWidthPromo() {
       </div>
     </section>
   )
-}
+}

@@ -1,5 +1,3 @@
-"use client"
-
 import { Package, Users, Star, Trophy } from "lucide-react"
 
 const stats = [

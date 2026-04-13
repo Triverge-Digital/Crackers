@@ -1,15 +1,9 @@
-"use client"
-
 import Image from "next/image"
 import { Zap } from "lucide-react"
 import { FadeIn } from "@modules/common/components/animations"
+import { ScrollToProductsButton } from "@modules/common/components/scroll-to-products"
 
 export function HeroSection() {
-  const onShopNow = () => {
-    const productsSection = document.getElementById("featured-products")
-    productsSection?.scrollIntoView({ behavior: "smooth" })
-  }
-
   return (
     <section className="relative min-h-[90vh] md:min-h-screen flex items-center overflow-hidden celebration-bg">
       {/* Background Image with Overlay */}
@@ -49,26 +43,20 @@ export function HeroSection() {
 
             <FadeIn delay={0.6}>
               <p className="text-xl md:text-2xl text-white/80 max-w-2xl leading-relaxed font-light">
-                Experience the pinnacle of pyrotechnics with B&W Crackers. 
-                Sourced from the heart of Sivakasi, crafted for your most 
+                Experience the pinnacle of pyrotechnics with B&W Crackers.
+                Sourced from the heart of Sivakasi, crafted for your most
                 precious moments.
               </p>
             </FadeIn>
 
             <FadeIn delay={0.8}>
               <div className="flex flex-wrap gap-6 pt-4">
-                <button
-                  onClick={onShopNow}
-                  className="premium-btn text-lg px-12 py-5"
-                >
+                <ScrollToProductsButton className="premium-btn text-lg px-12 py-5">
                   Explore Pricelist
-                </button>
-                <button
-                  onClick={onShopNow}
-                  className="ghost-gold text-lg px-10 py-5 rounded-full font-bold transition-all"
-                >
+                </ScrollToProductsButton>
+                <ScrollToProductsButton className="ghost-gold text-lg px-10 py-5 rounded-full font-bold transition-all">
                   View Combos
-                </button>
+                </ScrollToProductsButton>
               </div>
             </FadeIn>
 

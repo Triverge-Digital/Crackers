@@ -1,3 +1,4 @@
+import Image from "next/image"
 import { FadeIn } from "@modules/common/components/animations"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
@@ -63,10 +64,12 @@ export function ImageGallery() {
                  {/* Card Container */}
                 <div className="glass-card rounded-[2.5rem] overflow-hidden border-white/10 group-hover:border-brand-gold-400/40 transition-all duration-700 shadow-2xl relative">
                   <div className="aspect-[4/5] relative overflow-hidden">
-                    <img
+                    <Image
                       src={image.url}
                       alt={image.title}
-                      className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-1000 grayscale-[20%] group-hover:grayscale-0"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      className="object-cover transform group-hover:scale-110 transition-transform duration-1000 grayscale-[20%] group-hover:grayscale-0"
                     />
                     {/* Golden Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-brand-royal-950 via-brand-royal-950/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-700"></div>
