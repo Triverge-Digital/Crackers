@@ -20,7 +20,6 @@ import {
   Star,
   X,
   Home,
-  Package,
   Instagram,
   Facebook,
   Mail,
@@ -139,13 +138,7 @@ export default function App() {
       <header className="bg-gradient-to-r from-[#1A1A4E] to-[#2D1B6B] text-white py-3 px-4 sticky top-[32px] z-50 shadow-lg border-b border-white/10">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveView('home')}>
-            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center p-1" style={{ boxShadow: '0 0 15px rgba(255,255,255,0.5)' }}>
-               <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
-            </div>
-            <div className="hidden sm:flex flex-col">
-              <span className="text-xl font-black italic tracking-tighter leading-none">BW CRACKERS</span>
-              <span className="text-[10px] text-brand-gold uppercase tracking-widest font-extrabold text-amber-400">Official Store</span>
-            </div>
+            <img src="/logo.png" alt="B&W Crackers" className="h-12 md:h-14 w-auto object-contain drop-shadow-lg" />
           </div>
 
           <nav className="hidden lg:flex items-center gap-8">
@@ -301,29 +294,35 @@ export default function App() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-20">
                     {pricelist.slice(0, 6).map((cat, idx) => (
-                      <motion.div 
-                        key={idx} 
+                      <motion.div
+                        key={idx}
                         whileHover={{ scale: 1.05 }}
-                        className="relative flex flex-col items-center cursor-default group"
+                        onClick={() => { setSelectedCategory(cat.id); setActiveView('order'); }}
+                        className="relative flex flex-col items-center cursor-pointer group"
                       >
                         <div className="absolute -right-6 top-0 z-20 bg-brand-gold text-brand-purple p-3 rounded-2xl shadow-xl border-2 border-white rotate-12 flex flex-col items-center font-black scale-75 group-hover:scale-100 transition-transform">
-                          <span className="text-[8px] uppercase">Pricelist</span>
-                          <span className="text-base uppercase leading-none">Download</span>
+                          <span className="text-[8px] uppercase">{cat.products.length}</span>
+                          <span className="text-base uppercase leading-none">Items</span>
                         </div>
                         <div className="absolute -left-2 bottom-1/4 z-20 bg-red-600 text-white px-3 py-1 rounded-lg shadow-xl border-2 border-white -rotate-12 flex items-center font-black scale-75 group-hover:scale-100 transition-transform">
-                          <span className="text-[10px] uppercase italic">Estimate Now!</span>
+                          <span className="text-[10px] uppercase italic">Shop Now!</span>
                         </div>
                         <div className="ornate-frame w-72 h-72 md:w-80 md:h-80 shadow-2xl">
                           <div className="ornate-frame-inner">
-                            <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center group-hover:bg-brand-magenta/20 transition-colors">
-                               <Package size={80} className="text-white opacity-40" />
+                            <div className="w-full h-full rounded-full overflow-hidden">
+                               <img
+                                 src={cat.products[0]?.image || FALLBACK_IMG}
+                                 alt={cat.name}
+                                 onError={(e) => { e.currentTarget.src = FALLBACK_IMG; }}
+                                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                               />
                             </div>
                           </div>
                         </div>
                         <div className="mt-8 text-center flex flex-col items-center">
                            <h3 className="font-black text-2xl uppercase tracking-tighter text-brand-magenta group-hover:scale-110 transition-transform">{cat.name}</h3>
                            <p className="text-[10px] text-gray-400 font-bold uppercase mt-2 max-w-[200px] leading-tight">
-                              Ignite the night with enchanting {cat.name.toLowerCase()} that paint the sky.
+                              {cat.products.length} varieties starting from ₹{Math.min(...cat.products.map(p => p.discountPrice))}
                            </p>
                         </div>
                       </motion.div>
@@ -462,12 +461,7 @@ export default function App() {
                   {/* Brand Block */}
                   <div className="flex flex-col">
                      <div className="flex items-center gap-3 mb-6">
-                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center p-1 shadow-glow">
-                           <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" />
-                        </div>
-                        <div className="flex flex-col">
-                           <span className="text-2xl font-black italic tracking-tighter leading-none">B&W CRACKERS</span>
-                        </div>
+                        <img src="/logo.png" alt="B&W Crackers" className="h-16 w-auto object-contain drop-shadow-lg" />
                      </div>
                      <p className="text-gray-400 font-bold text-sm leading-relaxed mb-8">
                         Crafting celestial moments since 2010. We bring the magic of the stars to your celebrations with premium quality fireworks from Sivakasi.
