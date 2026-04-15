@@ -14,7 +14,7 @@ export default async function Nav() {
         <nav className="flex items-center justify-between gap-6 h-16 md:h-24">
           <div className="flex items-center gap-8">
             <SideMenu regions={regions} />
-            
+
             <LocalizedClientLink
               href="/"
               className="group flex flex-col items-start"
@@ -45,13 +45,13 @@ export default async function Nav() {
             ))}
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <Suspense
               fallback={
                 <div className="h-10 w-10 rounded-full bg-brand-cloud animate-pulse" />
               }
             >
-                <CartButton />
+              <CartButton />
             </Suspense>
           </div>
         </nav>

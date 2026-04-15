@@ -1,10 +1,10 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Download, 
-  Search, 
-  ChevronDown, 
-  Percent, 
+import {
+  Download,
+  Search,
+  ChevronDown,
+  Percent,
   Phone,
   MessageCircle,
   Plus,
@@ -24,9 +24,14 @@ import {
   Instagram,
   Facebook,
   Mail,
-  MapPin
+  MapPin,
+  User,
+  Send,
+  Check,
+  Trash2,
+  ArrowLeft
 } from 'lucide-react';
-import { pricelist } from './data/pricelist';
+import { pricelist, Product } from './data/pricelist';
 
 const POSTERS = [
   "/banner1.png",
@@ -148,22 +153,35 @@ export default function App() {
             <button onClick={() => setActiveView('order')} className={`text-xs font-black uppercase tracking-widest hover:text-brand-gold transition-colors ${activeView === 'order' ? 'text-brand-gold' : 'text-white/70'}`}>Store</button>
             <button onClick={() => { setActiveView('home'); setTimeout(() => document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="text-xs font-black uppercase tracking-widest text-white/70 hover:text-brand-gold transition-colors">Collections</button>
             <button onClick={() => { setActiveView('home'); setTimeout(() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="text-xs font-black uppercase tracking-widest text-white/70 hover:text-brand-gold transition-colors">About</button>
-            <button onClick={() => setActiveView('order')} className="text-xs font-black uppercase tracking-widest text-white/70 hover:text-brand-gold transition-colors">Cart</button>
           </nav>
-          
-          <button 
-            onClick={() => setActiveView(activeView === 'home' ? 'order' : 'home')}
-            className="bg-red-600 px-4 py-2 rounded-xl shadow-lg font-black text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-red-700 transition-all active:scale-95"
-          >
-            {activeView === 'home' ? <Download size={18} /> : <Home size={18} />}
-            {activeView === 'home' ? 'Pricelist' : 'Home'}
-          </button>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setActiveView('cart')}
+              className="relative bg-white/10 hover:bg-white/20 p-2.5 rounded-xl transition-all active:scale-95"
+              aria-label="Cart"
+            >
+              <ShoppingCart size={20} className="text-white" />
+              {totals.count > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-brand-magenta text-[10px] font-black text-white shadow-lg border-2 border-[#1A1A4E]">
+                  {totals.count}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setActiveView(activeView === 'home' ? 'order' : 'home')}
+              className="bg-red-600 px-4 py-2 rounded-xl shadow-lg font-black text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-red-700 transition-all active:scale-95"
+            >
+              {activeView === 'home' ? <Download size={18} /> : <Home size={18} />}
+              {activeView === 'home' ? 'Pricelist' : 'Home'}
+            </button>
+          </div>
         </div>
       </header>
 
       <AnimatePresence mode="wait">
-        {activeView === 'home' ? (
-          <motion.div 
+        {activeView === 'home' && (
+          <motion.div
             key="home"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -475,7 +493,7 @@ export default function App() {
                         <li><button onClick={() => setActiveView('order')} className="hover:text-white transition-colors">Store</button></li>
                         <li><a href="#" className="hover:text-white transition-colors">Collections</a></li>
                         <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-                        <li><button onClick={() => setActiveView('order')} className="hover:text-white transition-colors">Cart</button></li>
+                        <li><button onClick={() => setActiveView('cart')} className="hover:text-white transition-colors">Cart</button></li>
                      </ul>
                   </div>
 
@@ -539,8 +557,9 @@ export default function App() {
                </div>
             </footer>
             </motion.div>
-        ) : (
-          <motion.div 
+        )}
+        {activeView === 'order' && (
+          <motion.div
             key="order"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -736,7 +755,373 @@ export default function App() {
             </div>
           </motion.div>
         )}
+        {activeView === 'cart' && (
+          <motion.div
+            key="cart"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="max-w-5xl mx-auto w-full min-h-screen p-4 md:p-8 pb-40"
+          >
+            {/* Cart Header */}
+            <div className="flex items-center gap-4 mb-8">
+              <button
+                onClick={() => setActiveView('order')}
+                className="w-10 h-10 rounded-xl bg-white border border-gray-100 flex items-center justify-center hover:bg-gray-50 transition-colors shadow-sm"
+              >
+                <ArrowLeft size={18} className="text-gray-600" />
+              </button>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-black text-brand-purple uppercase tracking-tighter">Your Cart</h1>
+                <p className="text-xs text-gray-400 font-bold">{totals.count} item{totals.count !== 1 ? 's' : ''} in your cart</p>
+              </div>
+            </div>
+
+            {totals.count === 0 ? (
+              <div className="text-center py-20">
+                <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gray-100 flex items-center justify-center">
+                  <ShoppingCart size={40} className="text-gray-300" />
+                </div>
+                <h2 className="text-xl font-black text-brand-purple mb-2">Your Cart is Empty</h2>
+                <p className="text-gray-400 text-sm mb-6">Browse our collection to add items</p>
+                <button
+                  onClick={() => setActiveView('order')}
+                  className="bg-brand-magenta text-white px-6 py-3 rounded-xl font-black text-sm uppercase tracking-wider hover:bg-brand-magenta/90 transition-colors"
+                >
+                  Browse Products
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 items-start">
+                {/* Left: Cart Items + Form */}
+                <div className="space-y-6">
+                  {/* Cart Items */}
+                  <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                    <div className="hidden md:grid grid-cols-[1fr_100px_100px_80px] gap-4 px-6 py-3 bg-gray-50 border-b border-gray-100">
+                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider">Product</span>
+                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider text-center">Qty</span>
+                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider text-right">Price</span>
+                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider text-center">Remove</span>
+                    </div>
+                    <div className="divide-y divide-gray-50">
+                      {(() => {
+                        const cartItems: { product: Product; qty: number; categoryName: string }[] = [];
+                        pricelist.forEach(cat => {
+                          cat.products.forEach(p => {
+                            if (cart[p.code]) {
+                              cartItems.push({ product: p, qty: cart[p.code], categoryName: cat.name });
+                            }
+                          });
+                        });
+                        return cartItems.map(({ product: p, qty, categoryName }) => (
+                          <div key={p.code} className="p-4 md:px-6">
+                            {/* Desktop */}
+                            <div className="hidden md:grid grid-cols-[1fr_100px_100px_80px] gap-4 items-center">
+                              <div className="flex items-center gap-4">
+                                <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 flex-shrink-0">
+                                  <img src={p.image || FALLBACK_IMG} alt={p.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = FALLBACK_IMG; }} />
+                                </div>
+                                <div>
+                                  <h4 className="font-black text-sm text-brand-purple uppercase tracking-tight">{p.name}</h4>
+                                  <span className="text-[10px] text-gray-400 font-bold">{categoryName} · {p.unit}</span>
+                                </div>
+                              </div>
+                              <div className="flex items-center justify-center gap-2">
+                                <button onClick={() => updateQty(p.code, -1)} className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors text-brand-purple font-black text-sm">-</button>
+                                <span className="w-6 text-center font-black text-sm">{qty}</span>
+                                <button onClick={() => updateQty(p.code, 1)} className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors text-brand-purple font-black text-sm">+</button>
+                              </div>
+                              <div className="text-right font-black text-brand-purple">₹{(p.discountPrice * qty).toLocaleString()}</div>
+                              <div className="flex justify-center">
+                                <button onClick={() => { const newCart = { ...cart }; delete newCart[p.code]; setCart(newCart); }} className="text-gray-300 hover:text-red-500 transition-colors"><Trash2 size={16} /></button>
+                              </div>
+                            </div>
+                            {/* Mobile */}
+                            <div className="md:hidden flex gap-4">
+                              <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 flex-shrink-0">
+                                <img src={p.image || FALLBACK_IMG} alt={p.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = FALLBACK_IMG; }} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-black text-sm text-brand-purple uppercase tracking-tight truncate">{p.name}</h4>
+                                <span className="text-[10px] text-gray-400 font-bold">{p.unit}</span>
+                                <div className="flex items-center justify-between mt-2">
+                                  <div className="flex items-center gap-2">
+                                    <button onClick={() => updateQty(p.code, -1)} className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center text-brand-purple font-black text-sm">-</button>
+                                    <span className="w-6 text-center font-black text-sm">{qty}</span>
+                                    <button onClick={() => updateQty(p.code, 1)} className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center text-brand-purple font-black text-sm">+</button>
+                                    <button onClick={() => { const newCart = { ...cart }; delete newCart[p.code]; setCart(newCart); }} className="text-gray-300 hover:text-red-500 transition-colors ml-2"><Trash2 size={14} /></button>
+                                  </div>
+                                  <span className="font-black text-brand-purple">₹{(p.discountPrice * qty).toLocaleString()}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ));
+                      })()}
+                    </div>
+                  </div>
+
+                  {/* Order Enquiry Form */}
+                  <OrderEnquiryForm cart={cart} totals={totals} pricelist={pricelist} />
+                </div>
+
+                {/* Right: Order Summary */}
+                <aside className="lg:sticky lg:top-[100px]">
+                  <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                    <h3 className="text-sm font-black text-brand-purple uppercase tracking-wider mb-4 pb-3 border-b border-gray-100">Order Summary</h3>
+                    <div className="space-y-3 mb-4">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500 font-medium">Subtotal ({totals.count} items)</span>
+                        <span className="font-bold text-brand-purple">₹{totals.total.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500 font-medium">Delivery</span>
+                        <span className="font-bold text-green-600">Free</span>
+                      </div>
+                    </div>
+                    <div className="border-t border-gray-100 pt-4 flex justify-between items-center">
+                      <span className="font-black text-brand-purple uppercase tracking-wider text-sm">Total</span>
+                      <span className="text-2xl font-black text-brand-purple tracking-tighter">₹{totals.total.toLocaleString()}</span>
+                    </div>
+
+                    {totals.total < MIN_ORDER && (
+                      <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-xl">
+                        <p className="text-xs text-red-500 font-bold">Add ₹{(MIN_ORDER - totals.total).toLocaleString()} more to meet minimum order (₹{MIN_ORDER.toLocaleString()})</p>
+                        <div className="w-full bg-red-100 rounded-full h-1.5 mt-2">
+                          <div className="bg-red-500 h-full rounded-full transition-all" style={{ width: `${Math.min(100, (totals.total / MIN_ORDER) * 100)}%` }} />
+                        </div>
+                      </div>
+                    )}
+
+                    {totals.total >= MIN_ORDER && (
+                      <div className="mt-4 p-3 bg-green-50 border border-green-100 rounded-xl flex items-center gap-2">
+                        <ShieldCheck size={14} className="text-green-600" />
+                        <span className="text-xs font-bold text-green-600">Minimum order reached!</span>
+                      </div>
+                    )}
+
+                    <div className="mt-4 p-3 bg-amber-50 border border-amber-100 rounded-xl">
+                      <p className="text-xs text-amber-700 font-bold text-center">Payment upon delivery only — no online payment</p>
+                    </div>
+                  </div>
+                </aside>
+              </div>
+            )}
+          </motion.div>
+        )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+/* ─── Order Enquiry Form Component ─── */
+function OrderEnquiryForm({ cart, totals, pricelist: pl }: { cart: Record<string, number>; totals: { total: number; count: number }; pricelist: typeof pricelist }) {
+  const [formData, setFormData] = useState({
+    customer_name: '',
+    phone: '',
+    email: '',
+    address: '',
+    city: '',
+    state: '',
+    pincode: '',
+    notes: '',
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setError('');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (!formData.customer_name.trim()) {
+      setError('Please enter your name.');
+      return;
+    }
+    if (!formData.phone.trim() || !/^\d{10}$/.test(formData.phone.trim())) {
+      setError('Please enter a valid 10-digit mobile number.');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const items: { title: string; quantity: number; unit_price: number }[] = [];
+      pl.forEach(cat => {
+        cat.products.forEach(p => {
+          if (cart[p.code]) {
+            items.push({ title: p.name, quantity: cart[p.code], unit_price: p.discountPrice });
+          }
+        });
+      });
+
+      const backendUrl = (import.meta as any).env?.VITE_MEDUSA_BACKEND_URL || 'http://localhost:9000';
+      const apiKey = (import.meta as any).env?.VITE_MEDUSA_PUBLISHABLE_KEY || '';
+
+      const response = await fetch(`${backendUrl}/store/order-enquiry`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-publishable-api-key': apiKey,
+        },
+        body: JSON.stringify({
+          customer_name: formData.customer_name.trim(),
+          phone: `+91${formData.phone.trim()}`,
+          email: formData.email.trim() || undefined,
+          address: formData.address.trim() || undefined,
+          city: formData.city.trim() || undefined,
+          state: formData.state.trim() || undefined,
+          pincode: formData.pincode.trim() || undefined,
+          notes: formData.notes.trim() || undefined,
+          items,
+          subtotal: totals.total,
+          currency_code: 'inr',
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to place order');
+      }
+
+      setSubmitted(true);
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (submitted) {
+    return (
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+          <Check className="w-8 h-8 text-green-600" />
+        </div>
+        <h3 className="text-xl font-black text-brand-purple mb-2">Order Placed Successfully!</h3>
+        <p className="text-gray-500 mb-1">
+          Thank you, <span className="text-brand-magenta font-bold">{formData.customer_name}</span>!
+        </p>
+        <p className="text-gray-400 text-sm max-w-md mx-auto">
+          Our team will contact you at <span className="text-brand-magenta font-bold">+91 {formData.phone}</span> to confirm your order and arrange delivery.
+        </p>
+        <div className="mt-4 p-3 bg-amber-50 border border-amber-100 rounded-xl max-w-xs mx-auto">
+          <p className="text-xs text-amber-700 font-bold">No payment charged. Payment upon delivery.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const inputClass = "w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-gray-800 placeholder:text-gray-300 focus:outline-none focus:border-brand-magenta/40 focus:bg-white transition-all text-sm";
+  const labelClass = "text-xs text-gray-500 font-bold block mb-1.5";
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+      <div className="mb-6">
+        <h2 className="text-lg font-black text-brand-purple uppercase tracking-tight">Your Details</h2>
+        <p className="text-gray-400 text-sm mt-1">Fill in your details and our team will contact you to confirm your order.</p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className={labelClass}>Full Name <span className="text-red-400">*</span></label>
+            <div className="relative">
+              <input type="text" name="customer_name" value={formData.customer_name} onChange={handleChange} placeholder="Enter your full name" className={inputClass} required />
+              <User size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300" />
+            </div>
+          </div>
+          <div>
+            <label className={labelClass}>Phone Number <span className="text-red-400">*</span></label>
+            <div className="flex">
+              <span className="inline-flex items-center px-3 py-3 bg-gray-50 border border-r-0 border-gray-200 rounded-l-xl text-gray-400 font-bold text-sm">+91</span>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={(e) => { const val = e.target.value.replace(/\D/g, '').slice(0, 10); setFormData(prev => ({ ...prev, phone: val })); setError(''); }}
+                placeholder="10-digit mobile number"
+                className={`${inputClass} !rounded-l-none`}
+                maxLength={10}
+                required
+              />
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label className={labelClass}>Email</label>
+          <div className="relative">
+            <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="your@email.com (optional)" className={inputClass} />
+            <Mail size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300" />
+          </div>
+        </div>
+
+        <div>
+          <label className={labelClass}>Delivery Address</label>
+          <div className="relative">
+            <input type="text" name="address" value={formData.address} onChange={handleChange} placeholder="Street address, area, landmark" className={inputClass} />
+            <MapPin size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label className={labelClass}>City</label>
+            <input type="text" name="city" value={formData.city} onChange={handleChange} placeholder="City" className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}>State</label>
+            <input type="text" name="state" value={formData.state} onChange={handleChange} placeholder="State" className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}>Pincode</label>
+            <input
+              type="text"
+              name="pincode"
+              value={formData.pincode}
+              onChange={(e) => { const val = e.target.value.replace(/\D/g, '').slice(0, 6); setFormData(prev => ({ ...prev, pincode: val })); }}
+              placeholder="6-digit"
+              maxLength={6}
+              className={inputClass}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className={labelClass}>Notes / Special Requests</label>
+          <textarea name="notes" value={formData.notes} onChange={handleChange} placeholder="Any special requests..." rows={3} className={`${inputClass} resize-none`} />
+        </div>
+
+        {error && (
+          <div className="p-3 bg-red-50 border border-red-100 rounded-xl">
+            <p className="text-sm text-red-500 font-medium">{error}</p>
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={submitting}
+          className="w-full bg-brand-magenta hover:bg-brand-magenta/90 text-white font-black text-sm uppercase tracking-wider py-4 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          {submitting ? (
+            <>
+              <div className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+              Placing Order...
+            </>
+          ) : (
+            <>Place Order <Send size={16} /></>
+          )}
+        </button>
+
+        <p className="text-[11px] text-gray-400 text-center">
+          By placing this order, you agree to be contacted regarding your order. No online payment will be charged.
+        </p>
+      </form>
     </div>
   );
 }
