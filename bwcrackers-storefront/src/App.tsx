@@ -58,14 +58,14 @@ const MIN_ORDER = 3000;
 
 export default function App() {
   const [activeView, setActiveView] = useState('home');
-  const [cart, setCart] = useState({});
+  const [cart, setCart] = useState<Record<string, number>>({});
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPoster, setCurrentPoster] = useState(0);
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState<string | number>('all');
   const [sortBy, setSortBy] = useState('new');
 
   const allProducts = useMemo(() => {
-    let flattened = [];
+    const flattened: (Product & { categoryId: number; categoryName: string })[] = [];
     pricelist.forEach(cat => {
       cat.products.forEach(p => {
         if (selectedCategory === 'all' || selectedCategory === cat.id) {
@@ -78,11 +78,11 @@ export default function App() {
 
     if (sortBy === 'price-asc') flattened.sort((a, b) => a.discountPrice - b.discountPrice);
     if (sortBy === 'price-desc') flattened.sort((a, b) => b.discountPrice - a.discountPrice);
-    
+
     return flattened;
   }, [selectedCategory, sortBy, searchQuery]);
 
-  const updateQty = (code, delta) => {
+  const updateQty = (code: string, delta: number) => {
     setCart(prev => {
       const current = prev[code] || 0;
       const next = Math.max(0, current + delta);
