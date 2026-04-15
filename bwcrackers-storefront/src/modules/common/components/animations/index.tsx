@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react"
 
+import { motion } from "framer-motion"
+
 export const FadeIn = ({
   children,
   delay = 0,
@@ -39,6 +41,7 @@ export const FadeIn = ({
     down: "translateY(-20px)",
     left: "translateX(20px)",
     right: "translateX(-20px)",
+    none: "translate(0,0)",
   }
 
   return (
@@ -54,6 +57,23 @@ export const FadeIn = ({
     >
       {children}
     </div>
+  )
+}
+
+export const Float = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <motion.div
+      animate={{
+        y: [0, -20, 0],
+      }}
+      transition={{
+        duration: 4,
+        repeat: Infinity,
+        ease: "easeInOut",
+      }}
+    >
+      {children}
+    </motion.div>
   )
 }
 

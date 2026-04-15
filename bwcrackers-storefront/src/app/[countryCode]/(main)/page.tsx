@@ -3,49 +3,27 @@ import { Suspense } from "react"
 import dynamic from "next/dynamic"
 import { listCollections } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
-import { HeroSection } from "@modules/home/components/hero"
-import { PromoBanner } from "@modules/home/components/promo-banner"
-import { CelebrationSpecials } from "@modules/home/components/celebration-specials"
-import { AnimatedStats } from "@modules/home/components/animated-stats"
+import AppHero from "@modules/home/components/app-hero"
+import BentoShowcase from "@modules/home/components/bento-showcase"
 
-// Lazy-load below-fold sections to reduce initial JS bundle
-const FullWidthPromo = dynamic(
-  () => import("@modules/home/components/promo-banner/full-width-promo").then(m => ({ default: m.FullWidthPromo })),
-  { loading: () => <SectionSkeleton /> }
-)
+// Lazy-load sections for the new App-Commerce layout
 const FestivalBanner = dynamic(
   () => import("@modules/home/components/festival-banner").then(m => ({ default: m.FestivalBanner })),
-  { loading: () => <SectionSkeleton /> }
+  { fallback: <SectionSkeleton /> }
 )
-const CategoryShowcase = dynamic(
-  () => import("@modules/home/components/category-showcase").then(m => ({ default: m.CategoryShowcase })),
-  { loading: () => <SectionSkeleton /> }
-)
-const ColorfulFeatures = dynamic(
-  () => import("@modules/home/components/colorful-features").then(m => ({ default: m.ColorfulFeatures })),
-  { loading: () => <SectionSkeleton /> }
-)
-const ImageGallery = dynamic(
-  () => import("@modules/home/components/image-gallery").then(m => ({ default: m.ImageGallery })),
-  { loading: () => <SectionSkeleton /> }
-)
-const CollectionsShowcase = dynamic(
-  () => import("@modules/home/components/collections-showcase").then(m => ({ default: m.CollectionsShowcase })),
-  { loading: () => <SectionSkeleton /> }
-)
+
 const ContactForm = dynamic(
   () => import("@modules/home/components/contact-form").then(m => ({ default: m.ContactForm })),
-  { loading: () => <SectionSkeleton /> }
+  { fallback: <SectionSkeleton /> }
 )
 
 function SectionSkeleton() {
   return (
-    <div className="py-24 celebration-bg">
-      <div className="container mx-auto px-4">
+    <div className="py-24 bg-brand-cloud">
+      <div className="px-6 md:px-12 max-w-[1440px] mx-auto">
         <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-white/5 rounded-full w-48 mx-auto" />
-          <div className="h-12 bg-white/5 rounded-lg w-96 mx-auto" />
-          <div className="h-4 bg-white/5 rounded w-64 mx-auto" />
+          <div className="h-8 bg-brand-maroon/5 rounded-full w-48" />
+          <div className="h-12 bg-brand-maroon/5 rounded-2xl w-full" />
         </div>
       </div>
     </div>
@@ -53,9 +31,9 @@ function SectionSkeleton() {
 }
 
 export const metadata: Metadata = {
-  title: "BW Crackers - Premium Firecrackers & Fireworks",
+  title: "AHAMED | Premium Sivakasi Crackers",
   description:
-    "Experience the magic of festivals with our spectacular collection of premium fireworks and crackers. Quality guaranteed!",
+    "The world's most premium artisanal fireworks experience. Direct from Sivakasi, delivered with joy.",
 }
 
 export default async function Home(props: {
@@ -75,20 +53,37 @@ export default async function Home(props: {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <HeroSection />
-      <PromoBanner />
-      <AnimatedStats />
+    <div className="min-h-screen">
+      <AppHero />
+      
+      <div className="bg-white">
+        <BentoShowcase />
+      </div>
+
       <Suspense fallback={<SectionSkeleton />}>
-        <CelebrationSpecials collections={collections} region={region} />
+        <FestivalBanner />
       </Suspense>
-      <FullWidthPromo />
-      <FestivalBanner />
-      <CategoryShowcase />
-      <ColorfulFeatures />
-      <ImageGallery />
-      <ContactForm />
-      <CollectionsShowcase collections={collections} />
+
+      <Suspense fallback={<SectionSkeleton />}>
+        <ContactForm />
+      </Suspense>
+
+      {/* Trust Badges Bar */}
+      <section className="py-20 bg-brand-cloud border-t border-surface-border">
+          <div className="px-6 md:px-12 max-w-[1440px] mx-auto flex flex-wrap justify-center md:justify-between items-center gap-12">
+              {[
+                  { label: "Safety First", sub: "100% Certified" },
+                  { label: "Fast Shipping", sub: "Pan India Delivery" },
+                  { label: "Direct Sivakasi", sub: "No Middlemen" },
+                  { label: "Modern Pack", sub: "Vacuum Sealed" }
+              ].map(badge => (
+                  <div key={badge.label} className="flex flex-col items-center md:items-start">
+                      <span className="text-display mb-1">{badge.label}</span>
+                      <span className="text-xs font-bold text-text-muted uppercase tracking-widest">{badge.sub}</span>
+                  </div>
+              ))}
+          </div>
+      </section>
     </div>
   )
 }

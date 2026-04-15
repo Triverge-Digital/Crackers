@@ -9,6 +9,8 @@ import CartMismatchBanner from "@modules/layout/components/cart-mismatch-banner"
 import { NavProgress } from "@modules/common/components/nav-progress"
 import Footer from "@modules/layout/templates/footer"
 import Nav from "@modules/layout/templates/nav"
+import { FloatingActions } from "@modules/layout/components/floating-actions"
+import MobileBottomBar from "@modules/layout/components/mobile-bottom-bar"
 import FreeShippingPriceNudge from "@modules/shipping/components/free-shipping-price-nudge"
 
 export const metadata: Metadata = {
@@ -43,8 +45,15 @@ export default async function PageLayout(props: { children: React.ReactNode }) {
           shippingOptions={shippingOptions}
         />
       )}
-      {props.children}
+      <main className="relative min-h-screen">
+        <div className="bg-noise fixed inset-0 pointer-events-none z-[-1] opacity-5"></div>
+        {props.children}
+      </main>
       <Footer />
+      <MobileBottomBar />
+      <div className="hidden md:block">
+        <FloatingActions />
+      </div>
     </>
   )
 }

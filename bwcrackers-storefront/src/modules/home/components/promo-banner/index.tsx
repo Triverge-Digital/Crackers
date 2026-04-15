@@ -2,25 +2,25 @@ import { ScrollToProductsDiv } from "@modules/common/components/scroll-to-produc
 
 export function PromoBanner() {
   return (
-    <section className="py-24 celebration-bg relative overflow-hidden border-y border-white/5">
+    <section className="py-24 bg-brand-soft-pink/30 relative overflow-hidden border-y border-brand-pink-500/5">
       {/* Decorative background glow */}
-      <div className="absolute top-1/2 left-0 -translate-y-1/2 w-[600px] h-[400px] bg-brand-accent-hot/5 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="absolute top-1/2 left-0 -translate-y-1/2 w-[600px] h-[400px] bg-brand-pink-500/5 rounded-full blur-[120px] pointer-events-none"></div>
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-3 glass-gold px-6 py-2 rounded-full mb-6 border border-brand-gold-400/20">
-            <span className="text-display text-brand-gold-200 tracking-[0.2em]">Exclusive Privileges</span>
+          <div className="inline-flex items-center gap-3 bg-brand-pink-50 px-6 py-2 rounded-full mb-6 border border-brand-pink-500/20">
+            <span className="text-sm font-black text-brand-pink-500 uppercase tracking-widest">Exclusive Privileges</span>
           </div>
-          <h2 className="text-h2 text-white mb-6">
-            Celebration <span className="text-gold italic">Specials</span>
+          <h2 className="text-h2 mb-4">
+            Celebration <span className="text-brand-gradient italic">Specials</span>
           </h2>
-          <p className="text-xl text-white/50 max-w-2xl mx-auto font-light">
+          <p className="text-xl text-text-secondary max-w-2xl mx-auto font-medium leading-relaxed">
             Luxury experiences shouldn&apos;t have to wait. Explore our
             limited-time offers curated for the true connoisseur.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
           {[
             {
               title: "Complimentary Delivery",
@@ -39,24 +39,28 @@ export function PromoBanner() {
           ].map((promo) => (
             <ScrollToProductsDiv
               key={promo.title}
-              className="glass-card p-10 rounded-[2.5rem] border border-white/5 hover:border-brand-gold-400/30 transition-all duration-500 cursor-pointer group relative overflow-hidden"
+              className="group relative transition-all duration-500 hover:-translate-y-2"
             >
-              {/* Card background accent */}
-              <div className={`absolute top-0 right-0 w-32 h-32 bg-brand-${promo.theme === 'gold' ? 'gold-400' : 'accent-hot'}/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2`}></div>
+              <div className="fancy-border-container p-10 bg-white relative overflow-hidden">
+                <div className="fancy-border-accent"></div>
+                
+                {/* Card background accent */}
+                <div className={`absolute top-0 right-0 w-32 h-32 bg-brand-${promo.theme === 'gold' ? 'gold-500' : 'pink-500'}/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2`}></div>
 
-              <div className="text-5xl mb-6 transform group-hover:scale-110 transition-transform duration-500">
-                {promo.icon}
-              </div>
-              <h3 className="text-3xl font-black text-white mb-3 tracking-tight group-hover:text-gold transition-colors">
-                {promo.title}
-              </h3>
-              <p className="text-white/60 text-lg mb-8 font-light">
-                {promo.desc}
-              </p>
+                <div className="text-5xl mb-6 transform group-hover:scale-110 transition-transform duration-500">
+                  {promo.icon}
+                </div>
+                <h3 className="text-3xl font-black text-brand-royal-950 mb-3 tracking-tighter group-hover:text-brand-pink-500 transition-colors uppercase">
+                  {promo.title}
+                </h3>
+                <p className="text-text-muted text-lg mb-8 font-bold italic">
+                  {promo.desc}
+                </p>
 
-              <div className="flex items-center gap-2 text-brand-gold-400 font-bold uppercase tracking-widest text-xs group-hover:gap-4 transition-all">
-                {promo.cta}
-                <div className="h-px w-8 bg-brand-gold-400"></div>
+                <div className="flex items-center gap-2 text-brand-pink-500 font-black uppercase tracking-widest text-xs group-hover:gap-4 transition-all">
+                  {promo.cta}
+                  <div className="h-0.5 w-8 bg-brand-pink-500"></div>
+                </div>
               </div>
             </ScrollToProductsDiv>
           ))}

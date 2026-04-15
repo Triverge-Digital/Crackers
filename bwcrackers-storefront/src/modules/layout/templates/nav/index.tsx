@@ -9,41 +9,38 @@ export default async function Nav() {
   const regions = await listRegions().then((regions: StoreRegion[]) => regions)
 
   return (
-    <div className="fixed top-4 inset-x-0 z-[100] flex justify-center px-4">
-      <header className="relative w-full max-w-7xl glass-card rounded-full px-6 py-2 border border-white/20 shadow-premium">
-        <nav className="flex items-center justify-between gap-6 h-12 md:h-14">
-          <div className="flex items-center gap-4">
-            <div className="h-full flex items-center small:hidden">
-              <SideMenu regions={regions} />
-            </div>
+    <div className="sticky top-0 inset-x-0 z-[100] app-glass border-b border-surface-border">
+      <header className="relative w-full px-6 md:px-12">
+        <nav className="flex items-center justify-between gap-6 h-16 md:h-24">
+          <div className="flex items-center gap-8">
+            <SideMenu regions={regions} />
+            
             <LocalizedClientLink
               href="/"
-              className="flex items-center gap-2 group transition-transform hover:scale-105"
+              className="group flex flex-col items-start"
               data-testid="nav-store-link"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-brand-gold-400 via-brand-accent-orange to-brand-accent-hot shadow-glow-gold animate-sparkle">
-                <span className="text-white text-lg drop-shadow-md">✨</span>
-              </div>
-              <div className="flex flex-col leading-none">
-                <span className="text-gold font-black text-xl md:text-2xl font-serif tracking-tight">
-                  B&W
+              <div className="flex items-center gap-1">
+                <span className="text-brand-carbon font-black text-2xl md:text-3xl tracking-tightest leading-none uppercase">
+                   AHAMED
                 </span>
-                <span className="text-white/70 text-[10px] uppercase tracking-[0.2em] font-bold">
-                  Crackers
-                </span>
+                <div className="h-1.5 w-1.5 rounded-full bg-brand-maroon mt-1.5"></div>
               </div>
+              <span className="text-muted text-[8px] uppercase tracking-[0.4em] font-black leading-none mt-1">
+                 Sivakasi Premium
+              </span>
             </LocalizedClientLink>
           </div>
 
-          <div className="hidden small:flex items-center gap-8">
-            {["Home", "Collections", "Store", "About"].map((item) => (
+          <div className="hidden md:flex items-center gap-12 font-black uppercase tracking-[0.2em] text-[10px]">
+            {["Store", "Collections", "Pricelist", "About"].map((item) => (
               <LocalizedClientLink
                 key={item}
-                href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
-                className="text-white/80 hover:text-brand-gold-400 transition-all font-bold text-sm uppercase tracking-wider relative group"
+                href={item === "Pricelist" ? "/pricelist" : `/${item.toLowerCase()}`}
+                className="text-secondary hover:text-brand-maroon transition-all relative group"
               >
                 {item}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-gold-400 transition-all group-hover:w-full rounded-full shadow-glow-gold"></span>
+                <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-maroon transition-all group-hover:w-full"></div>
               </LocalizedClientLink>
             ))}
           </div>
@@ -51,12 +48,10 @@ export default async function Nav() {
           <div className="flex items-center gap-4">
             <Suspense
               fallback={
-                <div className="h-10 w-10 rounded-full glass-gold animate-pulse" />
+                <div className="h-10 w-10 rounded-full bg-brand-cloud animate-pulse" />
               }
             >
-              <div className="bg-brand-gold-400/10 hover:bg-brand-gold-400/20 p-1.5 rounded-full transition-colors border border-brand-gold-400/20">
                 <CartButton />
-              </div>
             </Suspense>
           </div>
         </nav>

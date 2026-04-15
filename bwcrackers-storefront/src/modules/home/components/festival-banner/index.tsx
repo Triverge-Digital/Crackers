@@ -3,61 +3,63 @@ import {
   Flame,
   Gift,
   PartyPopper,
+  ShieldCheck,
+  Zap,
 } from "lucide-react"
 import { FadeIn } from "@modules/common/components/animations"
 import { ScrollToProductsButton } from "@modules/common/components/scroll-to-products"
 
 export function FestivalBanner() {
   return (
-    <section className="relative py-24 overflow-hidden celebration-bg">
-      {/* Decorative gradients */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-accent-hot/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand-royal-700/20 rounded-full blur-[120px] translate-y-1/2 -translate-x-1/2"></div>
-
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="glass-card rounded-[3rem] p-8 md:p-16 border border-white/10 relative overflow-hidden">
-          {/* Sparkle effects */}
-          <div className="absolute top-10 left-10 animate-sparkle">
-            <Sparkles className="h-8 w-8 text-brand-gold-400 opacity-50" />
+    <section className="relative py-32 overflow-hidden bg-brand-cloud">
+      {/* Decorative patterns */}
+      <div className="absolute top-0 right-0 w-full h-[600px] bg-white opacity-50 blur-3xl -z-10"></div>
+      
+      <div className="px-6 md:px-12 relative z-10 max-w-[1440px] mx-auto">
+        <div className="bg-white rounded-[4rem] p-10 md:p-24 border border-surface-border shadow-[0_45px_100px_rgba(0,0,0,0.04)] relative overflow-hidden group">
+          {/* Noise effect */}
+          <div className="bg-noise absolute inset-0 pointer-events-none opacity-5"></div>
+          
+          {/* Design accents */}
+          <div className="absolute top-10 left-10 animate-pulse">
+            <Sparkles className="h-10 w-10 text-brand-gold opacity-20" />
           </div>
-          <div className="absolute bottom-10 right-10 animate-sparkle [animation-delay:1.5s]">
-            <PartyPopper className="h-10 w-10 text-brand-accent-pink opacity-50" />
+          <div className="absolute bottom-10 right-10 animate-bounce">
+            <PartyPopper className="h-12 w-12 text-brand-maroon opacity-10" />
           </div>
 
-          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-24">
+          <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24 relative z-10">
             <div className="flex-1 text-center lg:text-left">
               <FadeIn delay={0.2} direction="right">
-                <div className="inline-flex items-center gap-2 glass-gold px-6 py-2 rounded-full mb-8 border border-brand-gold-400/30">
-                  <Gift className="h-5 w-5 text-brand-gold-400" />
-                  <span className="text-display text-brand-gold-200">
+                <div className="inline-flex items-center gap-3 bg-brand-cloud px-8 py-3 rounded-full mb-12 border border-surface-border shadow-sm">
+                  <Gift className="h-5 w-5 text-brand-maroon" />
+                  <span className="text-[10px] font-black text-brand-carbon uppercase tracking-[0.4em]">
                     VIP Gift Box Pre-Booking
                   </span>
                 </div>
               </FadeIn>
 
               <FadeIn delay={0.4} direction="right">
-                <h2 className="text-h2 text-white mb-6">
-                  The Ultimate <br />
-                  <span className="text-gold">Festival Collection</span>
+                <h2 className="text-h2 text-brand-carbon mb-10 leading-[0.9] max-w-xl">
+                  THE ULTIMATE <br />
+                  <span className="text-brand-maroon italic">FESTIVAL BOX</span>
                 </h2>
               </FadeIn>
 
               <FadeIn delay={0.6} direction="right">
-                <p className="text-xl text-white/70 mb-10 leading-relaxed font-light">
-                  Don&apos;t wait for the rush. Secure our exclusive VIP Gift Boxes
-                  and handpicked festive combos now. Premium quality crackers
-                  with guaranteed safe delivery to your doorstep.
+                <p className="text-xl text-secondary mb-14 leading-relaxed font-bold max-w-lg">
+                  Secure our exclusive VIP Gift Boxes and handpicked festive combos now. 
+                  Premium quality Sivakasi crackers with guaranteed safe delivery.
                 </p>
               </FadeIn>
 
               <FadeIn delay={0.8} direction="right">
-                <div className="flex flex-wrap justify-center lg:justify-start gap-6">
-                  <ScrollToProductsButton className="premium-btn text-lg px-12 py-5">
-                    <Sparkles size={20} className="mr-2 inline" />
+                <div className="flex flex-wrap justify-center lg:justify-start gap-8">
+                  <ScrollToProductsButton className="app-btn app-btn-primary px-16 py-7 text-sm">
                     Pre-Book Now
                   </ScrollToProductsButton>
-                  <div className="flex items-center gap-4 text-white/50 font-bold uppercase tracking-widest text-sm">
-                    <Flame size={18} className="text-brand-accent-orange" />
+                  <div className="flex items-center gap-4 text-muted font-black uppercase tracking-widest text-[10px]">
+                    <Flame size={20} className="text-brand-gold animate-pulse" />
                     Limited Units Available
                   </div>
                 </div>
@@ -70,39 +72,39 @@ export function FestivalBanner() {
                   {
                     title: "VIP Combo",
                     desc: "Handpicked mega crackers",
-                    icon: "🎆",
-                    color: "from-brand-gold-400 to-brand-accent-orange",
+                    emoji: "🎆",
+                    color: "text-brand-maroon",
                   },
                   {
                     title: "Family Box",
                     desc: "Fun for all ages",
-                    icon: "🎊",
-                    color: "from-brand-royal-700 to-brand-accent-pink",
+                    emoji: "🎊",
+                    color: "text-brand-carbon",
                   },
                   {
                     title: "Safety First",
                     desc: "100% Certified fireworks",
-                    icon: "🛡️",
-                    color: "from-emerald-400 to-teal-600",
+                    emoji: "🛡️",
+                    color: "text-emerald-700",
                   },
                   {
                     title: "Fast Delivery",
                     desc: "Express shipping options",
-                    icon: "⚡",
-                    color: "from-blue-400 to-indigo-600",
+                    emoji: "⚡",
+                    color: "text-brand-gold",
                   },
                 ].map((feature) => (
                   <FadeIn key={feature.title} delay={0.2} direction="left">
                     <div
-                      className="glass-card p-6 rounded-2xl border border-white/5 hover:border-white/20 transition-all group"
+                      className="bg-brand-cloud p-10 rounded-[3rem] border border-surface-border hover:shadow-2xl hover:shadow-brand-maroon/5 hover:-translate-y-2 transition-all group"
                     >
-                      <div className="text-4xl mb-4 group-hover:scale-110 transition-transform inline-block">
-                        {feature.icon}
+                      <div className="text-5xl mb-8 group-hover:rotate-12 transition-transform inline-block">
+                        {feature.emoji}
                       </div>
-                      <div className={`text-xl font-bold bg-gradient-to-r ${feature.color} bg-clip-text text-transparent mb-1`}>
+                      <div className={`text-2xl font-black ${feature.color} mb-3 tracking-tightest uppercase`}>
                         {feature.title}
                       </div>
-                      <div className="text-sm text-white/50 font-medium">
+                      <div className="text-[10px] text-muted font-black uppercase tracking-widest leading-none">
                         {feature.desc}
                       </div>
                     </div>

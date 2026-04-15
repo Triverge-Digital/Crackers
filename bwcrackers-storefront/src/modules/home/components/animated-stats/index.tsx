@@ -5,56 +5,50 @@ const stats = [
     icon: Package,
     number: "500+",
     label: "Products",
-    bg: "from-orange-500 to-red-600",
-    iconColor: "text-orange-500",
+    iconColor: "text-brand-pink-500",
   },
   {
     icon: Users,
     number: "10K+",
     label: "Happy Customers",
-    bg: "from-purple-500 to-pink-600",
-    iconColor: "text-purple-500",
+    iconColor: "text-brand-purple",
   },
   {
     icon: Star,
     number: "4.9/5",
     label: "Rating",
-    bg: "from-yellow-500 to-orange-600",
-    iconColor: "text-yellow-500",
+    iconColor: "text-brand-gold-500",
   },
   {
     icon: Trophy,
     number: "15+",
     label: "Years Experience",
-    bg: "from-green-500 to-teal-600",
-    iconColor: "text-green-500",
+    iconColor: "text-brand-pink-500",
   },
 ]
 
 export function AnimatedStats() {
   return (
-    <section className="py-24 celebration-bg relative overflow-hidden border-y border-white/5">
+    <section className="py-24 bg-white relative overflow-hidden border-y border-brand-pink-500/5">
       {/* Background accents */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[300px] bg-brand-gold-400/5 blur-[120px] pointer-events-none"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[300px] bg-brand-pink-500/5 blur-[120px] pointer-events-none"></div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-12">
           {stats.map((stat, index) => (
             <div
               key={index}
-              className="glass-card group p-10 rounded-[2.5rem] border border-white/5 hover:border-brand-gold-400/30 transition-all duration-500 text-center relative overflow-hidden animate-fade-in-top"
+              className="group text-center animate-fade-in-top"
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              <div className="absolute top-0 right-0 w-24 h-24 bg-brand-gold-400/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
-              
-              <div className="w-16 h-16 mx-auto mb-8 rounded-2xl glass-gold flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 border border-brand-gold-400/20 shadow-glow-gold">
-                <stat.icon className="h-8 w-8 text-brand-gold-400" />
+              <div className={`w-20 h-20 mx-auto mb-6 rounded-3xl bg-white shadow-xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-12 transition-all duration-500 border border-brand-pink-500/10`}>
+                <stat.icon className={`h-10 w-10 ${stat.iconColor}`} />
               </div>
 
-              <div className="text-4xl font-black text-white mb-2 group-hover:text-gold transition-colors tracking-tighter">
+              <div className="text-5xl font-black text-brand-royal-950 mb-2 group-hover:text-brand-pink-500 transition-colors tracking-tightest">
                 {stat.number}
               </div>
-              <div className="text-[10px] text-white/40 font-black uppercase tracking-[0.2em] group-hover:text-white/60 transition-colors">
+              <div className="text-[10px] text-text-muted font-black uppercase tracking-[0.3em] group-hover:text-brand-royal-950 transition-colors">
                 {stat.label}
               </div>
             </div>

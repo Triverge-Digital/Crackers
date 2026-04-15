@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /* Ornate Scalloped Border for Category Cards */
+  /* Refined Ornate Frame with Scalloped Edges & Gold Border */
+  .ornate-frame {
+    @apply relative p-1.5 flex flex-col items-center justify-center transition-all duration-300 hover:scale-105;
+    background: linear-gradient(135deg, #FFD700 0%, #B8860B 100%); /* Gold Frame */
+    mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M100 0 C 120 0, 130 15, 150 15 C 170 15, 185 30, 185 50 C 185 70, 200 80, 200 100 C 200 120, 185 130, 185 150 C 185 170, 170 185, 150 185 C 130 185, 120 200, 100 200 C 80 200, 70 185, 50 185 C 30 185, 15 170, 15 150 C 15 130, 0 120, 0 100 C 0 80, 15 70, 15 50 C 15 30, 30 15, 50 15 C 70 15, 80 0, 100 0 Z' fill='black'/%3E%3C/svg%3E");
+    mask-size: 100% 100%;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M100 0 C 120 0, 130 15, 150 15 C 170 15, 185 30, 185 50 C 185 70, 200 80, 200 100 C 200 120, 185 130, 185 150 C 185 170, 170 185, 150 185 C 130 185, 120 200, 100 200 C 80 200, 70 185, 50 185 C 30 185, 15 170, 15 150 C 15 130, 0 120, 0 100 C 0 80, 15 70, 15 50 C 15 30, 30 15, 50 15 C 70 15, 80 0, 100 0 Z' fill='black'/%3E%3C/svg%3E");
+    -webkit-mask-size: 100% 100%;
+  }
+
+  .ornate-frame-inner {
+    @apply bg-white w-full h-full p-1 flex flex-col items-center justify-center;
+    background: linear-gradient(135deg, #E6007E 0%, #4B0082 100%);
+    mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M100 5 C 118 5, 128 18, 148 18 C 168 18, 182 32, 182 50 C 182 68, 195 78, 195 98 C 195 118, 182 128, 182 148 C 182 168, 168 182, 148 182 C 128 182, 118 195, 98 195 C 78 195, 68 182, 48 182 C 28 182, 14 168, 14 148 C 14 128, 5 118, 5 98 C 5 78, 14 68, 14 50 C 14 32, 28 18, 48 18 C 68 18, 78 5, 98 5 Z' fill='black'/%3E%3C/svg%3E");
+    mask-size: 100% 100%;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M100 5 C 118 5, 128 18, 148 18 C 168 18, 182 32, 182 50 C 182 68, 195 78, 195 98 C 195 118, 182 128, 182 148 C 182 168, 168 182, 148 182 C 128 182, 118 195, 98 195 C 78 195, 68 182, 48 182 C 28 182, 14 168, 14 148 C 14 128, 5 118, 5 98 C 5 78, 14 68, 14 50 C 14 32, 28 18, 48 18 C 68 18, 78 5, 98 5 Z' fill='black'/%3E%3C/svg%3E");
+    -webkit-mask-size: 100% 100%;
+  }
+
+  .glow-text {
+    text-shadow: 0 0 10px rgba(230, 0, 126, 0.5), 0 0 20px rgba(230, 0, 126, 0.3);
+  }
+
+  .floating-badge {
+    @apply absolute -right-4 -top-4 z-10 animate-bounce;
+  }
+}

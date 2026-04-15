@@ -1,21 +1,22 @@
 "use client"
 
 import { Popover, PopoverPanel, Transition } from "@headlessui/react"
-import { ArrowRightMini, XMark } from "@medusajs/icons"
-import { Text, clx, useToggleState } from "@medusajs/ui"
+import { XMark } from "@medusajs/icons"
+import { clx, useToggleState } from "@medusajs/ui"
 import { Fragment } from "react"
+import { Menu, Home, Grid, List, Info, Phone, Mail, Instagram } from "lucide-react"
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import CountrySelect from "../country-select"
 import { HttpTypes } from "@medusajs/types"
 
-const SideMenuItems = {
-  Home: "/",
-  Collections: "/collections",
-  "All Products": "/store",
-  About: "/about",
-  Cart: "/cart",
-}
+const SideMenuItems = [
+  { name: "Home", href: "/", icon: Home },
+  { name: "Collections", href: "/collections", icon: Grid },
+  { name: "Store", href: "/store", icon: List },
+  { name: "Pricelist", href: "/pricelist", icon: List },
+  { name: "About Us", href: "/about", icon: Info },
+]
 
 const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
   const toggleState = useToggleState()
@@ -29,15 +30,17 @@ const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
               <div className="relative flex h-full">
                 <Popover.Button
                   data-testid="nav-menu-button"
-                  className="relative h-full flex items-center transition-all ease-out duration-200 focus:outline-none hover:text-ui-fg-base"
+                  className="relative h-full flex items-center transition-all ease-out duration-200 focus:outline-none text-brand-carbon hover:text-brand-maroon"
                 >
-                  Menu
+                  <div className="w-10 h-10 rounded-full bg-white border border-surface-border flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
+                    <Menu size={18} />
+                  </div>
                 </Popover.Button>
               </div>
 
               {open && (
                 <div
-                  className="fixed inset-0 z-[50] bg-black/0 pointer-events-auto"
+                  className="fixed inset-0 z-[150] bg-brand-carbon/30 backdrop-blur-sm pointer-events-auto"
                   onClick={close}
                   data-testid="side-menu-backdrop"
                 />
@@ -53,77 +56,76 @@ const SideMenu = ({ regions }: { regions: HttpTypes.StoreRegion[] | null }) => {
                 leaveFrom="opacity-100 translate-x-0"
                 leaveTo="opacity-0 -translate-x-full"
               >
-                <PopoverPanel className="fixed inset-y-0 left-0 w-full sm:w-[480px] z-[100] outline-none">
+                <PopoverPanel className="fixed inset-y-0 left-0 w-full sm:w-[450px] z-[200] outline-none">
                   <div
                     data-testid="nav-menu-popup"
-                    className="flex flex-col h-full bg-brand-royal-950/90 backdrop-blur-3xl border-r border-white/5 p-12 lg:p-20 relative overflow-hidden"
+                    className="flex flex-col h-full bg-brand-cloud border-r border-surface-border p-8 lg:p-12 relative overflow-hidden"
                   >
-                     {/* Decorative background pulse */}
-                    <div className="absolute top-1/4 -left-1/4 w-[400px] h-[400px] bg-brand-gold-400/5 rounded-full blur-[100px] animate-pulse pointer-events-none"></div>
-
-                    <div className="flex justify-between items-center mb-24" id="xmark">
-                      <div className="flex flex-col leading-none">
-                        <span className="text-gold font-black text-2xl font-serif tracking-tight">
-                          B&W
-                        </span>
-                        <span className="text-white/40 text-[9px] uppercase tracking-[0.2em] font-bold">
-                          Navigation
+                    <div className="bg-noise absolute inset-0 pointer-events-none opacity-5"></div>
+                    
+                    <div className="flex justify-between items-center mb-16 relative z-10" id="xmark">
+                      <div className="flex flex-col items-start leading-none">
+                        <div className="flex items-center gap-1">
+                          <span className="text-brand-carbon font-black text-3xl tracking-tightest uppercase">
+                             AHAMED
+                          </span>
+                          <div className="h-2 w-2 rounded-full bg-brand-maroon mt-2"></div>
+                        </div>
+                        <span className="text-muted text-[10px] uppercase tracking-[0.4em] font-black mt-2">
+                           Premium Sivakasi
                         </span>
                       </div>
                       <button 
                         data-testid="close-menu-button" 
                         onClick={close}
-                        className="h-12 w-12 rounded-full glass-gold flex items-center justify-center border border-brand-gold-400/20 text-brand-gold-400 hover:scale-110 transition-transform"
+                        className="h-12 w-12 rounded-full bg-white flex items-center justify-center border border-surface-border text-brand-carbon hover:rotate-90 transition-all duration-500 shadow-sm"
                       >
                         <XMark />
                       </button>
                     </div>
 
-                    <ul className="flex flex-col gap-10 items-start justify-start flex-1">
-                      {Object.entries(SideMenuItems).map(([name, href], i) => {
+                    <ul className="flex flex-col gap-4 items-start justify-start flex-1 overflow-y-auto pr-4 custom-scrollbar relative z-10">
+                      {SideMenuItems.map((item, i) => {
                         return (
-                          <li key={name} className="animate-fade-in-right" style={{ animationDelay: `${i * 100}ms` }}>
+                          <li key={item.name} className="w-full">
                             <LocalizedClientLink
-                              href={href}
-                              className="text-4xl lg:text-5xl font-black text-white/40 hover:text-gold transition-all font-serif tracking-tighter flex items-center gap-6 group"
+                              href={item.href}
+                              className="w-full flex items-center justify-between p-5 rounded-3xl border border-transparent hover:border-surface-border hover:bg-white transition-all group shadow-none hover:shadow-xl hover:shadow-brand-maroon/5"
                               onClick={close}
-                              data-testid={`${name.toLowerCase()}-link`}
+                              data-testid={`${item.name.toLowerCase()}-link`}
                             >
-                              <span className="text-gold text-lg lg:text-xl italic opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 transition-all font-sans">0{i+1}</span>
-                              {name}
+                              <div className="flex items-center gap-6">
+                                <div className="h-12 w-12 rounded-2xl bg-white border border-surface-border flex items-center justify-center group-hover:bg-brand-maroon group-hover:text-white transition-colors shadow-sm">
+                                  <item.icon size={20} />
+                                </div>
+                                <span className="text-2xl font-black text-brand-carbon group-hover:text-brand-maroon transition-colors uppercase tracking-tightest">
+                                    {item.name}
+                                </span>
+                              </div>
                             </LocalizedClientLink>
                           </li>
                         )
                       })}
                     </ul>
 
-                    <div className="flex flex-col gap-y-12">
-                      <div
-                        className="flex justify-between items-center group cursor-pointer"
-                        onMouseEnter={toggleState.open}
-                        onMouseLeave={toggleState.close}
-                      >
-                        {regions && (
-                          <CountrySelect
-                            toggleState={toggleState}
-                            regions={regions}
-                          />
-                        )}
-                        <ArrowRightMini
-                          className={clx(
-                            "transition-transform duration-300 text-brand-gold-400",
-                            toggleState.state ? "-rotate-90" : ""
-                          )}
-                        />
+                    <div className="flex flex-col gap-y-10 mt-auto pt-10 border-t border-surface-border relative z-10">
+                      <div className="flex justify-center gap-8">
+                        {[
+                          { icon: Instagram, href: "#" },
+                          { icon: Phone, href: "#" },
+                          { icon: Mail, href: "#" },
+                        ].map((social, i) => (
+                          <a key={i} href={social.href} className="p-4 rounded-full bg-white border border-surface-border hover:border-brand-maroon hover:text-brand-maroon transition-all shadow-sm">
+                            <social.icon size={18} />
+                          </a>
+                        ))}
                       </div>
-                      
-                      <div className="pt-8 border-t border-white/5 space-y-2">
-                        <p className="text-white/20 text-[10px] font-black uppercase tracking-[0.3em]">
-                          © {new Date().getFullYear()} B&W Crackers. 
+
+                      <div className="text-center">
+                        <p className="text-muted text-[10px] font-black uppercase tracking-[0.4em] mb-4">
+                          © {new Date().getFullYear()} AHAMED CRACKERS
                         </p>
-                        <p className="text-white/10 text-[9px] uppercase font-bold tracking-[0.2em]">
-                          The Art of Celestial Celebration.
-                        </p>
+                        <div className="h-px w-12 bg-surface-border mx-auto"></div>
                       </div>
                     </div>
                   </div>
