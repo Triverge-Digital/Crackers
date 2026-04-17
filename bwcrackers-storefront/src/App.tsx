@@ -28,7 +28,8 @@ import {
   Send,
   Check,
   Trash2,
-  ArrowLeft
+  ArrowLeft,
+  Menu
 } from 'lucide-react';
 import { pricelist, Product } from './data/pricelist';
 
@@ -57,6 +58,7 @@ const MIN_ORDER = 3000;
 
 export default function App() {
   const [activeView, setActiveView] = useState('home');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [cart, setCart] = useState<Record<string, number>>({});
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPoster, setCurrentPoster] = useState(0);
@@ -137,8 +139,16 @@ export default function App() {
       {/* HEADER */}
       <header className="bg-gradient-to-r from-[#1A1A4E] to-[#2D1B6B] text-white py-3 px-4 sticky top-[32px] z-50 shadow-lg border-b border-white/10">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveView('home')}>
-            <img src="/logo.png" alt="B&W Crackers" className="h-12 md:h-14 w-auto object-contain drop-shadow-lg" />
+          <div className="flex items-center gap-4">
+            <button 
+              className="lg:hidden p-2 hover:bg-white/10 rounded-xl transition-colors"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+            <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveView('home')}>
+              <img src="/logo.png" alt="B&W Crackers" className="h-10 md:h-14 w-auto object-contain drop-shadow-lg" />
+            </div>
           </div>
 
           <nav className="hidden lg:flex items-center gap-8">
@@ -163,13 +173,47 @@ export default function App() {
             </button>
             <button
               onClick={() => setActiveView(activeView === 'home' ? 'order' : 'home')}
-              className="bg-red-600 px-4 py-2 rounded-xl shadow-lg font-black text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-red-700 transition-all active:scale-95"
+              className="bg-red-600 px-4 py-2 rounded-xl shadow-lg font-black text-[10px] md:text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-red-700 transition-all active:scale-95"
             >
-              {activeView === 'home' ? <Download size={18} /> : <Home size={18} />}
-              {activeView === 'home' ? 'Pricelist' : 'Home'}
+              {activeView === 'home' ? <Download size={16} /> : <Home size={16} />}
+              <span className="hidden xs:inline">{activeView === 'home' ? 'Pricelist' : 'Home'}</span>
+              <span className="xs:hidden">{activeView === 'home' ? 'List' : 'Home'}</span>
             </button>
           </div>
         </div>
+
+        {/* MOBILE MENU */}
+        <AnimatePresence>
+          {isMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="lg:hidden bg-[#1A1A4E] border-t border-white/10 overflow-hidden"
+            >
+              <div className="flex flex-col p-4 gap-2">
+                {[
+                  { label: 'Home', view: 'home' },
+                  { label: 'Store', view: 'order' },
+                  { label: 'Collections', action: () => { setActiveView('home'); setTimeout(() => document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' }), 100); } },
+                  { label: 'About', action: () => { setActiveView('home'); setTimeout(() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }), 100); } }
+                ].map((item) => (
+                  <button
+                    key={item.label}
+                    onClick={() => {
+                      if (item.view) setActiveView(item.view);
+                      if (item.action) item.action();
+                      setIsMenuOpen(false);
+                    }}
+                    className="text-left px-4 py-3 text-xs font-black uppercase tracking-widest text-white/70 hover:text-brand-gold hover:bg-white/5 rounded-xl transition-all"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       <AnimatePresence mode="wait">
@@ -240,7 +284,7 @@ export default function App() {
 
                {/* Text Side */}
                <div className="w-full md:w-1/2 bg-[#FDF0F6] p-8 md:p-16 flex flex-col justify-center items-center md:items-start text-center md:text-left">
-                  <h2 className="text-4xl md:text-5xl font-black text-brand-magenta uppercase italic tracking-tighter leading-none mb-8">
+                  <h2 className="text-4xl md:text-5xl font-black text-brand-magenta uppercase italic tracking-tighter leading-none mb-8 font-display">
                     BW CRACKERS <br/> SIVAKASI PATTASU
                   </h2>
                   
@@ -289,7 +333,7 @@ export default function App() {
             <section id="categories" className="py-20 bg-gray-50 border-t border-brand-magenta/5">
                 <div className="container mx-auto px-4">
                   <div className="text-center mb-16">
-                    <h2 className="text-4xl font-black text-brand-magenta uppercase tracking-tighter mb-2 italic">Our Products</h2>
+                    <h2 className="text-4xl font-black text-brand-magenta uppercase tracking-tighter mb-2 italic font-display">Our Products</h2>
                     <div className="w-24 h-1.5 bg-brand-gold mx-auto rounded-full" />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-20">
@@ -335,7 +379,7 @@ export default function App() {
             <section id="festive" className="py-24 bg-white">
                 <div className="container mx-auto px-4">
                   <div className="text-center mb-16">
-                    <h2 className="text-3xl font-black text-brand-magenta uppercase tracking-tighter italic mb-2">Festive Collections</h2>
+                    <h2 className="text-3xl font-black text-brand-magenta uppercase tracking-tighter italic mb-2 font-display">Festive Collections</h2>
                     <div className="w-16 h-1 bg-brand-gold mx-auto rounded-full" />
                   </div>
 
@@ -400,7 +444,7 @@ export default function App() {
             {/* OUR BRANDS SECTION */}
             <div className="bg-white py-12 border-t border-gray-100 overflow-hidden">
                <div className="container mx-auto px-4 mb-8 text-center">
-                  <h2 className="text-3xl font-black text-brand-magenta uppercase tracking-tighter italic mb-2">Our Brands</h2>
+                  <h2 className="text-3xl font-black text-brand-magenta uppercase tracking-tighter italic mb-2 font-display">Our Brands</h2>
                   <div className="w-16 h-1 bg-brand-gold mx-auto rounded-full" />
                </div>
                <div className="relative flex whitespace-nowrap">
@@ -412,7 +456,7 @@ export default function App() {
                     {[...BRANDS, ...BRANDS].map((brand, i) => (
                       <div 
                         key={i} 
-                        className="w-32 h-20 flex-shrink-0 grayscale hover:grayscale-0 transition-all opacity-50 hover:opacity-100 cursor-default"
+                        className="w-32 h-20 flex-shrink-0 transition-all cursor-default"
                       >
                         <img src={brand} alt="Brand" className="w-full h-full object-contain" />
                       </div>
@@ -424,7 +468,7 @@ export default function App() {
             {/* WHY CHOOSE US SECTION */}
             <section className="py-20 bg-white">
                <div className="container mx-auto px-4 text-center mb-16">
-                  <h2 className="text-3xl font-black text-brand-magenta uppercase italic tracking-tighter mb-2">Why Choose Us</h2>
+                  <h2 className="text-3xl font-black text-brand-magenta uppercase italic tracking-tighter mb-2 font-display">Why Choose Us</h2>
                   <div className="w-16 h-1 bg-brand-gold mx-auto rounded-full" />
                </div>
 
@@ -862,7 +906,7 @@ export default function App() {
                 {/* Right: Order Summary */}
                 <aside className="lg:sticky lg:top-[100px]">
                   <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                    <h3 className="text-sm font-black text-brand-purple uppercase tracking-wider mb-4 pb-3 border-b border-gray-100">Order Summary</h3>
+                    <h3 className="text-sm font-black text-brand-purple uppercase tracking-wider mb-4 pb-3 border-b border-gray-100 font-display">Order Summary</h3>
                     <div className="space-y-3 mb-4">
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-500 font-medium">Subtotal ({totals.count} items)</span>
@@ -996,7 +1040,7 @@ function OrderEnquiryForm({ cart, totals, pricelist: pl }: { cart: Record<string
         <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
           <Check className="w-8 h-8 text-green-600" />
         </div>
-        <h3 className="text-xl font-black text-brand-purple mb-2">Order Placed Successfully!</h3>
+        <h3 className="text-xl font-black text-brand-purple mb-2 font-display">Order Placed Successfully!</h3>
         <p className="text-gray-500 mb-1">
           Thank you, <span className="text-brand-magenta font-bold">{formData.customer_name}</span>!
         </p>

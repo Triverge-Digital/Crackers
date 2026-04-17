@@ -20,8 +20,8 @@ export default {
         'glow': '0 0 15px rgba(230, 0, 126, 0.3)',
       },
       fontFamily: {
-        sans: ["Outfit", "Inter", "sans-serif"],
-        festive: ["Montserrat", "sans-serif"],
+        sans: ["'Plus Jakarta Sans'", "sans-serif"],
+        display: ["'Marcellus'", "serif"],
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',
