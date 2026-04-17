@@ -35,8 +35,6 @@ out/
 # -----------------------------
 # Environment variables
 # -----------------------------
-.env
-.env.*
 !.env.example
 
 # -----------------------------
@@ -101,3 +99,4 @@ scripts/package-lock.json
 *.tgz
 *.bak
 *.tmp
+config.bat
