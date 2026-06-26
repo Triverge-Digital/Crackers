@@ -19,7 +19,6 @@ import {
   Award,
   Star,
   X,
-  Home,
   Instagram,
   Facebook,
   Mail,
@@ -188,14 +187,15 @@ export default function App() {
                 </span>
               )}
             </button>
-            <button
-              onClick={() => setActiveView(activeView === 'home' ? 'order' : 'home')}
+            <a
+              href="/BW-Crackers-Pricelist-2025.pdf"
+              download="BW-Crackers-Pricelist-2025.pdf"
               className="bg-red-600 px-4 py-2 rounded-xl shadow-lg font-black text-[10px] md:text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-red-700 transition-all active:scale-95"
             >
-              {activeView === 'home' ? <Download size={16} /> : <Home size={16} />}
-              <span className="hidden xs:inline">{activeView === 'home' ? 'Pricelist' : 'Home'}</span>
-              <span className="xs:hidden">{activeView === 'home' ? 'List' : 'Home'}</span>
-            </button>
+              <Download size={16} />
+              <span className="hidden xs:inline">Pricelist</span>
+              <span className="xs:hidden">List</span>
+            </a>
           </div>
         </div>
 
@@ -286,28 +286,12 @@ export default function App() {
                </div>
             </section>
 
-            {/* DISCOUNT BANNER SECTION */}
-            <section className="bg-gradient-to-b from-[#FDF0F6] to-white py-12 md:py-16">
-               <div className="container mx-auto px-4 flex justify-center">
-                  <motion.img
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                    src="/discount.webp"
-                    alt="80% Discount on all crackers"
-                    onClick={() => setActiveView('order')}
-                    className="w-full max-w-md rounded-[32px] shadow-2xl cursor-pointer hover:scale-[1.02] transition-transform duration-500"
-                  />
-               </div>
-            </section>
-
             {/* ABOUT US SECTION */}
             <section id="about" className="flex flex-col md:flex-row w-full bg-white overflow-hidden">
                {/* Image Side */}
                <div className="w-full md:w-1/2 min-h-[400px] bg-brand-purple relative overflow-hidden">
-                  <img 
-                    src="/bw-about.png" 
+                  <img
+                    src="/discount.webp"
                     alt="About BW Crackers"
                     onError={(e) => { e.currentTarget.src = "https://images.unsplash.com/photo-1549413243-982c7f5c22f6?auto=format&fit=crop&q=80&w=800"; }}
                     className="absolute inset-0 w-full h-full object-cover opacity-90"
