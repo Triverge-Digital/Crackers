@@ -1,6 +1,7 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { ORDER_ENQUIRY_MODULE } from "../../../modules/order-enquiry"
 import OrderEnquiryModuleService from "../../../modules/order-enquiry/service"
+import { sendOrderEnquiryEmail } from "../../../lib/order-email"
 
 export async function POST(req: MedusaRequest, res: MedusaResponse) {
   const orderEnquiryService: OrderEnquiryModuleService = req.scope.resolve(ORDER_ENQUIRY_MODULE)
@@ -58,6 +59,27 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     currency_code: currency_code || "inr",
     status: "pending",
   })
+
+  // Notify the store team by email. Non-blocking: a mail failure must not
+  // prevent the order enquiry from being saved/confirmed.
+  try {
+    await sendOrderEnquiryEmail({
+      id: (enquiry as any)?.id,
+      customer_name,
+      phone: phoneClean,
+      email,
+      address,
+      city,
+      state,
+      pincode,
+      notes,
+      items,
+      subtotal,
+      currency_code: currency_code || "inr",
+    })
+  } catch (err) {
+    console.error("[order-enquiry] Failed to send notification email:", err)
+  }
 
   res.status(201).json({ order_enquiry: enquiry })
 }

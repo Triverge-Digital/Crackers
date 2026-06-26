@@ -20,7 +20,8 @@ IMAGE="haridev111/bwcrackers-api:latest"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 echo "▶ Building + pushing $IMAGE for linux/amd64 (Railway runs amd64)…"
-docker buildx build --platform linux/amd64 -t "$IMAGE" --push "$ROOT"
+echo "   (tip: enable Docker Desktop → Settings → General → 'Use Rosetta for x86/amd64' for fast builds)"
+docker buildx build --platform linux/amd64 -t "$IMAGE" --push --progress=plain "$ROOT"
 
 echo "▶ Redeploying Railway service (re-pulls :latest)…"
 railway redeploy --yes
