@@ -23,5 +23,6 @@ build
 !.yarn/sdks
 !.yarn/versions
 
-# Keep .medusa build output committed for Railway deploy (no build step needed)
-# .medusa
+# Build output is now produced inside the Docker image (multi-stage Dockerfile),
+# so it should not be committed.
+.medusa

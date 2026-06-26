@@ -7,6 +7,12 @@ export interface Product {
   image?: string;
   rating?: number;
   isPremium?: boolean;
+  /**
+   * When false, the storefront renders this product as a name + price row
+   * with NO image. Used for "wala" (garland) crackers that have no photo.
+   * Defaults to true (image shown) when omitted.
+   */
+  showImage?: boolean;
 }
 
 export interface Category {
@@ -96,6 +102,19 @@ export const pricelist: Category[] = [
       { code: "159", name: "MUMBAI INDIANS (31 ITEMS)", unit: "1 BOX", mrp: 2400, discountPrice: 480, image: "/images/products/bw-159-mumbai-indians-31-items.jpeg", rating: 5, isPremium: true },
       { code: "160", name: "CHENNAI SUPER KINGS (42 ITEM)", unit: "1 BOX", mrp: 3500, discountPrice: 690, image: "/images/products/bw-160-chennai-super-kings-42-items.jpeg", rating: 5, isPremium: true },
       { code: "161", name: "ANDAL NACHIYAR (51 ITEMS)", unit: "1 BOX", mrp: 4500, discountPrice: 890, image: "/images/products/bw-161-andul-nachiyar-51-items.jpeg", rating: 5, isPremium: true }
+    ]
+  },
+  {
+    id: 8,
+    name: "WALA CRACKERS",
+    color: "bg-rose-600",
+    // Garland (wala) crackers are listed by name + price only (no photo).
+    // NOTE: prices below are placeholders — confirm/adjust before launch.
+    products: [
+      { code: "201", name: "1000 WALA", unit: "1 PKT", mrp: 1500, discountPrice: 300, rating: 5, showImage: false },
+      { code: "202", name: "2000 WALA", unit: "1 PKT", mrp: 3000, discountPrice: 600, rating: 5, showImage: false },
+      { code: "203", name: "5000 WALA", unit: "1 PKT", mrp: 7500, discountPrice: 1500, rating: 5, showImage: false },
+      { code: "204", name: "VKS 10000 WALA", unit: "1 PKT", mrp: 15000, discountPrice: 3000, rating: 5, showImage: false }
     ]
   }
 ];

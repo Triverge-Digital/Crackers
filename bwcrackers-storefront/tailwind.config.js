@@ -22,6 +22,7 @@ export default {
       fontFamily: {
         sans: ["'Plus Jakarta Sans'", "sans-serif"],
         display: ["'Marcellus'", "serif"],
+        brand: ["'Lilita One'", "cursive"],
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',

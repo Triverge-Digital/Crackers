@@ -34,22 +34,20 @@ import {
 import { pricelist, Product } from './data/pricelist';
 
 const POSTERS = [
-  "/banner1.png",
-  "/banner2.png",
-  "/banner3.png",
-  "/banner4.png"
+  "/banner1.webp",
+  "/banner2.webp",
+  "/banner3.webp",
+  "/banner4.webp"
 ];
 
-const BRANDS = [
-  "/brand1.png",
-  "/brand2.png",
-  "/brand3.png",
-  "/brand4.png",
-  "/brand5.png",
-  "/brand6.png",
-  "/brand7.png",
-  "/brand8.png",
-  "/brand9.png"
+// Fallback brand logos (used only if the backend /store/brands request fails).
+// Live list is fetched from the Medusa backend and managed in the admin.
+const FALLBACK_BRANDS = [
+  { name: "Anil", logo_url: "/brand1.png" },
+  { name: "Bheema", logo_url: "/brand2.png" },
+  { name: "Vanitha", logo_url: "/brand3.png" },
+  { name: "Sony", logo_url: "/brand4.png" },
+  { name: "Star Vell", logo_url: "/brand8.png" }
 ];
 
 const FALLBACK_IMG = "https://images.unsplash.com/photo-1549413243-982c7f5c22f6?auto=format&fit=crop&q=80&w=1200";
@@ -115,6 +113,25 @@ export default function App() {
       return () => clearInterval(timer);
     }
   }, [activeView]);
+
+  // Brands are managed in the Medusa admin and fetched from the backend.
+  // Falls back to the static list if the request fails.
+  const [brands, setBrands] = useState<{ name: string; logo_url: string }[]>(FALLBACK_BRANDS);
+  useEffect(() => {
+    const backendUrl = (import.meta as any).env?.VITE_MEDUSA_BACKEND_URL || 'http://localhost:9000';
+    const apiKey = (import.meta as any).env?.VITE_MEDUSA_PUBLISHABLE_KEY || '';
+    fetch(`${backendUrl}/store/brands`, {
+      headers: apiKey ? { 'x-publishable-api-key': apiKey } : {},
+    })
+      .then(r => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then(data => {
+        const list = (data?.brands || [])
+          .filter((b: any) => b?.logo_url)
+          .map((b: any) => ({ name: b.name, logo_url: b.logo_url }));
+        if (list.length) setBrands(list);
+      })
+      .catch(() => { /* keep fallback brands */ });
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#FDF0F6] flex flex-col font-sans selection:bg-brand-magenta selection:text-white">
@@ -269,6 +286,22 @@ export default function App() {
                </div>
             </section>
 
+            {/* DISCOUNT BANNER SECTION */}
+            <section className="bg-gradient-to-b from-[#FDF0F6] to-white py-12 md:py-16">
+               <div className="container mx-auto px-4 flex justify-center">
+                  <motion.img
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6 }}
+                    src="/discount.webp"
+                    alt="80% Discount on all crackers"
+                    onClick={() => setActiveView('order')}
+                    className="w-full max-w-md rounded-[32px] shadow-2xl cursor-pointer hover:scale-[1.02] transition-transform duration-500"
+                  />
+               </div>
+            </section>
+
             {/* ABOUT US SECTION */}
             <section id="about" className="flex flex-col md:flex-row w-full bg-white overflow-hidden">
                {/* Image Side */}
@@ -284,8 +317,8 @@ export default function App() {
 
                {/* Text Side */}
                <div className="w-full md:w-1/2 bg-[#FDF0F6] p-8 md:p-16 flex flex-col justify-center items-center md:items-start text-center md:text-left">
-                  <h2 className="text-4xl md:text-5xl font-black text-brand-magenta uppercase italic tracking-tighter leading-none mb-8 font-display">
-                    BW CRACKERS <br/> SIVAKASI PATTASU
+                  <h2 className="text-5xl md:text-6xl text-brand-magenta uppercase tracking-wide leading-none mb-8 font-brand">
+                    BW CRACKERS <br/> <span className="text-3xl md:text-4xl">SIVAKASI PATTASU</span>
                   </h2>
                   
                   <div className="space-y-6 text-gray-700 font-bold text-sm md:text-base leading-relaxed">
@@ -453,12 +486,12 @@ export default function App() {
                     transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
                     className="flex gap-12 items-center"
                   >
-                    {[...BRANDS, ...BRANDS].map((brand, i) => (
-                      <div 
-                        key={i} 
+                    {[...brands, ...brands].map((brand, i) => (
+                      <div
+                        key={i}
                         className="w-32 h-20 flex-shrink-0 transition-all cursor-default"
                       >
-                        <img src={brand} alt="Brand" className="w-full h-full object-contain" />
+                        <img src={brand.logo_url} alt={brand.name} title={brand.name} className="w-full h-full object-contain" />
                       </div>
                     ))}
                   </motion.div>
@@ -714,21 +747,31 @@ export default function App() {
                         whileHover={{ y: -12 }}
                         className="bg-white rounded-[40px] overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.03)] border border-gray-100 flex flex-col group relative"
                      >
-                        {/* PRODUCT IMAGE SECTION */}
+                        {/* PRODUCT IMAGE SECTION (hidden for name-only "wala" crackers) */}
+                        {p.showImage === false ? (
+                           <div className="relative h-32 overflow-hidden bg-gradient-to-br from-brand-purple to-brand-magenta flex items-center justify-center px-6">
+                              {p.isPremium && (
+                                 <div className="absolute top-6 left-6 z-10 bg-brand-gold text-brand-purple px-4 py-1 rounded-full text-[9px] font-black uppercase italic tracking-widest shadow-xl border border-white/20">
+                                    Premium
+                                 </div>
+                              )}
+                              <span className="text-2xl font-black text-white uppercase italic tracking-tighter text-center leading-tight drop-shadow-lg font-display">{p.name}</span>
+                           </div>
+                        ) : (
                         <div className="relative aspect-[4/4] overflow-hidden bg-gray-50">
                            {p.isPremium && (
                               <div className="absolute top-6 left-6 z-10 bg-brand-gold text-brand-purple px-4 py-1 rounded-full text-[9px] font-black uppercase italic tracking-widest shadow-xl border border-white/20">
                                  Premium
                               </div>
                            )}
-                           <img 
-                              src={p.image || FALLBACK_IMG} 
+                           <img
+                              src={p.image || FALLBACK_IMG}
                               alt={p.name}
                               onError={(e) => { e.currentTarget.src = FALLBACK_IMG; }}
                               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                            />
                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                              <button 
+                              <button
                                 onClick={() => updateQty(p.code, 1)}
                                 className="bg-brand-magenta text-white px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest shadow-2xl scale-75 group-hover:scale-100 transition-all duration-500"
                               >
@@ -736,6 +779,7 @@ export default function App() {
                               </button>
                            </div>
                         </div>
+                        )}
 
                         {/* PRODUCT INFO */}
                         <div className="p-8 flex-1 flex flex-col">
@@ -857,7 +901,11 @@ export default function App() {
                             <div className="hidden md:grid grid-cols-[1fr_100px_100px_80px] gap-4 items-center">
                               <div className="flex items-center gap-4">
                                 <div className="w-14 h-14 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 flex-shrink-0">
-                                  <img src={p.image || FALLBACK_IMG} alt={p.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = FALLBACK_IMG; }} />
+                                  {p.showImage === false ? (
+                                    <div className="w-full h-full bg-gradient-to-br from-brand-purple to-brand-magenta flex items-center justify-center text-white font-black text-lg">{p.name.charAt(0)}</div>
+                                  ) : (
+                                    <img src={p.image || FALLBACK_IMG} alt={p.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = FALLBACK_IMG; }} />
+                                  )}
                                 </div>
                                 <div>
                                   <h4 className="font-black text-sm text-brand-purple uppercase tracking-tight">{p.name}</h4>
@@ -877,7 +925,11 @@ export default function App() {
                             {/* Mobile */}
                             <div className="md:hidden flex gap-4">
                               <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 flex-shrink-0">
-                                <img src={p.image || FALLBACK_IMG} alt={p.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = FALLBACK_IMG; }} />
+                                {p.showImage === false ? (
+                                  <div className="w-full h-full bg-gradient-to-br from-brand-purple to-brand-magenta flex items-center justify-center text-white font-black text-xl">{p.name.charAt(0)}</div>
+                                ) : (
+                                  <img src={p.image || FALLBACK_IMG} alt={p.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = FALLBACK_IMG; }} />
+                                )}
                               </div>
                               <div className="flex-1 min-w-0">
                                 <h4 className="font-black text-sm text-brand-purple uppercase tracking-tight truncate">{p.name}</h4>
