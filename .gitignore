@@ -100,3 +100,5 @@ scripts/package-lock.json
 *.bak
 *.tmp
 config.bat
+
+.env.*
