@@ -409,7 +409,7 @@ export default function HomeView({
       </section>
 
       {/* ── ABOUT / 80% DISCOUNT IMAGE ── */}
-      <section className="w-full bg-white border-t border-gray-100 md:grid md:grid-cols-2">
+      <section id="about" className="w-full bg-white border-t border-gray-100 md:grid md:grid-cols-2 scroll-mt-28">
         <div className="bg-[#1A1A4E] flex items-center justify-center p-0">
           <img
             src="/discount.webp"
@@ -441,7 +441,7 @@ export default function HomeView({
       </section>
 
       {/* ── OUR PRODUCTS (CIRCULAR CARDS) ── */}
-      <section id="categories" className="py-16 bg-gray-50 border-t border-brand-magenta/5">
+      <section id="categories" className="py-16 bg-gray-50 border-t border-brand-magenta/5 scroll-mt-28">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black text-brand-magenta uppercase tracking-tighter mb-2 italic font-display">Our Products</h2>

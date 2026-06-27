@@ -101,7 +101,7 @@ export const pricelist: Category[] = [
       { code: "158", name: "ROYAL KING (26 ITEMS)", unit: "1 BOX", mrp: 1900, discountPrice: 380, image: "/images/products/bw-158-royal-king-26-items.jpeg", rating: 4, isPremium: true },
       { code: "159", name: "MUMBAI INDIANS (31 ITEMS)", unit: "1 BOX", mrp: 2400, discountPrice: 480, image: "/images/products/bw-159-mumbai-indians-31-items.jpeg", rating: 5, isPremium: true },
       { code: "160", name: "CHENNAI SUPER KINGS (42 ITEM)", unit: "1 BOX", mrp: 3500, discountPrice: 690, image: "/images/products/bw-160-chennai-super-kings-42-items.jpeg", rating: 5, isPremium: true },
-      { code: "161", name: "ANDAL NACHIYAR (51 ITEMS)", unit: "1 BOX", mrp: 4500, discountPrice: 890, image: "/images/products/bw-161-andul-nachiyar-51-items.jpeg", rating: 5, isPremium: true }
+      { code: "161", name: "ANDAL NACHIYAR (51 ITEMS)", unit: "1 BOX", mrp: 4500, discountPrice: 890, image: "/images/products/bw-161-andal-nachiyar-51-items.jpeg", rating: 5, isPremium: true }
     ]
   },
   {
