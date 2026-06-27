@@ -204,28 +204,18 @@ export default function HomeView({
           <h2 className="text-center text-white font-black text-lg md:text-2xl uppercase tracking-wide mb-4">
             Order in 3 Simple Steps
           </h2>
-          {/* Steps — flex row so arrows sit naturally between cards */}
-          <div className="flex items-center gap-1 md:gap-3 mb-5">
+          {/* Steps — horizontal on ALL screen sizes */}
+          <div className="grid grid-cols-3 gap-2 md:gap-4 mb-5">
             {[
               { step: '1', title: 'Browse & Add', desc: 'Tap + on any item you want' },
               { step: '2', title: 'Check Total', desc: 'Min. order Rs.3,000' },
               { step: '3', title: 'WhatsApp Order', desc: 'Green button sends your list' },
-            ].map(({ step, title, desc }, i) => (
-              <>
-                <div key={step} className="flex-1 bg-white/10 rounded-xl p-3 flex flex-col items-center text-center gap-1.5 min-w-0">
-                  <div className="w-8 h-8 rounded-full bg-brand-magenta text-white font-black text-base flex items-center justify-center flex-shrink-0">{step}</div>
-                  <p className="text-white font-black text-[11px] md:text-sm leading-tight">{title}</p>
-                  <p className="text-white/60 text-[10px] md:text-xs font-medium leading-tight hidden sm:block">{desc}</p>
-                </div>
-                {i < 2 && (
-                  <div key={`arrow-${i}`} className="flex-shrink-0 w-8 md:w-12 flex items-center justify-center -mt-4">
-                    <svg viewBox="0 0 48 24" className="w-full" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M2 18 Q24 2 44 12" fill="none" stroke="#FFD700" strokeWidth="2" strokeDasharray="5 3" strokeLinecap="round"/>
-                      <path d="M39 9 L44 12 L40 16" fill="none" stroke="#FFD700" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </div>
-                )}
-              </>
+            ].map(({ step, title, desc }) => (
+              <div key={step} className="bg-white/10 rounded-xl p-3 flex flex-col items-center text-center gap-1.5">
+                <div className="w-8 h-8 rounded-full bg-brand-magenta text-white font-black text-base flex items-center justify-center flex-shrink-0">{step}</div>
+                <p className="text-white font-black text-[11px] md:text-sm leading-tight">{title}</p>
+                <p className="text-white/60 text-[10px] md:text-xs font-medium leading-tight hidden sm:block">{desc}</p>
+              </div>
             ))}
           </div>
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
