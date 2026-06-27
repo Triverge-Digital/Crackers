@@ -21,5 +21,17 @@ export const FALLBACK_IMG = "https://images.unsplash.com/photo-1549413243-982c7f
 
 export const MIN_ORDER = 3000;
 
+// Contact details (shown in footer + WhatsApp button).
+export const CONTACT = {
+  primaryPhone: "93630 36289",
+  secondaryPhone: "78670 36289",
+  email: "bwcrackers@gmail.com",
+};
+// E.164 (no spaces / +) for wa.me + tel: links — India country code 91.
+export const PRIMARY_PHONE_INTL = "919363036289";
+export const WHATSAPP_LINK = `https://wa.me/${PRIMARY_PHONE_INTL}?text=${encodeURIComponent(
+  "Hi BW Crackers, I'd like to know more about your products."
+)}`;
+
 export type Totals = { total: number; count: number };
 export type Brand = { name: string; logo_url: string };

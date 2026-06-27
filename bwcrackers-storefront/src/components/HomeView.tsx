@@ -15,7 +15,7 @@ import {
   MapPin
 } from 'lucide-react';
 import { pricelist } from '../data/pricelist';
-import { POSTERS, FALLBACK_IMG, MIN_ORDER, Brand } from '../constants';
+import { POSTERS, FALLBACK_IMG, MIN_ORDER, Brand, CONTACT, WHATSAPP_LINK, PRIMARY_PHONE_INTL } from '../constants';
 
 type HomeViewProps = {
   setActiveView: (v: string) => void;
@@ -26,6 +26,17 @@ type HomeViewProps = {
 };
 
 export default function HomeView({ setActiveView, currentPoster, setCurrentPoster, setSelectedCategory, brands }: HomeViewProps) {
+  // Swipe support for the hero carousel (replaces the arrow buttons on mobile).
+  const touchStartX = React.useRef<number | null>(null);
+  const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    if (dx > 50) setCurrentPoster(p => (p - 1 + POSTERS.length) % POSTERS.length);
+    else if (dx < -50) setCurrentPoster(p => (p + 1) % POSTERS.length);
+    touchStartX.current = null;
+  };
+
   return (
     <motion.div
       key="home"
@@ -35,7 +46,11 @@ export default function HomeView({ setActiveView, currentPoster, setCurrentPoste
       className="flex flex-col"
     >
       {/* CAROUSEL */}
-      <section className="relative aspect-[3/1] w-full overflow-hidden bg-[#1A1A4E]">
+      <section
+        className="relative aspect-[16/10] sm:aspect-[2/1] md:aspect-[3/1] w-full overflow-hidden bg-[#1A1A4E] touch-pan-y"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
          <AnimatePresence initial={false}>
             <motion.img
               key={currentPoster}
@@ -50,8 +65,8 @@ export default function HomeView({ setActiveView, currentPoster, setCurrentPoste
             />
          </AnimatePresence>
 
-         {/* Carousel Navigation */}
-         <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 px-4 flex justify-between z-20">
+         {/* Carousel Navigation (desktop only — mobile uses swipe) */}
+         <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 px-4 hidden md:flex justify-between z-20">
             <button
               onClick={() => setCurrentPoster(p => (p - 1 + POSTERS.length) % POSTERS.length)}
               className="w-10 h-10 bg-brand-magenta/80 text-white rounded-full flex items-center justify-center hover:bg-brand-magenta transition-colors shadow-lg"
@@ -256,21 +271,30 @@ export default function HomeView({ setActiveView, currentPoster, setCurrentPoste
             <h2 className="text-3xl font-black text-brand-magenta uppercase tracking-tighter italic mb-2 font-display">Our Brands</h2>
             <div className="w-16 h-1 bg-brand-gold mx-auto rounded-full" />
          </div>
-         <div className="relative flex whitespace-nowrap">
-            <motion.div
-              animate={{ x: ["0%", "-50%"] }}
-              transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
-              className="flex gap-12 items-center"
-            >
-              {[...brands, ...brands].map((brand, i) => (
-                <div
-                  key={i}
-                  className="w-32 h-20 flex-shrink-0 transition-all cursor-default"
+         <div className="relative flex overflow-hidden">
+            {(() => {
+              // Repeat the brand set enough to overflow the widest viewport, then
+              // render two identical tracks. Each track scrolls a full -100% of its
+              // own width (incl. the trailing gap from pr-12), so the two tracks
+              // tile perfectly with no gap/jump at the loop point.
+              const reps = Math.max(2, Math.ceil(12 / (brands.length || 1)));
+              const track = Array.from({ length: reps }).flatMap(() => brands);
+              return [0, 1].map((t) => (
+                <motion.div
+                  key={t}
+                  aria-hidden={t === 1}
+                  animate={{ x: ["0%", "-100%"] }}
+                  transition={{ repeat: Infinity, duration: track.length * 4, ease: "linear" }}
+                  className="flex gap-12 items-center pr-12 shrink-0"
                 >
-                  <img src={brand.logo_url} alt={brand.name} title={brand.name} className="w-full h-full object-contain" />
-                </div>
-              ))}
-            </motion.div>
+                  {track.map((brand, i) => (
+                    <div key={i} className="w-32 h-20 flex-shrink-0 cursor-default">
+                      <img src={brand.logo_url} alt={brand.name} title={brand.name} className="w-full h-full object-contain" />
+                    </div>
+                  ))}
+                </motion.div>
+              ));
+            })()}
          </div>
       </div>
 
@@ -323,7 +347,7 @@ export default function HomeView({ setActiveView, currentPoster, setCurrentPoste
                   <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-magenta transition-colors">
                      <Instagram size={20} />
                   </a>
-                  <a href="https://wa.me/91XXXXXXXXXX" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-[#25D366] transition-colors">
+                  <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-[#25D366] transition-colors">
                      <MessageCircle size={20} />
                   </a>
                   <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-[#1877F2] transition-colors">
@@ -361,24 +385,34 @@ export default function HomeView({ setActiveView, currentPoster, setCurrentPoste
             <div>
                <h4 className="text-brand-gold font-black uppercase tracking-widest text-sm mb-8">Connectivity</h4>
                <div className="space-y-6">
-                  <div className="flex gap-4">
-                     <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0">
+                  <a href={`mailto:${CONTACT.email}`} className="flex gap-4 group">
+                     <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-gold/20 transition-colors">
                         <Mail size={18} className="text-brand-gold" />
                      </div>
                      <div className="flex flex-col">
                         <span className="text-[10px] text-gray-500 uppercase font-black">Inquiry</span>
-                        <span className="text-sm font-bold">info@bwcrackers.com</span>
+                        <span className="text-sm font-bold group-hover:text-brand-gold transition-colors">{CONTACT.email}</span>
                      </div>
-                  </div>
+                  </a>
                   <div className="flex gap-4">
                      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0">
                         <Phone size={18} className="text-brand-gold" />
                      </div>
                      <div className="flex flex-col">
                         <span className="text-[10px] text-gray-500 uppercase font-black">Hotline</span>
-                        <span className="text-sm font-bold">+91 98765 43210</span>
+                        <a href={`tel:+${PRIMARY_PHONE_INTL}`} className="text-sm font-bold hover:text-brand-gold transition-colors">+91 {CONTACT.primaryPhone}</a>
+                        <a href="tel:+917867036289" className="text-sm font-bold hover:text-brand-gold transition-colors">+91 {CONTACT.secondaryPhone}</a>
                      </div>
                   </div>
+                  <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="flex gap-4 group">
+                     <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0 group-hover:bg-[#25D366]/20 transition-colors">
+                        <MessageCircle size={18} className="text-[#25D366]" />
+                     </div>
+                     <div className="flex flex-col">
+                        <span className="text-[10px] text-gray-500 uppercase font-black">WhatsApp</span>
+                        <span className="text-sm font-bold group-hover:text-[#25D366] transition-colors">+91 {CONTACT.primaryPhone}</span>
+                     </div>
+                  </a>
                   <div className="flex gap-4">
                      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0">
                         <MapPin size={18} className="text-brand-gold" />

@@ -6,6 +6,7 @@ import Header from './components/Header';
 import HomeView from './components/HomeView';
 import StoreView from './components/StoreView';
 import CartView from './components/CartView';
+import WhatsAppButton from './components/WhatsAppButton';
 
 export default function App() {
   const [activeView, setActiveView] = useState('home');
@@ -130,6 +131,8 @@ export default function App() {
           />
         )}
       </AnimatePresence>
+
+      <WhatsAppButton />
     </div>
   );
 }

@@ -10,7 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends python3 build-e
     && rm -rf /var/lib/apt/lists/*
 
 COPY bwcrackers/package.json bwcrackers/package-lock.json ./
-RUN npm ci --loglevel=error
+# Cache mount keeps downloaded tarballs across builds → fast re-installs.
+RUN --mount=type=cache,target=/root/.npm npm ci --loglevel=error
 
 COPY bwcrackers/ ./
 # Produces a self-contained app in .medusa/server (with its own package.json)
@@ -23,8 +24,9 @@ ENV NODE_ENV=production
 WORKDIR /app
 
 COPY --from=builder /app/.medusa/server ./
-RUN npm install --omit=dev --loglevel=error \
-    && npm cache clean --force
+# Same npm cache mount; do NOT `npm cache clean` (the cache lives in the mount,
+# not the layer, so it doesn't bloat the image and speeds up every rebuild).
+RUN --mount=type=cache,target=/root/.npm npm install --omit=dev --loglevel=error
 
 EXPOSE 9000
 
