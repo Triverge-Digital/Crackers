@@ -37,6 +37,13 @@ export default function HomeView({ setActiveView, currentPoster, setCurrentPoste
     touchStartX.current = null;
   };
 
+  // Open the store filtered to a specific category and scroll back to the top.
+  const goToCategory = (categoryId: string | number) => {
+    setSelectedCategory(categoryId);
+    setActiveView('order');
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  };
+
   return (
     <motion.div
       key="home"
@@ -128,10 +135,6 @@ export default function HomeView({ setActiveView, currentPoster, setCurrentPoste
                 80% discount on MRP.
               </p>
             </div>
-
-            <button className="mt-12 bg-brand-magenta text-white px-10 py-4 rounded-full font-black text-sm uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl">
-              Read More
-            </button>
          </div>
       </section>
 
@@ -372,12 +375,13 @@ export default function HomeView({ setActiveView, currentPoster, setCurrentPoste
             <div>
                <h4 className="text-brand-gold font-black uppercase tracking-widest text-sm mb-8">Collections</h4>
                <ul className="space-y-4 text-gray-400 font-bold text-sm">
-                  <li><button onClick={() => setActiveView('order')} className="hover:text-white transition-colors">Single Sound Crackers</button></li>
-                  <li><button onClick={() => setActiveView('order')} className="hover:text-white transition-colors">Deluxe Crackers</button></li>
-                  <li><button onClick={() => setActiveView('order')} className="hover:text-white transition-colors">Bijili Crackers</button></li>
-                  <li><button onClick={() => setActiveView('order')} className="hover:text-white transition-colors">Rockets</button></li>
-                  <li><button onClick={() => setActiveView('order')} className="hover:text-white transition-colors">Candles</button></li>
-                  <li><button onClick={() => setActiveView('order')} className="hover:text-white transition-colors">Color Pencil</button></li>
+                  {pricelist.slice(0, 6).map((cat) => (
+                     <li key={cat.id}>
+                        <button onClick={() => goToCategory(cat.id)} className="text-left hover:text-white transition-colors capitalize">
+                           {cat.name.toLowerCase()}
+                        </button>
+                     </li>
+                  ))}
                </ul>
             </div>
 
