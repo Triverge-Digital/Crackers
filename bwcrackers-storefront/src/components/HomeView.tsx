@@ -95,63 +95,58 @@ export default function HomeView({
           style={{ zIndex: 0 }}
         />
 
-        {/* Sparkle doodle overlay */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 2 }} aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-          {/* 4-point star helper: cx cy size */}
-          {/* top-left cluster */}
+        {/* Sparkle doodle overlay — viewBox coords so stars scale to any screen width */}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 2 }} viewBox="0 0 300 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+          {/* TOP-LEFT cluster */}
           <g opacity="0.55" fill="none" stroke="#FFD700" strokeLinecap="round">
-            <path d="M60 40 L60 28 M60 40 L60 52 M60 40 L48 40 M60 40 L72 40" strokeWidth="1.8"/>
-            <path d="M60 40 L54 34 M60 40 L66 46 M60 40 L54 46 M60 40 L66 34" strokeWidth="1"/>
-            <circle cx="60" cy="40" r="2.5" fill="#FFD700" opacity="0.8"/>
+            <path d="M15 18 L15 10 M15 18 L15 26 M15 18 L7 18 M15 18 L23 18" strokeWidth="0.6"/>
+            <path d="M15 18 L11 14 M15 18 L19 22 M15 18 L11 22 M15 18 L19 14" strokeWidth="0.35"/>
+            <circle cx="15" cy="18" r="1" fill="#FFD700" opacity="0.8"/>
           </g>
           <g opacity="0.4" fill="none" stroke="#FFD700" strokeLinecap="round">
-            <path d="M110 75 L110 67 M110 75 L110 83 M110 75 L102 75 M110 75 L118 75" strokeWidth="1.4"/>
-            <circle cx="110" cy="75" r="1.8" fill="#FFD700" opacity="0.7"/>
+            <path d="M28 35 L28 29 M28 35 L28 41 M28 35 L22 35 M28 35 L34 35" strokeWidth="0.5"/>
+            <circle cx="28" cy="35" r="0.8" fill="#FFD700" opacity="0.7"/>
           </g>
           <g opacity="0.35" fill="none" stroke="#ffffff" strokeLinecap="round">
-            <path d="M35 90 L35 83 M35 90 L35 97 M35 90 L28 90 M35 90 L42 90" strokeWidth="1.2"/>
-            <circle cx="35" cy="90" r="1.5" fill="#ffffff" opacity="0.6"/>
+            <path d="M8 55 L8 49 M8 55 L8 61 M8 55 L2 55 M8 55 L14 55" strokeWidth="0.45"/>
+            <circle cx="8" cy="55" r="0.7" fill="#ffffff" opacity="0.6"/>
           </g>
-          {/* top-right cluster */}
-          <g opacity="0.5" fill="none" stroke="#FFD700" strokeLinecap="round">
-            <path d="M88% 30 L88% 18 M88% 30 L88% 42" strokeWidth="1.8"/>
-          </g>
-          <g opacity="0.55" fill="none" stroke="#FFD700" strokeLinecap="round" transform="translate(-80, 0)">
-            <path d="M100% 45 L100% 33 M100% 45 L100% 57" strokeWidth="1.5"/>
-          </g>
-          {/* Use fixed positions for right side */}
+
+          {/* TOP-RIGHT cluster */}
           <g opacity="0.55" fill="none" stroke="#FFD700" strokeLinecap="round">
-            <path d="M1180 50 L1180 38 M1180 50 L1180 62 M1180 50 L1168 50 M1180 50 L1192 50" strokeWidth="1.8"/>
-            <path d="M1180 50 L1174 44 M1180 50 L1186 56 M1180 50 L1174 56 M1180 50 L1186 44" strokeWidth="1"/>
-            <circle cx="1180" cy="50" r="2.5" fill="#FFD700" opacity="0.8"/>
+            <path d="M285 18 L285 10 M285 18 L285 26 M285 18 L277 18 M285 18 L293 18" strokeWidth="0.6"/>
+            <path d="M285 18 L281 14 M285 18 L289 22 M285 18 L281 22 M285 18 L289 14" strokeWidth="0.35"/>
+            <circle cx="285" cy="18" r="1" fill="#FFD700" opacity="0.8"/>
           </g>
           <g opacity="0.4" fill="none" stroke="#ffffff" strokeLinecap="round">
-            <path d="M1230 90 L1230 82 M1230 90 L1230 98 M1230 90 L1222 90 M1230 90 L1238 90" strokeWidth="1.4"/>
-            <circle cx="1230" cy="90" r="1.8" fill="#ffffff" opacity="0.6"/>
+            <path d="M272 38 L272 32 M272 38 L272 44 M272 38 L266 38 M272 38 L278 38" strokeWidth="0.5"/>
+            <circle cx="272" cy="38" r="0.8" fill="#ffffff" opacity="0.6"/>
           </g>
           <g opacity="0.35" fill="none" stroke="#FFD700" strokeLinecap="round">
-            <path d="M1280 60 L1280 53 M1280 60 L1280 67 M1280 60 L1273 60 M1280 60 L1287 60" strokeWidth="1.2"/>
-            <circle cx="1280" cy="60" r="1.5" fill="#FFD700" opacity="0.5"/>
+            <path d="M294 55 L294 49 M294 55 L294 61 M294 55 L288 55 M294 55 L300 55" strokeWidth="0.45"/>
+            <circle cx="294" cy="55" r="0.7" fill="#FFD700" opacity="0.5"/>
           </g>
-          {/* bottom-left */}
+
+          {/* BOTTOM-LEFT */}
           <g opacity="0.3" fill="none" stroke="#ffffff" strokeLinecap="round">
-            <path d="M80 140 L80 133 M80 140 L80 147 M80 140 L73 140 M80 140 L87 140" strokeWidth="1.2"/>
-            <circle cx="80" cy="140" r="1.5" fill="#ffffff" opacity="0.5"/>
+            <path d="M18 80 L18 74 M18 80 L18 86 M18 80 L12 80 M18 80 L24 80" strokeWidth="0.45"/>
+            <circle cx="18" cy="80" r="0.7" fill="#ffffff" opacity="0.5"/>
           </g>
-          {/* bottom-right */}
+
+          {/* BOTTOM-RIGHT */}
           <g opacity="0.3" fill="none" stroke="#FFD700" strokeLinecap="round">
-            <path d="M1200 145 L1200 138 M1200 145 L1200 152 M1200 145 L1193 145 M1200 145 L1207 145" strokeWidth="1.2"/>
-            <circle cx="1200" cy="145" r="1.5" fill="#FFD700" opacity="0.5"/>
+            <path d="M282 80 L282 74 M282 80 L282 86 M282 80 L276 80 M282 80 L288 80" strokeWidth="0.45"/>
+            <circle cx="282" cy="80" r="0.7" fill="#FFD700" opacity="0.5"/>
           </g>
-          {/* scattered tiny dots */}
-          <circle cx="200" cy="30" r="2" fill="#FFD700" opacity="0.5"/>
-          <circle cx="400" cy="55" r="1.5" fill="#ffffff" opacity="0.4"/>
-          <circle cx="650" cy="25" r="2" fill="#FFD700" opacity="0.45"/>
-          <circle cx="900" cy="60" r="1.5" fill="#ffffff" opacity="0.35"/>
-          <circle cx="1050" cy="35" r="2" fill="#FFD700" opacity="0.4"/>
-          <circle cx="300" cy="130" r="1.5" fill="#FFD700" opacity="0.3"/>
-          <circle cx="750" cy="140" r="2" fill="#ffffff" opacity="0.3"/>
-          <circle cx="1100" cy="120" r="1.5" fill="#FFD700" opacity="0.3"/>
+
+          {/* Scattered centre dots */}
+          <circle cx="75"  cy="12" r="0.8" fill="#FFD700" opacity="0.45"/>
+          <circle cx="150" cy="8"  r="0.9" fill="#ffffff" opacity="0.35"/>
+          <circle cx="225" cy="14" r="0.8" fill="#FFD700" opacity="0.4"/>
+          <circle cx="110" cy="85" r="0.7" fill="#FFD700" opacity="0.3"/>
+          <circle cx="190" cy="88" r="0.8" fill="#ffffff" opacity="0.28"/>
+          <circle cx="60"  cy="70" r="0.6" fill="#FFD700" opacity="0.25"/>
+          <circle cx="245" cy="72" r="0.6" fill="#ffffff" opacity="0.25"/>
         </svg>
         <AnimatePresence initial={false}>
           <motion.img
