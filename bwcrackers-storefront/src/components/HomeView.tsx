@@ -1,21 +1,14 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ChevronLeft,
-  ChevronRight,
-  ShieldCheck,
-  Truck,
-  Headphones,
-  Award,
-  Instagram,
-  MessageCircle,
-  Facebook,
-  Mail,
-  Phone,
-  MapPin
+  ChevronLeft, ChevronRight, ShieldCheck, Truck,
+  Headphones, Award, Instagram, MessageCircle,
+  Facebook, Mail, Phone, MapPin, Plus, Minus, ChevronDown, ChevronUp,
+  Search, X
 } from 'lucide-react';
 import { pricelist } from '../data/pricelist';
-import { POSTERS, FALLBACK_IMG, MIN_ORDER, Brand, CONTACT, WHATSAPP_LINK, PRIMARY_PHONE_INTL } from '../constants';
+import { POSTERS, FALLBACK_IMG, MIN_ORDER, Brand, CONTACT, WHATSAPP_LINK, PRIMARY_PHONE_INTL, Totals } from '../constants';
+import OrderModal from './OrderModal';
 
 type HomeViewProps = {
   setActiveView: (v: string) => void;
@@ -23,11 +16,36 @@ type HomeViewProps = {
   setCurrentPoster: React.Dispatch<React.SetStateAction<number>>;
   setSelectedCategory: React.Dispatch<React.SetStateAction<string | number>>;
   brands: Brand[];
+  cart: Record<string, number>;
+  updateQty: (code: string, delta: number) => void;
+  totals: Totals;
 };
 
-export default function HomeView({ setActiveView, currentPoster, setCurrentPoster, setSelectedCategory, brands }: HomeViewProps) {
-  // Swipe support for the hero carousel (replaces the arrow buttons on mobile).
-  const touchStartX = React.useRef<number | null>(null);
+export default function HomeView({
+  setActiveView, currentPoster, setCurrentPoster,
+  setSelectedCategory, brands, cart, updateQty, totals
+}: HomeViewProps) {
+  const [openCategories, setOpenCategories] = useState<Set<number>>(
+    new Set(pricelist.map(c => c.id))
+  );
+  const [modalOpen, setModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+
+  const filteredPricelist = pricelist.map(cat => ({
+    ...cat,
+    products: cat.products.filter(p =>
+      !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  })).filter(cat => cat.products.length > 0);
+
+  // Auto-play carousel every 5 seconds
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentPoster(p => (p + 1) % POSTERS.length), 5000);
+    return () => clearInterval(timer);
+  }, [setCurrentPoster]);
+
+  const touchStartX = useRef<number | null>(null);
   const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartX.current === null) return;
@@ -37,410 +55,638 @@ export default function HomeView({ setActiveView, currentPoster, setCurrentPoste
     touchStartX.current = null;
   };
 
-  // Open the store filtered to a specific category and scroll back to the top.
+  const toggleCategory = (id: number) => {
+    setOpenCategories(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
   const goToCategory = (categoryId: string | number) => {
     setSelectedCategory(categoryId);
     setActiveView('order');
     window.scrollTo({ top: 0, behavior: 'auto' });
   };
 
+  const progress = Math.min((totals.total / MIN_ORDER) * 100, 100);
+  const remaining = Math.max(MIN_ORDER - totals.total, 0);
+
+  const catColors: Record<number, string> = {
+    1: 'bg-red-600', 2: 'bg-blue-600', 3: 'bg-green-600', 4: 'bg-purple-600',
+    5: 'bg-orange-500', 6: 'bg-pink-600', 7: 'bg-indigo-600', 8: 'bg-yellow-600',
+    9: 'bg-teal-600', 10: 'bg-rose-600', 11: 'bg-cyan-600', 12: 'bg-amber-600',
+  };
+
   return (
-    <motion.div
-      key="home"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="flex flex-col"
-    >
-      {/* CAROUSEL */}
+    <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col">
+
+      {/* ── HERO CAROUSEL ── */}
       <section
-        className="relative aspect-[16/10] sm:aspect-[2/1] md:aspect-[3/1] w-full overflow-hidden bg-[#1A1A4E] touch-pan-y"
+        className="relative w-full overflow-hidden bg-[#1A1A4E] touch-pan-y aspect-[3/1]"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-         <AnimatePresence initial={false}>
-            <motion.img
-              key={currentPoster}
-              src={POSTERS[currentPoster]}
-              onError={(e) => { e.currentTarget.src = FALLBACK_IMG; }}
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ type: "tween", ease: "easeInOut", duration: 0.8 }}
-              className="absolute inset-0 w-full h-full object-cover"
-              style={{ zIndex: 1 }}
-            />
-         </AnimatePresence>
+        {/* Base image always visible — prevents background from ever showing */}
+        <img
+          src={POSTERS[currentPoster]}
+          onError={e => { e.currentTarget.src = FALLBACK_IMG; }}
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ zIndex: 0 }}
+        />
 
-         {/* Carousel Navigation (desktop only — mobile uses swipe) */}
-         <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 px-4 hidden md:flex justify-between z-20">
-            <button
-              onClick={() => setCurrentPoster(p => (p - 1 + POSTERS.length) % POSTERS.length)}
-              className="w-10 h-10 bg-brand-magenta/80 text-white rounded-full flex items-center justify-center hover:bg-brand-magenta transition-colors shadow-lg"
-            >
-              <ChevronLeft size={24} />
-            </button>
-            <button
-              onClick={() => setCurrentPoster(p => (p + 1) % POSTERS.length)}
-              className="w-10 h-10 bg-brand-magenta/80 text-white rounded-full flex items-center justify-center hover:bg-brand-magenta transition-colors shadow-lg"
-            >
-              <ChevronRight size={24} />
-            </button>
-         </div>
-
-         {/* Carousel Indicators (Squares) */}
-         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-           {POSTERS.map((_, i) => (
-              <div
-                key={i}
-                className={`w-3 h-3 transition-all border border-white cursor-pointer ${i === currentPoster ? 'scale-110 bg-brand-magenta' : 'bg-white/40'}`}
-                onClick={() => setCurrentPoster(i)}
-              />
-           ))}
-         </div>
+        {/* Sparkle doodle overlay */}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 2 }} aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+          {/* 4-point star helper: cx cy size */}
+          {/* top-left cluster */}
+          <g opacity="0.55" fill="none" stroke="#FFD700" strokeLinecap="round">
+            <path d="M60 40 L60 28 M60 40 L60 52 M60 40 L48 40 M60 40 L72 40" strokeWidth="1.8"/>
+            <path d="M60 40 L54 34 M60 40 L66 46 M60 40 L54 46 M60 40 L66 34" strokeWidth="1"/>
+            <circle cx="60" cy="40" r="2.5" fill="#FFD700" opacity="0.8"/>
+          </g>
+          <g opacity="0.4" fill="none" stroke="#FFD700" strokeLinecap="round">
+            <path d="M110 75 L110 67 M110 75 L110 83 M110 75 L102 75 M110 75 L118 75" strokeWidth="1.4"/>
+            <circle cx="110" cy="75" r="1.8" fill="#FFD700" opacity="0.7"/>
+          </g>
+          <g opacity="0.35" fill="none" stroke="#ffffff" strokeLinecap="round">
+            <path d="M35 90 L35 83 M35 90 L35 97 M35 90 L28 90 M35 90 L42 90" strokeWidth="1.2"/>
+            <circle cx="35" cy="90" r="1.5" fill="#ffffff" opacity="0.6"/>
+          </g>
+          {/* top-right cluster */}
+          <g opacity="0.5" fill="none" stroke="#FFD700" strokeLinecap="round">
+            <path d="M88% 30 L88% 18 M88% 30 L88% 42" strokeWidth="1.8"/>
+          </g>
+          <g opacity="0.55" fill="none" stroke="#FFD700" strokeLinecap="round" transform="translate(-80, 0)">
+            <path d="M100% 45 L100% 33 M100% 45 L100% 57" strokeWidth="1.5"/>
+          </g>
+          {/* Use fixed positions for right side */}
+          <g opacity="0.55" fill="none" stroke="#FFD700" strokeLinecap="round">
+            <path d="M1180 50 L1180 38 M1180 50 L1180 62 M1180 50 L1168 50 M1180 50 L1192 50" strokeWidth="1.8"/>
+            <path d="M1180 50 L1174 44 M1180 50 L1186 56 M1180 50 L1174 56 M1180 50 L1186 44" strokeWidth="1"/>
+            <circle cx="1180" cy="50" r="2.5" fill="#FFD700" opacity="0.8"/>
+          </g>
+          <g opacity="0.4" fill="none" stroke="#ffffff" strokeLinecap="round">
+            <path d="M1230 90 L1230 82 M1230 90 L1230 98 M1230 90 L1222 90 M1230 90 L1238 90" strokeWidth="1.4"/>
+            <circle cx="1230" cy="90" r="1.8" fill="#ffffff" opacity="0.6"/>
+          </g>
+          <g opacity="0.35" fill="none" stroke="#FFD700" strokeLinecap="round">
+            <path d="M1280 60 L1280 53 M1280 60 L1280 67 M1280 60 L1273 60 M1280 60 L1287 60" strokeWidth="1.2"/>
+            <circle cx="1280" cy="60" r="1.5" fill="#FFD700" opacity="0.5"/>
+          </g>
+          {/* bottom-left */}
+          <g opacity="0.3" fill="none" stroke="#ffffff" strokeLinecap="round">
+            <path d="M80 140 L80 133 M80 140 L80 147 M80 140 L73 140 M80 140 L87 140" strokeWidth="1.2"/>
+            <circle cx="80" cy="140" r="1.5" fill="#ffffff" opacity="0.5"/>
+          </g>
+          {/* bottom-right */}
+          <g opacity="0.3" fill="none" stroke="#FFD700" strokeLinecap="round">
+            <path d="M1200 145 L1200 138 M1200 145 L1200 152 M1200 145 L1193 145 M1200 145 L1207 145" strokeWidth="1.2"/>
+            <circle cx="1200" cy="145" r="1.5" fill="#FFD700" opacity="0.5"/>
+          </g>
+          {/* scattered tiny dots */}
+          <circle cx="200" cy="30" r="2" fill="#FFD700" opacity="0.5"/>
+          <circle cx="400" cy="55" r="1.5" fill="#ffffff" opacity="0.4"/>
+          <circle cx="650" cy="25" r="2" fill="#FFD700" opacity="0.45"/>
+          <circle cx="900" cy="60" r="1.5" fill="#ffffff" opacity="0.35"/>
+          <circle cx="1050" cy="35" r="2" fill="#FFD700" opacity="0.4"/>
+          <circle cx="300" cy="130" r="1.5" fill="#FFD700" opacity="0.3"/>
+          <circle cx="750" cy="140" r="2" fill="#ffffff" opacity="0.3"/>
+          <circle cx="1100" cy="120" r="1.5" fill="#FFD700" opacity="0.3"/>
+        </svg>
+        <AnimatePresence initial={false}>
+          <motion.img
+            key={currentPoster}
+            src={POSTERS[currentPoster]}
+            onError={e => { e.currentTarget.src = FALLBACK_IMG; }}
+            initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "-100%" }}
+            transition={{ type: "tween", ease: "easeInOut", duration: 0.6 }}
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ zIndex: 1 }}
+          />
+        </AnimatePresence>
+        <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 px-4 hidden md:flex justify-between z-20">
+          <button onClick={() => setCurrentPoster(p => (p - 1 + POSTERS.length) % POSTERS.length)} className="w-10 h-10 bg-brand-magenta/80 text-white rounded-full flex items-center justify-center hover:bg-brand-magenta transition-colors shadow-lg"><ChevronLeft size={24} /></button>
+          <button onClick={() => setCurrentPoster(p => (p + 1) % POSTERS.length)} className="w-10 h-10 bg-brand-magenta/80 text-white rounded-full flex items-center justify-center hover:bg-brand-magenta transition-colors shadow-lg"><ChevronRight size={24} /></button>
+        </div>
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+          {POSTERS.map((_, i) => (
+            <div key={i} onClick={() => setCurrentPoster(i)} className={`w-3 h-3 border border-white cursor-pointer transition-all ${i === currentPoster ? 'bg-brand-magenta scale-110' : 'bg-white/40'}`} />
+          ))}
+        </div>
       </section>
 
-      {/* ABOUT US SECTION */}
-      <section id="about" className="flex flex-col md:flex-row w-full bg-white overflow-hidden">
-         {/* Image Side */}
-         <div className="w-full md:w-1/2 min-h-[400px] bg-brand-purple relative overflow-hidden flex items-center justify-center p-6">
-            <img
-              src="/discount.webp"
-              alt="About BW Crackers"
-              onError={(e) => { e.currentTarget.src = "https://images.unsplash.com/photo-1549413243-982c7f5c22f6?auto=format&fit=crop&q=80&w=800"; }}
-              className="max-w-full max-h-full w-auto h-auto object-contain"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-brand-purple/20 to-transparent" />
-         </div>
-
-         {/* Text Side */}
-         <div className="w-full md:w-1/2 bg-[#FDF0F6] p-8 md:p-16 flex flex-col justify-center items-center md:items-start text-center md:text-left">
-            <h2 className="text-5xl md:text-6xl text-brand-magenta uppercase tracking-wide leading-none mb-8 font-brand">
-              BW CRACKERS <br/> <span className="text-3xl md:text-4xl">SIVAKASI PATTASU</span>
-            </h2>
-
-            <div className="space-y-6 text-gray-700 font-bold text-sm md:text-base leading-relaxed">
-              <p>
-                Welcome to BW Crackers, your premier destination for high-quality firecrackers and fireworks.
-                Based in Sivakasi, the fireworks capital of India, we have been bringing joy and light to
-                celebrations for over a decade.
-              </p>
-              <p>
-                Our commitment to safety, quality, and customer satisfaction sets us apart. All our products
-                are certified and tested to ensure a spectacular yet safe experience for your family and loved ones.
-              </p>
-              <p>
-                We source directly from the finest manufacturers in Sivakasi, ensuring that every product meets
-                the highest standards of quality while offering the best prices in the market with our signature
-                80% discount on MRP.
-              </p>
+      {/* ── FESTIVAL OFFER BANNER ── */}
+      <AnimatePresence>
+        {!bannerDismissed && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="bg-brand-gold flex items-center justify-between px-4 py-2.5 gap-3">
+              <div className="flex items-center gap-2 flex-1 justify-center">
+                <span className="text-brand-purple font-black text-xs md:text-sm uppercase tracking-wide text-center">
+                  🎆 Festival Special — Flat 80% Off on all Sivakasi crackers! Order now &amp; celebrate big 🎆
+                </span>
+              </div>
+              <button onClick={() => setBannerDismissed(true)} className="text-brand-purple hover:opacity-70 flex-shrink-0 transition-opacity">
+                <X size={16} />
+              </button>
             </div>
-         </div>
-      </section>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* MIN ORDER RIBBON */}
-      <div className="bg-brand-magenta py-4 shadow-xl border-y-4 border-brand-gold/20">
-         <div className="container mx-auto px-4 text-center">
-            <h3 className="text-xl md:text-2xl font-black text-white uppercase italic tracking-wider">
-              Minimum Order Value Rs.{MIN_ORDER}
-            </h3>
-            <p className="text-[10px] md:text-xs text-brand-gold font-bold uppercase mt-1 tracking-widest">
-              Explore secure crackers for a safer environment. The order starts at a minimum price of Rs. {MIN_ORDER}.
-            </p>
-            <button
-              onClick={() => setActiveView('order')}
-              className="mt-3 bg-white text-brand-magenta px-6 py-2 rounded-full font-black text-xs uppercase hover:scale-105 transition-transform shadow-lg"
-            >
-              Order Now
-            </button>
-         </div>
-      </div>
-
-      {/* OUR PRODUCTS (CIRCULAR) SECTION */}
-      <section id="categories" className="py-20 bg-gray-50 border-t border-brand-magenta/5">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-black text-brand-magenta uppercase tracking-tighter mb-2 italic font-display">Our Products</h2>
-              <div className="w-24 h-1.5 bg-brand-gold mx-auto rounded-full" />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-20">
-              {pricelist.slice(0, 6).map((cat, idx) => (
-                <motion.div
-                  key={idx}
-                  whileHover={{ scale: 1.05 }}
-                  onClick={() => { setSelectedCategory(cat.id); setActiveView('order'); }}
-                  className="relative flex flex-col items-center cursor-pointer group"
-                >
-                  <div className="absolute -right-6 top-0 z-20 bg-brand-gold text-brand-purple p-3 rounded-2xl shadow-xl border-2 border-white rotate-12 flex flex-col items-center font-black scale-75 group-hover:scale-100 transition-transform">
-                    <span className="text-[8px] uppercase">{cat.products.length}</span>
-                    <span className="text-base uppercase leading-none">Items</span>
-                  </div>
-                  <div className="absolute -left-2 bottom-1/4 z-20 bg-red-600 text-white px-3 py-1 rounded-lg shadow-xl border-2 border-white -rotate-12 flex items-center font-black scale-75 group-hover:scale-100 transition-transform">
-                    <span className="text-[10px] uppercase italic">Shop Now!</span>
-                  </div>
-                  <div className="ornate-frame w-72 h-72 md:w-80 md:h-80 shadow-2xl">
-                    <div className="ornate-frame-inner">
-                      <div className="w-full h-full rounded-full overflow-hidden">
-                         <img
-                           src={cat.products[0]?.image || FALLBACK_IMG}
-                           alt={cat.name}
-                           onError={(e) => { e.currentTarget.src = FALLBACK_IMG; }}
-                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                         />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-8 text-center flex flex-col items-center">
-                     <h3 className="font-black text-2xl uppercase tracking-tighter text-brand-magenta group-hover:scale-110 transition-transform">{cat.name}</h3>
-                     <p className="text-[10px] text-gray-400 font-bold uppercase mt-2 max-w-[200px] leading-tight">
-                        {cat.products.length} varieties starting from ₹{Math.min(...cat.products.map(p => p.discountPrice))}
-                     </p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-      </section>
-
-      {/* COLLECTIONS SECTION */}
-      <section id="festive" className="py-24 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-black text-brand-magenta uppercase tracking-tighter italic mb-2 font-display">Festive Collections</h2>
-              <div className="w-16 h-1 bg-brand-gold mx-auto rounded-full" />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                {
-                  title: "Sparklers & Ground Chakkars",
-                  desc: "Perfect for kids and family fun",
-                  varieties: 45,
-                  img: "/images/products/bw-1-2-3-4-kuruvi.jpeg"
-                },
-                {
-                  title: "Aerial Fireworks",
-                  desc: "Spectacular sky shows",
-                  varieties: 67,
-                  img: "/images/products/bw-17-baby-rocket.jpeg"
-                },
-                {
-                  title: "Festival Combo Packs",
-                  desc: "Complete celebration bundles",
-                  varieties: 32,
-                  img: "/images/products/bw-160-chennai-super-kings-42-items.jpeg"
-                },
-                {
-                  title: "Sound Crackers",
-                  desc: "Loud and exciting celebrations",
-                  varieties: 58,
-                  img: "/images/products/bw-7-2-sound-crackers.jpeg"
-                }
-              ].map((col, idx) => (
-                <motion.div
-                  key={idx}
-                  whileHover={{ y: -10 }}
-                  onClick={() => setActiveView('order')}
-                  className="relative aspect-[3/4] rounded-[40px] overflow-hidden cursor-pointer group shadow-2xl"
-                >
-                  <img
-                    src={col.img}
-                    alt={col.title}
-                    onError={(e) => { e.currentTarget.src = FALLBACK_IMG; }}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A2E] via-[#0A0A2E]/40 to-transparent" />
-
-                  <div className="absolute inset-0 p-8 flex flex-col justify-end">
-                     <h3 className="text-2xl font-black text-white leading-tight mb-2 drop-shadow-lg">{col.title}</h3>
-                     <p className="text-white/70 font-bold text-xs mb-6 max-w-[180px] leading-relaxed">{col.desc}</p>
-
-                     <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-black text-brand-gold uppercase tracking-[0.2em]">{col.varieties} VARIETIES</span>
-                        <div className="w-10 h-10 bg-brand-gold rounded-full flex items-center justify-center text-brand-purple shadow-xl group-hover:scale-110 transition-transform">
-                           <ChevronRight size={20} />
-                        </div>
-                     </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-      </section>
-
-      {/* OUR BRANDS SECTION */}
-      <div className="bg-white py-12 border-t border-gray-100 overflow-hidden">
-         <div className="container mx-auto px-4 mb-8 text-center">
-            <h2 className="text-3xl font-black text-brand-magenta uppercase tracking-tighter italic mb-2 font-display">Our Brands</h2>
-            <div className="w-16 h-1 bg-brand-gold mx-auto rounded-full" />
-         </div>
-         <div className="relative flex overflow-hidden">
-            {(() => {
-              // Repeat the brand set enough to overflow the widest viewport, then
-              // render two identical tracks. Each track scrolls a full -100% of its
-              // own width (incl. the trailing gap from pr-12), so the two tracks
-              // tile perfectly with no gap/jump at the loop point.
-              const reps = Math.max(2, Math.ceil(12 / (brands.length || 1)));
-              const track = Array.from({ length: reps }).flatMap(() => brands);
-              return [0, 1].map((t) => (
-                <motion.div
-                  key={t}
-                  aria-hidden={t === 1}
-                  animate={{ x: ["0%", "-100%"] }}
-                  transition={{ repeat: Infinity, duration: track.length * 4, ease: "linear" }}
-                  className="flex gap-12 items-center pr-12 shrink-0"
-                >
-                  {track.map((brand, i) => (
-                    <div key={i} className="w-32 h-20 flex-shrink-0 cursor-default">
-                      <img src={brand.logo_url} alt={brand.name} title={brand.name} className="w-full h-full object-contain" />
-                    </div>
-                  ))}
-                </motion.div>
-              ));
-            })()}
-         </div>
-      </div>
-
-      {/* WHY CHOOSE US SECTION */}
-      <section className="py-20 bg-white">
-         <div className="container mx-auto px-4 text-center mb-16">
-            <h2 className="text-3xl font-black text-brand-magenta uppercase italic tracking-tighter mb-2 font-display">Why Choose Us</h2>
-            <div className="w-16 h-1 bg-brand-gold mx-auto rounded-full" />
-         </div>
-
-         <div className="container mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      {/* ── HOW TO ORDER — 3 STEPS ── */}
+      <section className="bg-[#1A1A4E] py-6 px-4">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-center text-white font-black text-lg md:text-2xl uppercase tracking-wide mb-4">
+            Order in 3 Simple Steps
+          </h2>
+          {/* Steps — horizontal on ALL screen sizes */}
+          <div className="relative grid grid-cols-3 gap-2 md:gap-4 mb-5">
             {[
-              { icon: <ShieldCheck size={36} className="text-green-600" />, title: "Safety First", desc: "All products are certified and rigorously tested for maximum safety.", color: "bg-green-50" },
-              { icon: <Truck size={36} className="text-blue-600" />, title: "Fast Delivery", desc: "Quick and secure delivery across India with careful handling.", color: "bg-blue-50" },
-              { icon: <Headphones size={36} className="text-purple-600" />, title: "24/7 Support", desc: "Round the clock customer service to help you with your orders.", color: "bg-purple-50" },
-              { icon: <Award size={36} className="text-orange-600" />, title: "Premium Quality", desc: "Top-notch products sourced directly from Sivakasi manufacturers.", color: "bg-orange-50" }
-            ].map((feature, i) => (
+              { step: '1', title: 'Browse & Add', desc: 'Tap + on any item you want' },
+              { step: '2', title: 'Check Total', desc: 'Min. order Rs.3,000' },
+              { step: '3', title: 'WhatsApp Order', desc: 'Green button sends your list' },
+            ].map(({ step, title, desc }) => (
+              <div key={step} className="bg-white/10 rounded-xl p-3 flex flex-col items-center text-center gap-1.5">
+                <div className="w-8 h-8 rounded-full bg-brand-magenta text-white font-black text-base flex items-center justify-center flex-shrink-0">{step}</div>
+                <p className="text-white font-black text-[11px] md:text-sm leading-tight">{title}</p>
+                <p className="text-white/60 text-[10px] md:text-xs font-medium leading-tight hidden sm:block">{desc}</p>
+              </div>
+            ))}
+            {/* Doodle arrows between steps — hidden on very small screens */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none hidden sm:block" viewBox="0 0 300 80" preserveAspectRatio="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+              {/* Arrow 1→2 */}
+              <path d="M100 20 Q125 8 148 22" fill="none" stroke="#FFD700" strokeWidth="1.8" strokeDasharray="4 3" strokeLinecap="round"/>
+              <path d="M144 18 L148 22 L143 26" fill="none" stroke="#FFD700" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+              {/* Arrow 2→3 */}
+              <path d="M200 22 Q225 8 248 20" fill="none" stroke="#FFD700" strokeWidth="1.8" strokeDasharray="4 3" strokeLinecap="round"/>
+              <path d="M244 16 L248 20 L243 24" fill="none" stroke="#FFD700" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
+            <a
+              href={WHATSAPP_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 bg-green-500 hover:bg-green-400 text-white font-black px-6 py-3 rounded-xl transition-colors shadow-lg text-sm w-full sm:w-auto"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 flex-shrink-0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.533 5.855L.057 23.882l6.173-1.616A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.8 9.8 0 01-5.005-1.366l-.358-.213-3.714.974 1.01-3.61-.234-.373A9.783 9.783 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
+              Chat & Order on WhatsApp
+            </a>
+            <a
+              href={`tel:+${PRIMARY_PHONE_INTL}`}
+              className="flex items-center justify-center gap-2 bg-white/15 hover:bg-white/25 text-white font-black px-6 py-3 rounded-xl transition-colors text-sm w-full sm:w-auto"
+            >
+              <Phone size={16} /> Call: {CONTACT.primaryPhone}
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ── ALL PRODUCTS PRICE LIST ── */}
+      <section className="bg-[#FDF0F6] py-8 px-3 md:px-6">
+        <div className="max-w-4xl mx-auto">
+          {/* Section header */}
+          <div className="text-center mb-5">
+            <h2 className="text-2xl md:text-3xl font-black text-[#1A1A4E] uppercase tracking-tight">Full Price List</h2>
+            <p className="text-sm text-gray-500 font-medium mt-1">
+              All prices after <span className="text-brand-magenta font-black">80% discount</span> on MRP &nbsp;·&nbsp; Min. order Rs.{MIN_ORDER.toLocaleString()}
+            </p>
+          </div>
+
+          {/* Search bar */}
+          <div className="relative mb-4">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+            <input
+              type="text"
+              placeholder="Search any product..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="w-full bg-white border border-gray-200 rounded-xl py-3 pl-10 pr-10 text-sm font-medium focus:outline-none focus:border-brand-magenta/50 shadow-sm"
+            />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                <X size={16} />
+              </button>
+            )}
+          </div>
+
+          {/* Progress bar (visible when cart has items) */}
+          {totals.count > 0 && (
+            <div className="mb-5 bg-white rounded-2xl px-5 py-4 border border-gray-100 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-black text-gray-500 uppercase tracking-wider">Your Total</span>
+                <span className={`font-black text-lg ${totals.total >= MIN_ORDER ? 'text-green-600' : 'text-[#1A1A4E]'}`}>₹{totals.total.toLocaleString()}</span>
+              </div>
+              <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                <div className={`h-full rounded-full transition-all duration-500 ${totals.total >= MIN_ORDER ? 'bg-green-500' : 'bg-pink-500'}`} style={{ width: `${progress}%` }} />
+              </div>
+              <p className="text-[11px] mt-1.5 font-bold text-gray-400">
+                {totals.total >= MIN_ORDER ? 'Ready to order! Tap the WhatsApp button below.' : `Add Rs.${remaining.toLocaleString()} more to reach minimum order`}
+              </p>
+            </div>
+          )}
+
+          {/* Category jump pills */}
+          {!searchQuery && (
+            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 mb-4">
+              {pricelist.map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => {
+                    const el = document.getElementById(`cat-${cat.id}`);
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    if (!openCategories.has(cat.id)) toggleCategory(cat.id);
+                  }}
+                  className="flex-shrink-0 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-[11px] font-black uppercase tracking-wide text-[#1A1A4E] hover:bg-brand-magenta hover:text-white hover:border-brand-magenta transition-colors shadow-sm"
+                >
+                  {cat.name}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Category sections */}
+          {filteredPricelist.length === 0 && (
+            <div className="text-center py-12 text-gray-400 font-bold">No products found for "{searchQuery}"</div>
+          )}
+          <div className="space-y-3">
+            {filteredPricelist.map((cat, catIdx) => {
+              const isOpen = openCategories.has(cat.id);
+              const headerColor = catColors[cat.id] || 'bg-gray-700';
+              return (
+                <motion.div
+                  key={cat.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: catIdx * 0.03 }}
+                  id={`cat-${cat.id}`}
+                  className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100"
+                >
+                  {/* Category header */}
+                  <button
+                    onClick={() => toggleCategory(cat.id)}
+                    className={`w-full flex items-center justify-between px-5 py-4 text-white ${headerColor}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="font-black text-sm md:text-base uppercase tracking-wide">{cat.name}</span>
+                      <span className="bg-white/20 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">{cat.products.length} items</span>
+                    </div>
+                    {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                  </button>
+
+                  {/* Products */}
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                      >
+                        {/* Table header */}
+                        <div className="grid grid-cols-[1fr_auto_auto] gap-2 px-3 py-2 bg-gray-50 border-b border-gray-100 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                          <span>Product</span>
+                          <span className="text-right">Price</span>
+                          <span className="text-right">Add</span>
+                        </div>
+
+                        {cat.products.map((p, idx) => (
+                          <div
+                            key={p.code}
+                            className={`grid grid-cols-[1fr_auto_auto] gap-2 items-center px-3 py-2.5 border-b border-gray-100 last:border-0 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}`}
+                          >
+                            {/* Name + image (image hidden on mobile) */}
+                            <div className="flex items-center gap-2 min-w-0">
+                              {p.showImage !== false && (
+                                <img
+                                  src={p.image || FALLBACK_IMG}
+                                  alt={p.name}
+                                  onError={e => { e.currentTarget.src = FALLBACK_IMG; }}
+                                  className="hidden sm:block w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-gray-100"
+                                />
+                              )}
+                              <div className="min-w-0">
+                                <p className="font-black text-[12px] sm:text-[13px] text-[#1A1A4E] leading-tight">{p.name}</p>
+                                <p className="text-[10px] text-gray-400 font-medium">{p.unit}{p.isPremium ? ' · Premium' : ''}</p>
+                              </div>
+                            </div>
+
+                            {/* Price */}
+                            <div className="text-right">
+                              <p className="font-black text-sm text-[#1A1A4E] leading-none">Rs.{p.discountPrice}</p>
+                              <p className="text-[10px] text-gray-400 line-through leading-none mt-0.5">Rs.{p.mrp}</p>
+                            </div>
+
+                            {/* Qty */}
+                            <div className="flex items-center justify-end">
+                              {cart[p.code] ? (
+                                <div className="flex items-center gap-0.5 bg-[#1A1A4E] rounded-lg px-1 py-0.5">
+                                  <button onClick={() => updateQty(p.code, -1)} className="w-7 h-7 rounded-md bg-white/10 text-white flex items-center justify-center active:scale-90"><Minus size={11} /></button>
+                                  <span className="w-5 text-center text-xs font-black text-white">{cart[p.code]}</span>
+                                  <button onClick={() => updateQty(p.code, 1)} className="w-7 h-7 rounded-md bg-pink-500 text-white flex items-center justify-center active:scale-90"><Plus size={11} /></button>
+                                </div>
+                              ) : (
+                                <button onClick={() => updateQty(p.code, 1)} className="w-9 h-9 rounded-xl bg-pink-500 text-white flex items-center justify-center shadow active:scale-90"><Plus size={16} /></button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Bottom order CTA */}
+          <div className="mt-8 bg-[#1A1A4E] rounded-2xl p-6 text-center">
+            <p className="text-white font-black text-lg mb-1">Ready to order?</p>
+            <p className="text-white/60 text-sm mb-4">Add items above, then place your order on WhatsApp. It's that simple!</p>
+            <button
+              onClick={() => setModalOpen(true)}
+              disabled={totals.count === 0}
+              className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-400 disabled:opacity-40 disabled:cursor-not-allowed text-white font-black px-8 py-3.5 rounded-xl transition-colors shadow-lg"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.533 5.855L.057 23.882l6.173-1.616A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.8 9.8 0 01-5.005-1.366l-.358-.213-3.714.974 1.01-3.61-.234-.373A9.783 9.783 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
+              Place Order via WhatsApp
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* ── ABOUT / 80% DISCOUNT IMAGE ── */}
+      <section className="w-full bg-white border-t border-gray-100 md:grid md:grid-cols-2">
+        <div className="bg-[#1A1A4E] flex items-center justify-center p-0">
+          <img
+            src="/discount.webp"
+            alt="80% Discount on MRP"
+            onError={e => { e.currentTarget.style.display = 'none'; }}
+            className="w-full h-auto block"
+          />
+        </div>
+        <div className="bg-[#FDF0F6] p-8 md:p-14 flex flex-col justify-center items-center md:items-start text-center md:text-left">
+          <h2 className="text-4xl md:text-5xl text-brand-magenta uppercase tracking-wide leading-none mb-6 font-brand">
+            BW CRACKERS<br /><span className="text-2xl md:text-3xl">SIVAKASI PATTASU</span>
+          </h2>
+          <div className="space-y-4 text-gray-700 font-bold text-sm leading-relaxed">
+            <p>Welcome to BW Crackers, your premier destination for high-quality firecrackers and fireworks. Based in Sivakasi, the fireworks capital of India, we have been bringing joy and light to celebrations for over a decade.</p>
+            <p>Our commitment to safety, quality, and customer satisfaction sets us apart. All our products are certified and tested to ensure a spectacular yet safe experience for your family and loved ones.</p>
+            <p>We source directly from the finest manufacturers in Sivakasi, ensuring that every product meets the highest standards of quality while offering the best prices in the market with our signature <span className="text-brand-magenta font-black">80% discount on MRP</span>.</p>
+          </div>
+          <div className="mt-6 flex gap-3">
+            <div className="bg-brand-magenta text-white rounded-2xl px-5 py-3 text-center">
+              <p className="font-black text-2xl leading-none">80%</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider mt-1">Discount on MRP</p>
+            </div>
+            <div className="bg-[#1A1A4E] text-white rounded-2xl px-5 py-3 text-center">
+              <p className="font-black text-2xl leading-none">100%</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider mt-1">Sivakasi Direct</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── OUR PRODUCTS (CIRCULAR CARDS) ── */}
+      <section id="categories" className="py-16 bg-gray-50 border-t border-brand-magenta/5">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-black text-brand-magenta uppercase tracking-tighter mb-2 italic font-display">Our Products</h2>
+            <div className="w-24 h-1.5 bg-brand-gold mx-auto rounded-full" />
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-10 md:gap-16">
+            {pricelist.slice(0, 6).map((cat, idx) => (
               <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1, duration: 0.5 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -8, scale: 1.02 }}
-                className="bg-white p-10 rounded-[40px] shadow-[0_20px_60px_rgba(0,0,0,0.03)] border border-gray-50 flex flex-col items-center text-center transition-all group"
+                key={idx}
+                whileHover={{ scale: 1.04 }}
+                onClick={() => { setSelectedCategory(cat.id); setActiveView('order'); }}
+                className="relative flex flex-col items-center cursor-pointer group"
               >
-                <div className={`w-20 h-20 rounded-3xl ${feature.color} flex items-center justify-center mb-10 group-hover:scale-110 transition-transform duration-500 rotate-3 group-hover:rotate-0`}>
-                  {feature.icon}
+                <div className="absolute -right-2 top-0 z-20 bg-brand-gold text-brand-purple p-2 rounded-xl shadow-xl border-2 border-white rotate-12 flex flex-col items-center font-black scale-75 group-hover:scale-100 transition-transform">
+                  <span className="text-[8px] uppercase">{cat.products.length}</span>
+                  <span className="text-xs uppercase leading-none">Items</span>
                 </div>
-                <h3 className="text-2xl font-black text-brand-purple uppercase tracking-tighter mb-4">{feature.title}</h3>
-                <div className="w-10 h-1 bg-brand-magenta/10 mb-6" />
-                <p className="text-gray-500 font-bold text-xs leading-relaxed max-w-[220px]">{feature.desc}</p>
+                <div className="absolute -left-2 bottom-1/4 z-20 bg-red-600 text-white px-2 py-0.5 rounded-lg shadow-xl border-2 border-white -rotate-12 flex items-center font-black scale-75 group-hover:scale-100 transition-transform">
+                  <span className="text-[9px] uppercase italic">Shop Now!</span>
+                </div>
+                <div className="ornate-frame w-40 h-40 sm:w-56 sm:h-56 md:w-64 md:h-64 shadow-2xl">
+                  <div className="ornate-frame-inner">
+                    <div className="w-full h-full rounded-full overflow-hidden">
+                      <img
+                        src={cat.products[0]?.image || FALLBACK_IMG}
+                        alt={cat.name}
+                        onError={e => { e.currentTarget.src = FALLBACK_IMG; }}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-5 text-center">
+                  <h3 className="font-black text-base md:text-xl uppercase tracking-tighter text-brand-magenta group-hover:scale-105 transition-transform">{cat.name}</h3>
+                  <p className="text-[10px] text-gray-400 font-bold uppercase mt-1">
+                    {cat.products.length} varieties · from Rs.{Math.min(...cat.products.map(p => p.discountPrice))}
+                  </p>
+                </div>
               </motion.div>
             ))}
-         </div>
+          </div>
+        </div>
       </section>
 
-      {/* FOOTER SECTION */}
-      <footer className="bg-[#0A0A2E] text-white pt-20 pb-10 border-t border-brand-gold/10">
-         <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20">
-            {/* Brand Block */}
-            <div className="flex flex-col">
-               <div className="flex items-center gap-3 mb-6">
-                  <img src="/logo.png" alt="B&W Crackers" className="h-16 w-auto object-contain drop-shadow-lg" />
-               </div>
-               <p className="text-gray-400 font-bold text-sm leading-relaxed mb-8">
-                  Crafting celestial moments since 2010. We bring the magic of the stars to your celebrations with premium quality fireworks from Sivakasi.
-               </p>
-               <div className="flex gap-4">
-                  <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-magenta transition-colors">
-                     <Instagram size={20} />
-                  </a>
-                  <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-[#25D366] transition-colors">
-                     <MessageCircle size={20} />
-                  </a>
-                  <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-[#1877F2] transition-colors">
-                     <Facebook size={20} />
-                  </a>
-               </div>
-            </div>
-
-            {/* Navigation */}
-            <div>
-               <h4 className="text-brand-gold font-black uppercase tracking-widest text-sm mb-8">Navigation</h4>
-               <ul className="space-y-4 text-gray-400 font-bold text-sm">
-                  <li><button onClick={() => setActiveView('home')} className="hover:text-white transition-colors">Home</button></li>
-                  <li><button onClick={() => setActiveView('order')} className="hover:text-white transition-colors">Store</button></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Collections</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-                  <li><button onClick={() => setActiveView('cart')} className="hover:text-white transition-colors">Cart</button></li>
-               </ul>
-            </div>
-
-            {/* Collections */}
-            <div>
-               <h4 className="text-brand-gold font-black uppercase tracking-widest text-sm mb-8">Collections</h4>
-               <ul className="space-y-4 text-gray-400 font-bold text-sm">
-                  {pricelist.slice(0, 6).map((cat) => (
-                     <li key={cat.id}>
-                        <button onClick={() => goToCategory(cat.id)} className="text-left hover:text-white transition-colors capitalize">
-                           {cat.name.toLowerCase()}
-                        </button>
-                     </li>
-                  ))}
-               </ul>
-            </div>
-
-            {/* Connectivity */}
-            <div>
-               <h4 className="text-brand-gold font-black uppercase tracking-widest text-sm mb-8">Connectivity</h4>
-               <div className="space-y-6">
-                  <a href={`mailto:${CONTACT.email}`} className="flex gap-4 group">
-                     <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-gold/20 transition-colors">
-                        <Mail size={18} className="text-brand-gold" />
-                     </div>
-                     <div className="flex flex-col">
-                        <span className="text-[10px] text-gray-500 uppercase font-black">Inquiry</span>
-                        <span className="text-sm font-bold group-hover:text-brand-gold transition-colors">{CONTACT.email}</span>
-                     </div>
-                  </a>
-                  <div className="flex gap-4">
-                     <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0">
-                        <Phone size={18} className="text-brand-gold" />
-                     </div>
-                     <div className="flex flex-col">
-                        <span className="text-[10px] text-gray-500 uppercase font-black">Hotline</span>
-                        <a href={`tel:+${PRIMARY_PHONE_INTL}`} className="text-sm font-bold hover:text-brand-gold transition-colors">+91 {CONTACT.primaryPhone}</a>
-                        <a href="tel:+917867036289" className="text-sm font-bold hover:text-brand-gold transition-colors">+91 {CONTACT.secondaryPhone}</a>
-                     </div>
+      {/* ── FESTIVE COLLECTIONS ── */}
+      <section className="py-16 bg-gray-50 border-t border-brand-magenta/5">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-black text-brand-magenta uppercase tracking-tighter italic mb-2 font-display">Festive Collections</h2>
+            <div className="w-16 h-1 bg-brand-gold mx-auto rounded-full" />
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            {[
+              { title: "Single Sound Crackers", desc: "Classic celebration sounds", img: "/images/products/bw-7-2-sound-crackers.jpeg", catId: 1 },
+              { title: "Rockets", desc: "Spectacular sky shows", img: "/images/products/bw-17-baby-rocket.jpeg", catId: 4 },
+              { title: "Premium Gift Boxes", desc: "Complete celebration bundles", img: "/images/products/bw-160-chennai-super-kings-42-items.jpeg", catId: 7 },
+              { title: "Sparklers & Chakkars", desc: "Safe fun for the whole family", img: "/images/products/bw-22-7-magic-pencil.jpeg", catId: 5 },
+            ].map((col, idx) => (
+              <motion.div
+                key={idx}
+                whileHover={{ y: -6 }}
+                onClick={() => goToCategory(col.catId)}
+                className="relative aspect-[3/4] rounded-2xl md:rounded-[32px] overflow-hidden cursor-pointer group shadow-lg"
+              >
+                <img
+                  src={col.img}
+                  alt={col.title}
+                  onError={e => { e.currentTarget.src = FALLBACK_IMG; }}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A2E] via-[#0A0A2E]/30 to-transparent" />
+                <div className="absolute inset-0 p-4 md:p-6 flex flex-col justify-end">
+                  <h3 className="text-sm md:text-lg font-black text-white leading-tight mb-1">{col.title}</h3>
+                  <p className="text-white/60 text-[10px] md:text-xs font-bold hidden sm:block">{col.desc}</p>
+                  <div className="mt-3 inline-flex items-center gap-1 text-brand-gold text-[10px] font-black uppercase tracking-wider">
+                    Shop Now <ChevronRight size={12} />
                   </div>
-                  <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="flex gap-4 group">
-                     <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0 group-hover:bg-[#25D366]/20 transition-colors">
-                        <MessageCircle size={18} className="text-[#25D366]" />
-                     </div>
-                     <div className="flex flex-col">
-                        <span className="text-[10px] text-gray-500 uppercase font-black">WhatsApp</span>
-                        <span className="text-sm font-bold group-hover:text-[#25D366] transition-colors">+91 {CONTACT.primaryPhone}</span>
-                     </div>
-                  </a>
-                  <div className="flex gap-4">
-                     <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0">
-                        <MapPin size={18} className="text-brand-gold" />
-                     </div>
-                     <div className="flex flex-col">
-                        <span className="text-[10px] text-gray-500 uppercase font-black">Heritage</span>
-                        <span className="text-sm font-bold">Sivakasi, Tamil Nadu, India</span>
-                     </div>
-                  </div>
-               </div>
-            </div>
-         </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-         {/* Copyright Overlay */}
-         <div className="container mx-auto px-6 pt-10 border-t border-white/5 text-center flex flex-col items-center gap-6">
-            <span className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em]">
-               © 2026 B&W Crackers. The Art of Celebration.
-            </span>
-            <div className="flex items-center gap-2">
-               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-               <span className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Sivakasi Direct Operations</span>
+      {/* ── OUR BRANDS ── */}
+      <div className="bg-white py-10 border-t border-gray-100 overflow-hidden">
+        <div className="container mx-auto px-4 mb-6 text-center">
+          <h2 className="text-2xl font-black text-brand-magenta uppercase tracking-tighter italic mb-2 font-display">Our Brands</h2>
+          <div className="w-16 h-1 bg-brand-gold mx-auto rounded-full" />
+        </div>
+        <div className="relative flex overflow-hidden">
+          {(() => {
+            const reps = Math.max(2, Math.ceil(12 / (brands.length || 1)));
+            const track = Array.from({ length: reps }).flatMap(() => brands);
+            return [0, 1].map(t => (
+              <motion.div
+                key={t}
+                aria-hidden={t === 1}
+                animate={{ x: ["0%", "-100%"] }}
+                transition={{ repeat: Infinity, duration: track.length * 4, ease: "linear" }}
+                className="flex gap-12 items-center pr-12 shrink-0"
+              >
+                {track.map((brand, i) => (
+                  <div key={i} className="w-28 h-16 flex-shrink-0">
+                    <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-contain" />
+                  </div>
+                ))}
+              </motion.div>
+            ));
+          })()}
+        </div>
+      </div>
+
+      {/* ── WHY CHOOSE US ── */}
+      <section className="py-16 bg-white border-t border-gray-100">
+        <div className="container mx-auto px-4 text-center mb-10">
+          <h2 className="text-2xl font-black text-brand-magenta uppercase italic tracking-tighter mb-2 font-display">Why Choose Us</h2>
+          <div className="w-16 h-1 bg-brand-gold mx-auto rounded-full" />
+        </div>
+        <div className="container mx-auto px-4 grid grid-cols-2 lg:grid-cols-4 gap-5">
+          {[
+            { icon: <ShieldCheck size={30} className="text-green-600" />, title: "Safety First", desc: "All products certified & tested", color: "bg-green-50" },
+            { icon: <Truck size={30} className="text-blue-600" />, title: "Fast Delivery", desc: "Quick delivery across India", color: "bg-blue-50" },
+            { icon: <Headphones size={30} className="text-purple-600" />, title: "24/7 Support", desc: "Always here to help you", color: "bg-purple-50" },
+            { icon: <Award size={30} className="text-orange-600" />, title: "Premium Quality", desc: "Direct from Sivakasi", color: "bg-orange-50" },
+          ].map((f, i) => (
+            <div key={i} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center gap-3">
+              <div className={`w-14 h-14 rounded-2xl ${f.color} flex items-center justify-center`}>{f.icon}</div>
+              <p className="font-black text-sm text-[#1A1A4E] uppercase">{f.title}</p>
+              <p className="text-gray-500 text-xs font-medium">{f.desc}</p>
             </div>
-         </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── FOOTER ── */}
+      <footer className="bg-[#0A0A2E] text-white pt-16 pb-8 border-t border-brand-gold/10">
+        <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+          <div className="flex flex-col">
+            <img src="/logo.png" alt="B&W Crackers" className="h-14 w-auto object-contain drop-shadow-lg mb-4" />
+            <p className="text-gray-400 font-bold text-sm leading-relaxed mb-6">Premium quality fireworks directly from Sivakasi, with our signature 80% discount on MRP.</p>
+            <div className="flex gap-3">
+              <a href="#" className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-magenta transition-colors"><Instagram size={18} /></a>
+              <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center hover:bg-[#25D366] transition-colors"><MessageCircle size={18} /></a>
+              <a href="#" className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center hover:bg-[#1877F2] transition-colors"><Facebook size={18} /></a>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="text-brand-gold font-black uppercase tracking-widest text-xs mb-6">Navigation</h4>
+            <ul className="space-y-3 text-gray-400 font-bold text-sm">
+              <li><button onClick={() => setActiveView('home')} className="hover:text-white transition-colors">Home</button></li>
+              <li><button onClick={() => setActiveView('order')} className="hover:text-white transition-colors">Browse by Category</button></li>
+              <li><button onClick={() => setActiveView('cart')} className="hover:text-white transition-colors">My Cart</button></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-brand-gold font-black uppercase tracking-widest text-xs mb-6">Categories</h4>
+            <ul className="space-y-2 text-gray-400 font-bold text-sm">
+              {pricelist.slice(0, 6).map(cat => (
+                <li key={cat.id}>
+                  <button onClick={() => goToCategory(cat.id)} className="text-left hover:text-white transition-colors capitalize">{cat.name.toLowerCase()}</button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-brand-gold font-black uppercase tracking-widest text-xs mb-6">Contact</h4>
+            <div className="space-y-4">
+              <a href={`tel:+${PRIMARY_PHONE_INTL}`} className="flex gap-3 group">
+                <Phone size={16} className="text-brand-gold mt-0.5 flex-shrink-0" />
+                <span className="text-sm font-bold text-gray-400 group-hover:text-white transition-colors">+91 {CONTACT.primaryPhone}</span>
+              </a>
+              <a href={`tel:+917867036289`} className="flex gap-3 group">
+                <Phone size={16} className="text-brand-gold mt-0.5 flex-shrink-0" />
+                <span className="text-sm font-bold text-gray-400 group-hover:text-white transition-colors">+91 {CONTACT.secondaryPhone}</span>
+              </a>
+              <a href={`mailto:${CONTACT.email}`} className="flex gap-3 group">
+                <Mail size={16} className="text-brand-gold mt-0.5 flex-shrink-0" />
+                <span className="text-sm font-bold text-gray-400 group-hover:text-white transition-colors">{CONTACT.email}</span>
+              </a>
+              <div className="flex gap-3">
+                <MapPin size={16} className="text-brand-gold mt-0.5 flex-shrink-0" />
+                <span className="text-sm font-bold text-gray-400">Sivakasi, Tamil Nadu</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="container mx-auto px-6 pt-6 border-t border-white/5 text-center">
+          <span className="text-gray-500 text-[11px] font-black uppercase tracking-widest">© 2026 B&W Crackers · Sivakasi Direct</span>
+        </div>
       </footer>
+
+      {/* ── ORDER MODAL ── */}
+      <OrderModal open={modalOpen} onClose={() => setModalOpen(false)} cart={cart} totals={totals} />
+
+      {/* ── FLOATING ORDER BAR (when cart has items) ── */}
+      <AnimatePresence>
+        {totals.count > 0 && (
+          <motion.div
+            initial={{ y: 80, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 80, opacity: 0 }}
+            className="fixed bottom-4 left-3 right-3 flex justify-center z-50"
+          >
+            <div className="bg-[#1A1A4E] rounded-2xl shadow-2xl flex items-center gap-3 px-4 py-3 w-full max-w-sm border border-white/10">
+              <div className="flex-1">
+                <p className="text-white font-black text-base leading-none">₹{totals.total.toLocaleString()}</p>
+                <p className="text-white/50 text-[10px] font-bold mt-0.5">{totals.count} item{totals.count > 1 ? 's' : ''} added</p>
+              </div>
+              {totals.total >= MIN_ORDER ? (
+                <button
+                  onClick={() => setModalOpen(true)}
+                  className="bg-green-500 hover:bg-green-400 text-white font-black text-xs px-5 py-2.5 rounded-xl flex items-center gap-2 transition-colors shadow-lg"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.533 5.855L.057 23.882l6.173-1.616A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.8 9.8 0 01-5.005-1.366l-.358-.213-3.714.974 1.01-3.61-.234-.373A9.783 9.783 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
+                  Order on WhatsApp
+                </button>
+              ) : (
+                <div className="text-right">
+                  <p className="text-white/40 text-[10px] font-bold">Need ₹{remaining.toLocaleString()} more</p>
+                  <p className="text-white/60 text-[10px]">for min. order</p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

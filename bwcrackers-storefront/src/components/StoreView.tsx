@@ -1,8 +1,9 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Search, ShieldCheck, Star, ShoppingCart } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, ShieldCheck, ShoppingCart, ChevronDown, ChevronUp, Plus, Minus } from 'lucide-react';
 import { pricelist, Product } from '../data/pricelist';
 import { MIN_ORDER, FALLBACK_IMG, Totals } from '../constants';
+import OrderModal from './OrderModal';
 
 type StoreProduct = Product & { categoryId: number; categoryName: string };
 
@@ -20,217 +21,277 @@ type StoreViewProps = {
 };
 
 export default function StoreView({
-  sortBy, setSortBy,
   selectedCategory, setSelectedCategory,
   searchQuery, setSearchQuery,
-  allProducts, totals, cart, updateQty
+  totals, cart, updateQty
 }: StoreViewProps) {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [openCategories, setOpenCategories] = useState<Set<number>>(
+    new Set(pricelist.map(c => c.id))
+  );
+
+  const toggleCategory = (id: number) => {
+    setOpenCategories(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const filteredPricelist = pricelist
+    .map(cat => ({
+      ...cat,
+      products: cat.products.filter(p => {
+        const matchCat = selectedCategory === 'all' || selectedCategory === cat.id;
+        const matchSearch = !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase());
+        return matchCat && matchSearch;
+      })
+    }))
+    .filter(cat => cat.products.length > 0);
+
+  const totalProducts = filteredPricelist.reduce((sum, c) => sum + c.products.length, 0);
+  const progress = Math.min((totals.total / MIN_ORDER) * 100, 100);
+  const remaining = Math.max(MIN_ORDER - totals.total, 0);
+
   return (
     <motion.div
       key="order"
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      className="flex flex-col lg:flex-row max-w-[1400px] mx-auto w-full min-h-screen gap-8 p-4 md:p-8 pb-40"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      className="max-w-5xl mx-auto w-full px-3 md:px-6 pb-40 pt-4"
     >
-      {/* SIDEBAR - REFINE SELECTION */}
-      <aside className="w-full lg:w-72 flex-shrink-0">
-         <div className="sticky top-[100px] space-y-8">
-            <div className="bg-[#1A1A4E] rounded-[32px] p-8 border border-white/5 shadow-2xl">
-               <h3 className="text-brand-gold font-black uppercase tracking-[0.2em] text-[10px] mb-8">Refine Selection</h3>
+      {/* ── STICKY TOP BAR ── */}
+      <div className="sticky top-[68px] z-30 bg-[#FDF0F6]/95 backdrop-blur-sm py-3 mb-4 border-b border-pink-100">
+        {/* Search */}
+        <div className="flex gap-2 mb-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="w-full bg-white border border-gray-200 rounded-xl py-2.5 pl-9 pr-4 text-sm font-medium focus:outline-none focus:border-pink-400 shadow-sm"
+            />
+          </div>
+          <span className="flex items-center bg-white border border-gray-200 rounded-xl px-4 text-sm font-bold text-gray-500 shadow-sm whitespace-nowrap">
+            {totalProducts} items
+          </span>
+        </div>
 
-               <div className="space-y-6">
-                  <div>
-                     <label className="text-[10px] text-gray-400 font-bold uppercase tracking-widest block mb-4">Sort by</label>
-                     <div className="space-y-2">
-                        {[
-                           { id: 'new', label: 'New Arrivals' },
-                           { id: 'low-high', label: 'Price: Low to High' },
-                           { id: 'high-low', label: 'Price: High to Low' }
-                        ].map(sort => (
-                           <button
-                             key={sort.id}
-                             onClick={() => setSortBy(sort.id)}
-                             className={`w-full text-left px-5 py-3 rounded-2xl text-xs font-bold transition-all border ${sortBy === sort.id ? 'bg-brand-magenta/10 border-brand-magenta text-white shadow-lg shadow-brand-magenta/20' : 'bg-white/5 border-transparent text-gray-400 hover:bg-white/10'}`}
-                           >
-                              <div className="flex items-center gap-3">
-                                 <div className={`w-1.5 h-1.5 rounded-full ${sortBy === sort.id ? 'bg-brand-magenta animate-pulse' : 'bg-gray-600'}`} />
-                                 {sort.label}
-                              </div>
-                           </button>
-                        ))}
-                     </div>
-                  </div>
+        {/* Category pills */}
+        <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+          <button
+            onClick={() => setSelectedCategory('all')}
+            className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wide transition-all ${selectedCategory === 'all' ? 'bg-[#1A1A4E] text-white shadow' : 'bg-white text-gray-500 border border-gray-200'}`}
+          >All</button>
+          {pricelist.map(cat => (
+            <button
+              key={cat.id}
+              onClick={() => setSelectedCategory(cat.id)}
+              className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wide transition-all ${selectedCategory === cat.id ? 'bg-[#1A1A4E] text-white shadow' : 'bg-white text-gray-500 border border-gray-200'}`}
+            >{cat.name}</button>
+          ))}
+        </div>
 
-                  <div>
-                     <label className="text-[10px] text-gray-400 font-bold uppercase tracking-widest block mb-4">Categories</label>
-                     <div className="flex flex-wrap lg:flex-col gap-2">
-                        <button
-                          onClick={() => setSelectedCategory('all')}
-                          className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${selectedCategory === 'all' ? 'bg-brand-gold text-brand-purple' : 'bg-white/5 text-gray-400'}`}
-                        > All items </button>
-                        {pricelist.map(cat => (
-                           <button
-                             key={cat.id}
-                             onClick={() => setSelectedCategory(cat.id)}
-                             className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-left ${selectedCategory === cat.id ? 'bg-brand-gold text-brand-purple shadow-lg shadow-brand-gold/20' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
-                           >
-                              {cat.name}
-                           </button>
-                        ))}
-                     </div>
-                  </div>
-               </div>
-            </div>
-
-            {/* MIN ORDER STATUS SIDEBAR */}
-            <div className={`rounded-[32px] p-8 border ${totals.total >= MIN_ORDER ? 'bg-green-500/10 border-green-500/20' : 'bg-red-500/10 border-red-500/20'} shadow-2xl`}>
-               <span className="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-2 block">Total Estimate</span>
-               <div className="flex items-end gap-2 mb-4">
-                  <span className={`text-4xl font-black italic tracking-tighter ${totals.total >= MIN_ORDER ? 'text-green-500' : 'text-red-500'}`}>₹{totals.total.toLocaleString()}</span>
-               </div>
-               {totals.total < MIN_ORDER ? (
-                  <div className="space-y-3">
-                     <div className="w-full bg-white/5 rounded-full h-1 overflow-hidden">
-                        <div className="bg-red-500 h-full transition-all duration-1000" style={{ width: `${(totals.total / MIN_ORDER) * 100}%` }} />
-                     </div>
-                     <p className="text-[9px] text-red-400 font-bold uppercase tracking-wider">Add ₹{(MIN_ORDER - totals.total).toLocaleString()} more to confirm</p>
-                  </div>
-               ) : (
-                  <div className="flex items-center gap-2 text-green-500 bg-green-500/10 py-2 px-3 rounded-xl border border-green-500/20">
-                     <ShieldCheck size={14} />
-                     <span className="text-[10px] font-black uppercase tracking-widest leading-none">Min. Order Reached</span>
-                  </div>
-               )}
-            </div>
-         </div>
-      </aside>
-
-      {/* MAIN CONTENT - PRODUCT GRID */}
-      <div className="flex-1">
-         <div className="flex items-center justify-between mb-10 px-2 lg:px-0">
-            <div className="flex flex-col">
-               <span className="text-[10px] text-gray-500 font-black uppercase tracking-[0.2em] mb-1">Showing</span>
-               <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-black text-brand-purple italic tracking-tighter">{allProducts.length}</span>
-                  <span className="text-sm font-bold text-gray-400">products</span>
-               </div>
-            </div>
-
-            {/* SEARCH BAR */}
-            <div className="relative group hidden sm:block">
-               <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-magenta transition-colors" size={18} />
-               <input
-                  type="text"
-                  placeholder="Search crackers..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-white border-2 border-gray-100 rounded-full py-4 pl-14 pr-8 text-sm font-bold focus:outline-none focus:border-brand-magenta/30 w-[300px] shadow-sm transition-all focus:shadow-xl focus:w-[400px]"
-               />
-            </div>
-         </div>
-
-         <motion.div
-           layout
-           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8"
-         >
-            {allProducts.map((p) => (
-               <motion.div
-                  key={p.code}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  whileHover={{ y: -12 }}
-                  className="bg-white rounded-[40px] overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.03)] border border-gray-100 flex flex-col group relative"
-               >
-                  {/* PRODUCT IMAGE SECTION (hidden for name-only "wala" crackers) */}
-                  {p.showImage === false ? (
-                     <div className="relative h-32 overflow-hidden bg-gradient-to-br from-brand-purple to-brand-magenta flex items-center justify-center px-6">
-                        {p.isPremium && (
-                           <div className="absolute top-6 left-6 z-10 bg-brand-gold text-brand-purple px-4 py-1 rounded-full text-[9px] font-black uppercase italic tracking-widest shadow-xl border border-white/20">
-                              Premium
-                           </div>
-                        )}
-                        <span className="text-2xl font-black text-white uppercase italic tracking-tighter text-center leading-tight drop-shadow-lg font-display">{p.name}</span>
-                     </div>
-                  ) : (
-                  <div className="relative aspect-[4/4] overflow-hidden bg-gray-50">
-                     {p.isPremium && (
-                        <div className="absolute top-6 left-6 z-10 bg-brand-gold text-brand-purple px-4 py-1 rounded-full text-[9px] font-black uppercase italic tracking-widest shadow-xl border border-white/20">
-                           Premium
-                        </div>
-                     )}
-                     <img
-                        src={p.image || FALLBACK_IMG}
-                        alt={p.name}
-                        onError={(e) => { e.currentTarget.src = FALLBACK_IMG; }}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                     />
-                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <button
-                          onClick={() => updateQty(p.code, 1)}
-                          className="bg-brand-magenta text-white px-6 py-3 rounded-full font-black text-[10px] uppercase tracking-widest shadow-2xl scale-75 group-hover:scale-100 transition-all duration-500"
-                        >
-                          Quick Add
-                        </button>
-                     </div>
-                  </div>
-                  )}
-
-                  {/* PRODUCT INFO */}
-                  <div className="p-8 flex-1 flex flex-col">
-                     <div className="flex justify-between items-start mb-4">
-                        <h4 className="text-xl font-black text-brand-purple uppercase tracking-tighter leading-tight drop-shadow-sm group-hover:text-brand-magenta transition-colors">{p.name}</h4>
-                     </div>
-
-                     <div className="flex items-center gap-1 mb-6">
-                        {[...Array(5)].map((_, i) => (
-                           <Star key={i} size={12} className={i < (p.rating || 4) ? "text-brand-gold fill-brand-gold" : "text-gray-200 fill-gray-200"} />
-                        ))}
-                        <div className="ml-4 h-4 w-[1px] bg-gray-100 mx-2" />
-                        <div className="flex items-center gap-1 text-green-500">
-                           <ShieldCheck size={14} />
-                           <span className="text-[10px] font-black uppercase tracking-widest leading-none">Safe & Quality</span>
-                        </div>
-                     </div>
-
-                     <div className="mt-auto flex items-end justify-between pt-6 border-t border-gray-50">
-                        <div className="flex flex-col">
-                           <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-1 leading-none">Starting from</span>
-                           <div className="flex items-baseline gap-2">
-                              <span className="text-3xl font-black text-brand-purple tracking-tighter leading-none italic">₹{p.discountPrice}</span>
-                              <span className="text-xs text-brand-magenta/30 line-through font-bold">₹{p.mrp}</span>
-                           </div>
-                        </div>
-
-                        <div className="flex items-center gap-3 bg-gray-50 rounded-2xl p-1.5 border border-gray-100 shadow-inner group-hover:bg-brand-magenta group-hover:border-brand-magenta transition-all duration-500">
-                           {cart[p.code] ? (
-                              <div className="flex items-center gap-3">
-                                 <button
-                                    onClick={() => updateQty(p.code, -1)}
-                                    className="w-10 h-10 rounded-xl bg-white text-brand-purple flex items-center justify-center font-black shadow-md hover:scale-110 active:scale-90 transition-transform"
-                                 > - </button>
-                                 <span className="w-6 text-center font-black text-xs text-brand-purple group-hover:text-white">{cart[p.code]}</span>
-                                 <button
-                                    onClick={() => updateQty(p.code, 1)}
-                                    className="w-10 h-10 rounded-xl bg-white text-brand-magenta flex items-center justify-center font-black shadow-md hover:scale-110 active:scale-90 transition-transform"
-                                 > + </button>
-                              </div>
-                           ) : (
-                              <button
-                                 onClick={() => updateQty(p.code, 1)}
-                                 className="w-11 h-11 rounded-xl bg-brand-gold text-brand-purple flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-transform"
-                              >
-                                 <ShoppingCart size={22} fill="currentColor" />
-                              </button>
-                           )}
-                        </div>
-                     </div>
-                  </div>
-               </motion.div>
-            ))}
-         </motion.div>
+        {/* Order progress */}
+        <div className="mt-3 bg-white rounded-xl px-4 py-2.5 border border-gray-100 shadow-sm">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[11px] font-black uppercase tracking-wider text-gray-500">Order Total</span>
+            <span className={`text-sm font-black ${totals.total >= MIN_ORDER ? 'text-green-600' : 'text-[#1A1A4E]'}`}>
+              ₹{totals.total.toLocaleString()}
+            </span>
+          </div>
+          <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${totals.total >= MIN_ORDER ? 'bg-green-500' : 'bg-pink-500'}`}
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <p className="text-[10px] mt-1 font-bold text-gray-400">
+            {totals.total >= MIN_ORDER
+              ? '✅ Minimum order reached — you can place your order!'
+              : `Add ₹${remaining.toLocaleString()} more to reach minimum order of ₹${MIN_ORDER.toLocaleString()}`}
+          </p>
+        </div>
       </div>
+
+      {/* ── HOW TO ORDER BANNER ── */}
+      <div className="mb-5 bg-[#1A1A4E] rounded-2xl px-5 py-4 text-white flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="flex-1">
+          <p className="font-black text-sm mb-1">How to Order</p>
+          <div className="flex flex-wrap gap-x-6 gap-y-1 text-[11px] text-white/70 font-medium">
+            <span>① Browse categories below</span>
+            <span>② Tap <strong className="text-white">+</strong> to add items</span>
+            <span>③ Tap <strong className="text-white">Place Order via WhatsApp</strong></span>
+          </div>
+        </div>
+        <button
+          onClick={() => setModalOpen(true)}
+          className="flex-shrink-0 bg-green-500 hover:bg-green-400 text-white font-black text-xs px-5 py-2.5 rounded-xl flex items-center gap-2 transition-colors shadow-lg"
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.533 5.855L.057 23.882l6.173-1.616A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.8 9.8 0 01-5.005-1.366l-.358-.213-3.714.974 1.01-3.61-.234-.373A9.783 9.783 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
+          Place Order via WhatsApp
+        </button>
+      </div>
+
+      {/* ── CATEGORY SECTIONS ── */}
+      {filteredPricelist.length === 0 ? (
+        <div className="text-center py-20 text-gray-400 font-bold">No products found</div>
+      ) : (
+        <div className="space-y-4">
+          {filteredPricelist.map((cat, catIdx) => {
+            const isOpen = openCategories.has(cat.id);
+            const catColors: Record<number, string> = {
+              1: 'bg-red-600', 2: 'bg-blue-600', 3: 'bg-green-600', 4: 'bg-purple-600',
+              5: 'bg-orange-500', 6: 'bg-pink-600', 7: 'bg-indigo-600', 8: 'bg-yellow-500',
+              9: 'bg-teal-600', 10: 'bg-rose-600', 11: 'bg-cyan-600', 12: 'bg-amber-600',
+            };
+            const headerColor = catColors[cat.id] || 'bg-gray-700';
+
+            return (
+              <motion.div
+                key={cat.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: catIdx * 0.04 }}
+                className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100"
+              >
+                {/* Category Header */}
+                <button
+                  onClick={() => toggleCategory(cat.id)}
+                  className={`w-full flex items-center justify-between px-5 py-4 text-white ${headerColor}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="font-black text-sm uppercase tracking-wide">{cat.name}</span>
+                    <span className="bg-white/20 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+                      {cat.products.length} items
+                    </span>
+                  </div>
+                  {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                </button>
+
+                {/* Product Rows */}
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      {/* Table header */}
+                      <div className="grid grid-cols-[1fr_auto_auto] sm:grid-cols-[2fr_auto_auto_auto] gap-2 px-4 py-2 bg-gray-50 border-b border-gray-100 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                        <span>Product</span>
+                        <span className="hidden sm:block text-right">Unit</span>
+                        <span className="text-right">Price</span>
+                        <span className="text-right">Qty</span>
+                      </div>
+
+                      {cat.products.map((p, idx) => (
+                        <div
+                          key={p.code}
+                          className={`grid grid-cols-[1fr_auto_auto] sm:grid-cols-[2fr_auto_auto_auto] gap-2 items-center px-4 py-3 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/60'} border-b border-gray-100 last:border-0`}
+                        >
+                          {/* Name + image */}
+                          <div className="flex items-center gap-3 min-w-0">
+                            {p.showImage !== false && (
+                              <img
+                                src={p.image || FALLBACK_IMG}
+                                alt={p.name}
+                                onError={e => { e.currentTarget.src = FALLBACK_IMG; }}
+                                className="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-gray-100"
+                              />
+                            )}
+                            <div className="min-w-0">
+                              <p className="font-black text-[13px] text-[#1A1A4E] leading-tight truncate">{p.name}</p>
+                              {p.isPremium && (
+                                <span className="text-[9px] font-black uppercase text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Premium</span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Unit */}
+                          <span className="hidden sm:block text-[11px] text-gray-400 font-semibold text-right whitespace-nowrap">{p.unit}</span>
+
+                          {/* Price */}
+                          <div className="text-right">
+                            <p className="font-black text-base text-[#1A1A4E] leading-none">₹{p.discountPrice}</p>
+                            <p className="text-[10px] text-gray-400 line-through leading-none mt-0.5">₹{p.mrp}</p>
+                          </div>
+
+                          {/* Qty control */}
+                          <div className="flex items-center justify-end gap-1">
+                            {cart[p.code] ? (
+                              <div className="flex items-center gap-1 bg-[#1A1A4E] rounded-xl px-1.5 py-1">
+                                <button
+                                  onClick={() => updateQty(p.code, -1)}
+                                  className="w-7 h-7 rounded-lg bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors active:scale-90"
+                                ><Minus size={12} /></button>
+                                <span className="w-6 text-center text-sm font-black text-white">{cart[p.code]}</span>
+                                <button
+                                  onClick={() => updateQty(p.code, 1)}
+                                  className="w-7 h-7 rounded-lg bg-pink-500 text-white flex items-center justify-center hover:bg-pink-400 transition-colors active:scale-90"
+                                ><Plus size={12} /></button>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => updateQty(p.code, 1)}
+                                className="w-9 h-9 rounded-xl bg-pink-500 text-white flex items-center justify-center hover:bg-pink-400 transition-colors shadow active:scale-90"
+                              ><Plus size={16} /></button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
+
+      <OrderModal open={modalOpen} onClose={() => setModalOpen(false)} cart={cart} totals={totals} />
+
+      {/* ── FLOATING ORDER BUTTON (when cart has items) ── */}
+      <AnimatePresence>
+        {totals.count > 0 && (
+          <motion.div
+            initial={{ y: 80, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 80, opacity: 0 }}
+            className="fixed bottom-6 left-0 right-0 flex justify-center z-50 px-4"
+          >
+            <div className="bg-[#1A1A4E] rounded-2xl shadow-2xl flex items-center gap-4 px-5 py-3 max-w-sm w-full">
+              <div className="flex-1">
+                <p className="text-white font-black text-base leading-none">₹{totals.total.toLocaleString()}</p>
+                <p className="text-white/50 text-[10px] font-bold mt-0.5">{totals.count} item{totals.count > 1 ? 's' : ''} in cart</p>
+              </div>
+              {totals.total >= MIN_ORDER ? (
+                <button
+                  onClick={() => setModalOpen(true)}
+                  className="bg-green-500 hover:bg-green-400 text-white font-black text-xs px-5 py-2.5 rounded-xl flex items-center gap-2 transition-colors"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.533 5.855L.057 23.882l6.173-1.616A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.8 9.8 0 01-5.005-1.366l-.358-.213-3.714.974 1.01-3.61-.234-.373A9.783 9.783 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
+                  Order via WhatsApp
+                </button>
+              ) : (
+                <button
+                  onClick={() => {}}
+                  className="bg-white/10 text-white/60 font-black text-xs px-5 py-2.5 rounded-xl cursor-default"
+                >
+                  <ShieldCheck size={14} className="inline mr-1" />
+                  ₹{remaining.toLocaleString()} more
+                </button>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

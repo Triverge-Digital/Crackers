@@ -32,8 +32,34 @@ export default function Header({ activeView, setActiveView, isMenuOpen, setIsMen
       </div>
 
       {/* HEADER */}
-      <header className="bg-gradient-to-r from-[#1A1A4E] to-[#2D1B6B] text-white py-3 px-4 sticky top-[32px] z-50 shadow-lg border-b border-white/10">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+      <header className="relative bg-gradient-to-r from-[#1A1A4E] to-[#2D1B6B] text-white py-3 px-4 sticky top-[32px] z-50 shadow-lg border-b border-white/10 overflow-hidden">
+        {/* Sparkle doodles in header background */}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none select-none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+          {/* 4-point stars — gold */}
+          <g fill="none" stroke="#FFD700" strokeLinecap="round">
+            <path d="M220 12 L220 6 M220 12 L220 18 M220 12 L214 12 M220 12 L226 12" strokeWidth="1.2" opacity="0.45"/>
+            <circle cx="220" cy="12" r="1.5" fill="#FFD700" opacity="0.5"/>
+            <path d="M480 8 L480 3 M480 8 L480 13 M480 8 L475 8 M480 8 L485 8" strokeWidth="1" opacity="0.35"/>
+            <circle cx="480" cy="8" r="1.2" fill="#FFD700" opacity="0.4"/>
+            <path d="M760 14 L760 8 M760 14 L760 20 M760 14 L754 14 M760 14 L766 14" strokeWidth="1.2" opacity="0.4"/>
+            <circle cx="760" cy="14" r="1.5" fill="#FFD700" opacity="0.45"/>
+            <path d="M1050 10 L1050 4 M1050 10 L1050 16 M1050 10 L1044 10 M1050 10 L1056 10" strokeWidth="1" opacity="0.35"/>
+            <circle cx="1050" cy="10" r="1.2" fill="#FFD700" opacity="0.4"/>
+          </g>
+          {/* diagonal sparkle arms */}
+          <g fill="none" stroke="#FFD700" strokeLinecap="round">
+            <path d="M220 12 L216 8 M220 12 L224 16 M220 12 L224 8 M220 12 L216 16" strokeWidth="0.7" opacity="0.3"/>
+            <path d="M760 14 L756 10 M760 14 L764 18 M760 14 L764 10 M760 14 L756 18" strokeWidth="0.7" opacity="0.28"/>
+          </g>
+          {/* tiny white dots scattered */}
+          <circle cx="340" cy="16" r="1.2" fill="#ffffff" opacity="0.2"/>
+          <circle cx="600" cy="9"  r="1"   fill="#FFD700" opacity="0.25"/>
+          <circle cx="880" cy="17" r="1.2" fill="#ffffff" opacity="0.18"/>
+          <circle cx="1150" cy="8" r="1"   fill="#FFD700" opacity="0.22"/>
+          <circle cx="140"  cy="10" r="1"  fill="#FFD700" opacity="0.2"/>
+          <circle cx="1300" cy="14" r="1.2" fill="#ffffff" opacity="0.18"/>
+        </svg>
+        <div className="max-w-6xl mx-auto flex items-center justify-between relative">
           <div className="flex items-center gap-4">
             <button
               className="lg:hidden p-2 hover:bg-white/10 rounded-xl transition-colors"

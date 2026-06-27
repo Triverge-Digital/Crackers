@@ -105,6 +105,9 @@ export default function App() {
             setCurrentPoster={setCurrentPoster}
             setSelectedCategory={setSelectedCategory}
             brands={brands}
+            cart={cart}
+            updateQty={updateQty}
+            totals={totals}
           />
         )}
         {activeView === 'order' && (
