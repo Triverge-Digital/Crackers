@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, User, MapPin, Copy, Check } from 'lucide-react';
-import { QRCodeSVG } from 'qrcode.react';
 import { buildWhatsAppOrderUrl } from '../lib/whatsappOrder';
 import { Totals } from '../constants';
 
@@ -205,19 +204,11 @@ export default function OrderModal({ open, onClose, cart, totals }: OrderModalPr
                     <p className="text-xs text-gray-400 mt-0.5">Pay after receiving order confirmation from us</p>
                   </div>
 
-                  {/* Dynamic QR Code with amount pre-filled */}
+                  {/* QR Code */}
                   <div className="flex justify-center">
-                    <div className="border-2 border-gray-100 rounded-2xl p-4 bg-white shadow-sm flex flex-col items-center">
-                      <QRCodeSVG
-                        value={`upi://pay?pa=${BANK.upi}@okicici&pn=${encodeURIComponent(BANK.name)}&am=${grandTotal}&cu=INR&tn=${encodeURIComponent('BW Crackers Order')}`}
-                        size={160}
-                        bgColor="#ffffff"
-                        fgColor="#1A1A4E"
-                        level="M"
-                        imageSettings={{ src: '/gpay-qr.jpeg', x: undefined, y: undefined, height: 36, width: 36, excavate: true }}
-                      />
-                      <p className="text-center text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2">Scan to Pay — Amount Auto-Filled</p>
-                      <p className="text-center text-xs font-black text-green-600 mt-0.5">Rs.{grandTotal.toLocaleString('en-IN')}</p>
+                    <div className="border-2 border-gray-100 rounded-2xl p-3 bg-white shadow-sm">
+                      <img src="/gpay-qr.jpeg" alt="GPay QR Code" className="w-40 h-40 object-contain" />
+                      <p className="text-center text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2">Scan to Pay</p>
                     </div>
                   </div>
 
