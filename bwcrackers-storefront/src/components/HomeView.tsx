@@ -440,6 +440,22 @@ export default function HomeView({
         </div>
       </section>
 
+      {/* ── UNBOXING POLICY ── */}
+      <section className="bg-amber-50 border-y border-amber-200 py-6 px-4">
+        <div className="max-w-3xl mx-auto flex gap-4 items-start">
+          <div className="text-3xl flex-shrink-0">📦</div>
+          <div>
+            <h3 className="font-black text-amber-800 text-sm md:text-base uppercase tracking-wide mb-2">Important — Unboxing Policy</h3>
+            <p className="text-amber-900 font-medium text-sm leading-relaxed">
+              Claims for damaged or missing items will be accepted <span className="font-black">only if an unboxing video is provided</span> at the time of opening the package.
+            </p>
+            <p className="text-amber-900 font-medium text-sm leading-relaxed mt-1.5">
+              The company will not be responsible for any claims regarding sold items if an unboxing video is not provided.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── OUR PRODUCTS (CIRCULAR CARDS) ── */}
       <section id="categories" className="py-16 bg-gray-50 border-t border-brand-magenta/5 scroll-mt-28">
         <div className="container mx-auto px-4">
