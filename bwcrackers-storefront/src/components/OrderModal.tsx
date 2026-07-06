@@ -207,7 +207,7 @@ export default function OrderModal({ open, onClose, cart, totals }: OrderModalPr
                   {/* QR Code */}
                   <div className="flex justify-center">
                     <div className="border-2 border-gray-100 rounded-2xl p-3 bg-white shadow-sm">
-                      <img src="/gpay-qr.png" alt="GPay QR Code" className="w-40 h-40 object-contain" onError={e => { e.currentTarget.style.display = 'none'; }} />
+                      <img src="/gpay-qr.jpeg" alt="GPay QR Code" className="w-40 h-40 object-contain" onError={e => { e.currentTarget.style.display = 'none'; }} />
                       <p className="text-center text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2">Scan to Pay</p>
                     </div>
                   </div>
