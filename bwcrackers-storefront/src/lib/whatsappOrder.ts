@@ -10,6 +10,7 @@ type CustomerDetails = {
 export function buildWhatsAppOrderUrl(
   cart: Record<string, number>,
   total: number,
+  packingFee: number,
   customer?: CustomerDetails
 ): string {
   const lines: string[] = [];
@@ -36,6 +37,8 @@ export function buildWhatsAppOrderUrl(
         ]
       : [];
 
+    const grandTotal = total + packingFee;
+
     message = [
       'Hi BW Crackers! I would like to place the following order:',
       '',
@@ -43,9 +46,12 @@ export function buildWhatsAppOrderUrl(
       'Items Ordered:',
       ...lines,
       '',
-      `Total: Rs.${total.toLocaleString('en-IN')}`,
+      `Items Total: Rs.${total.toLocaleString('en-IN')}`,
+      `Packing Fee (2%): Rs.${packingFee.toLocaleString('en-IN')}`,
+      `Transport Charges: To be confirmed`,
+      `Grand Total: Rs.${grandTotal.toLocaleString('en-IN')} + transport`,
       '',
-      'Please confirm availability and delivery. Thank you!',
+      'Please confirm availability, transport charges, and delivery. Thank you!',
     ].join('\n');
   }
 

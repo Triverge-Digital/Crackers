@@ -1,26 +1,9 @@
 import { motion } from 'framer-motion';
-import { WHATSAPP_LINK, CONTACT, PRIMARY_PHONE_INTL } from '../constants';
+import { WHATSAPP_LINK, CONTACT } from '../constants';
 
 export default function WhatsAppButton() {
   return (
-    <div className="fixed bottom-5 right-5 z-[80] flex flex-col gap-3 items-center">
-      {/* Call button */}
-      <motion.a
-        href={`tel:+${PRIMARY_PHONE_INTL}`}
-        aria-label={`Call us: ${CONTACT.primaryPhone}`}
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.8, type: 'spring', stiffness: 260, damping: 18 }}
-        whileHover={{ scale: 1.08 }}
-        whileTap={{ scale: 0.92 }}
-        className="flex items-center justify-center w-12 h-12 rounded-full bg-[#1A1A4E] shadow-[0_6px_20px_rgba(26,26,78,0.4)] ring-4 ring-white/30"
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-          <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .84h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
-        </svg>
-      </motion.a>
-
-      {/* WhatsApp button */}
+    <div className="fixed bottom-5 right-5 z-[80]">
       <motion.a
         href={WHATSAPP_LINK}
         target="_blank"
@@ -31,7 +14,7 @@ export default function WhatsAppButton() {
         transition={{ delay: 0.6, type: 'spring', stiffness: 260, damping: 18 }}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.92 }}
-        className="flex items-center justify-center w-14 h-14 rounded-full bg-[#25D366] shadow-[0_8px_24px_rgba(37,211,102,0.5)] ring-4 ring-white/30"
+        className="relative flex items-center justify-center w-14 h-14 rounded-full bg-[#25D366] shadow-[0_8px_24px_rgba(37,211,102,0.5)] ring-4 ring-white/30"
       >
         <span className="absolute inline-flex h-14 w-14 rounded-full bg-[#25D366] opacity-60 animate-ping" />
         <svg viewBox="0 0 32 32" className="relative w-8 h-8 fill-white" aria-hidden="true">
