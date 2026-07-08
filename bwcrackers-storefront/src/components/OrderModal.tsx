@@ -64,7 +64,7 @@ export default function OrderModal({ open, onClose, cart, totals }: OrderModalPr
 
   const handleClose = () => {
     onClose();
-    setTimeout(() => { setStep('details'); setForm({ name: '', phone: '', address: '' }); setErrors({}); }, 400);
+    setTimeout(() => { setStep('details'); setErrors({}); }, 400);
   };
 
   const inputClass = (field: string) =>
