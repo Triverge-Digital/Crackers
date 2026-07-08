@@ -4,11 +4,15 @@ import { X, User, MapPin, Copy, Check } from 'lucide-react';
 import { buildWhatsAppOrderUrl } from '../lib/whatsappOrder';
 import { Totals } from '../constants';
 
+export type CustomerForm = { name: string; phone: string; address: string };
+
 type OrderModalProps = {
   open: boolean;
   onClose: () => void;
   cart: Record<string, number>;
   totals: Totals;
+  form: CustomerForm;
+  setForm: React.Dispatch<React.SetStateAction<CustomerForm>>;
 };
 
 const BANK = {
@@ -21,9 +25,8 @@ const BANK = {
   upi: '7867036289',
 };
 
-export default function OrderModal({ open, onClose, cart, totals }: OrderModalProps) {
+export default function OrderModal({ open, onClose, cart, totals, form, setForm }: OrderModalProps) {
   const [step, setStep] = useState<'details' | 'payment'>('details');
-  const [form, setForm] = useState({ name: '', phone: '', address: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [copied, setCopied] = useState<string | null>(null);
 

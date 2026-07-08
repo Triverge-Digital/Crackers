@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { pricelist } from '../data/pricelist';
 import { POSTERS, FALLBACK_IMG, MIN_ORDER, Brand, CONTACT, WHATSAPP_LINK, PRIMARY_PHONE_INTL, Totals } from '../constants';
-import OrderModal from './OrderModal';
+import OrderModal, { CustomerForm } from './OrderModal';
 
 type HomeViewProps = {
   setActiveView: (v: string) => void;
@@ -29,6 +29,7 @@ export default function HomeView({
     new Set(pricelist.map(c => c.id))
   );
   const [modalOpen, setModalOpen] = useState(false);
+  const [customerForm, setCustomerForm] = useState<CustomerForm>({ name: '', phone: '', address: '' });
   const [searchQuery, setSearchQuery] = useState('');
   const [bannerDismissed, setBannerDismissed] = useState(false);
 
@@ -655,7 +656,7 @@ export default function HomeView({
       </footer>
 
       {/* ── ORDER MODAL ── */}
-      <OrderModal open={modalOpen} onClose={() => setModalOpen(false)} cart={cart} totals={totals} />
+      <OrderModal open={modalOpen} onClose={() => setModalOpen(false)} cart={cart} totals={totals} form={customerForm} setForm={setCustomerForm} />
 
       {/* ── FLOATING ORDER BAR (when cart has items) ── */}
       <AnimatePresence>
