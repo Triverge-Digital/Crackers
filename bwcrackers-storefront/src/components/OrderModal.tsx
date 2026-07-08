@@ -85,7 +85,7 @@ export default function OrderModal({ open, onClose, cart, totals }: OrderModalPr
             transition={{ type: 'spring', stiffness: 300, damping: 28 }}
             className="fixed bottom-0 left-0 right-0 sm:inset-0 sm:flex sm:items-center sm:justify-center z-[100] px-0 sm:px-4"
           >
-            <div className="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[92vh] overflow-y-auto">
+            <div className="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[92vh] overflow-y-auto">
 
               {/* Header */}
               <div className="bg-[#1A1A4E] px-6 py-4 flex items-center justify-between sticky top-0 z-10">
@@ -154,7 +154,7 @@ export default function OrderModal({ open, onClose, cart, totals }: OrderModalPr
                   <div>
                     <label className="text-xs font-black text-gray-500 uppercase tracking-wider block mb-1.5">Delivery Address <span className="text-red-400">*</span></label>
                     <div className="relative">
-                      <textarea name="address" value={form.address} onChange={handleChange} placeholder="Street, area, city, pincode" rows={2} className={`${inputClass('address')} resize-none`} />
+                      <textarea name="address" value={form.address} onChange={handleChange} placeholder="Street, area, city, pincode" rows={3} className={`${inputClass('address')} resize-none pb-2 pr-8`} />
                       <MapPin size={15} className="absolute right-3 top-3 text-gray-300" />
                     </div>
                     {errors.address && <p className="text-xs text-red-500 font-medium mt-1">{errors.address}</p>}
