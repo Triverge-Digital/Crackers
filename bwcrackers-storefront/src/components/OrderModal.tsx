@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, User, MapPin, Copy, Check } from 'lucide-react';
 import { buildWhatsAppOrderUrl } from '../lib/whatsappOrder';
+import { pricelist } from '../data/pricelist';
 import { Totals } from '../constants';
 
 export type CustomerForm = { name: string; phone: string; address: string };
@@ -29,6 +30,8 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
   const [step, setStep] = useState<'details' | 'payment'>('details');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [copied, setCopied] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const packingFee = Math.ceil(totals.total * 0.02);
   const grandTotal = totals.total + packingFee;
@@ -47,15 +50,60 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
     return Object.keys(e).length === 0;
   };
 
-  const handleOrder = () => {
+  const handleOrder = async () => {
     if (!validate()) return;
-    const url = buildWhatsAppOrderUrl(cart, totals.total, packingFee, {
-      name: form.name.trim(),
-      phone: form.phone.trim(),
-      address: form.address.trim(),
-    });
-    window.open(url, '_blank', 'noopener,noreferrer');
-    setStep('payment');
+    setSubmitError('');
+    setSubmitting(true);
+
+    // The order must be recorded regardless of whether the customer ever
+    // taps "Send" in WhatsApp (or pays) — save it to the backend first so
+    // it's guaranteed to reach the admin, then open WhatsApp as a bonus.
+    try {
+      const items: { title: string; quantity: number; unit_price: number }[] = [];
+      pricelist.forEach(cat => {
+        cat.products.forEach(p => {
+          if (cart[p.code]) {
+            items.push({ title: p.name, quantity: cart[p.code], unit_price: p.discountPrice });
+          }
+        });
+      });
+
+      const backendUrl = (import.meta as any).env?.VITE_MEDUSA_BACKEND_URL || 'http://localhost:9000';
+      const apiKey = (import.meta as any).env?.VITE_MEDUSA_PUBLISHABLE_KEY || '';
+
+      const response = await fetch(`${backendUrl}/store/order-enquiry`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-publishable-api-key': apiKey,
+        },
+        body: JSON.stringify({
+          customer_name: form.name.trim(),
+          phone: `+91${form.phone.trim()}`,
+          address: form.address.trim(),
+          items,
+          subtotal: totals.total,
+          currency_code: 'inr',
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.message || 'Failed to place order. Please try again.');
+      }
+
+      const url = buildWhatsAppOrderUrl(cart, totals.total, packingFee, {
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        address: form.address.trim(),
+      });
+      window.open(url, '_blank', 'noopener,noreferrer');
+      setStep('payment');
+    } catch (err: any) {
+      setSubmitError(err.message || 'Something went wrong. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const copyToClipboard = (text: string, key: string) => {
@@ -97,7 +145,7 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
                     {step === 'details' ? 'Place Your Order' : 'Order Confirmed!'}
                   </p>
                   <p className="text-white/60 text-xs mt-0.5">
-                    {step === 'details' ? 'Enter your details to send order via WhatsApp' : 'Now complete your payment below'}
+                    {step === 'details' ? 'Enter your details to place your order' : 'Now complete your payment below'}
                   </p>
                 </div>
                 <button onClick={handleClose} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors text-white flex-shrink-0">
@@ -118,13 +166,9 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
                       <span className="text-gray-500 font-medium">Packing Fee (2%)</span>
                       <span className="font-black text-[#1A1A4E]">Rs.{packingFee.toLocaleString('en-IN')}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500 font-medium">Transport Charges</span>
-                      <span className="font-bold text-orange-500 text-xs">To be confirmed</span>
-                    </div>
                     <div className="border-t border-gray-200 pt-1.5 flex justify-between">
-                      <span className="font-black text-sm text-[#1A1A4E]">Grand Total</span>
-                      <span className="font-black text-green-600">Rs.{grandTotal.toLocaleString('en-IN')} + transport</span>
+                      <span className="font-black text-sm text-[#1A1A4E]">Total Amount</span>
+                      <span className="font-black text-green-600">Rs.{grandTotal.toLocaleString('en-IN')}</span>
                     </div>
                   </div>
 
@@ -164,11 +208,29 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
                   </div>
 
                   {/* Submit */}
-                  <button onClick={handleOrder} className="w-full bg-green-500 hover:bg-green-400 active:scale-95 text-white font-black py-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg text-sm mt-2">
-                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.533 5.855L.057 23.882l6.173-1.616A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.8 9.8 0 01-5.005-1.366l-.358-.213-3.714.974 1.01-3.61-.234-.373A9.783 9.783 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
-                    Send Order on WhatsApp
+                  {submitError && (
+                    <div className="p-3 bg-red-50 border border-red-100 rounded-xl">
+                      <p className="text-sm text-red-500 font-medium">{submitError}</p>
+                    </div>
+                  )}
+                  <button
+                    onClick={handleOrder}
+                    disabled={submitting}
+                    className="w-full bg-green-500 hover:bg-green-400 active:scale-95 text-white font-black py-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg text-sm mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {submitting ? (
+                      <>
+                        <div className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                        Placing Order...
+                      </>
+                    ) : (
+                      <>
+                        <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.533 5.855L.057 23.882l6.173-1.616A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.8 9.8 0 01-5.005-1.366l-.358-.213-3.714.974 1.01-3.61-.234-.373A9.783 9.783 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
+                        Place Order
+                      </>
+                    )}
                   </button>
-                  <p className="text-[11px] text-center text-gray-400">Your order will be sent to us via WhatsApp. Payment can be done manually after confirmation.</p>
+                  <p className="text-[11px] text-center text-gray-400">Your order will be sent to us. Payment can be done manually after confirmation.</p>
                 </div>
               )}
 
@@ -177,8 +239,8 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
                 <div className="px-6 pt-4 pb-6 space-y-4">
                   {/* Success banner */}
                   <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-center">
-                    <p className="text-green-700 font-black text-sm">Order sent on WhatsApp!</p>
-                    <p className="text-green-600 text-xs mt-0.5">We will confirm your order and transport charges shortly.</p>
+                    <p className="text-green-700 font-black text-sm">Order placed successfully!</p>
+                    <p className="text-green-600 text-xs mt-0.5">We will confirm your order shortly.</p>
                   </div>
 
                   {/* Order total */}
@@ -191,13 +253,9 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
                       <span className="text-gray-500 font-medium">Packing Fee (2%)</span>
                       <span className="font-black text-[#1A1A4E]">Rs.{packingFee.toLocaleString('en-IN')}</span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500 font-medium">Transport Charges</span>
-                      <span className="font-bold text-orange-500 text-xs">Will be informed by BW Crackers</span>
-                    </div>
                     <div className="border-t border-gray-200 pt-1.5 flex justify-between">
                       <span className="font-black text-sm text-[#1A1A4E]">Amount to Pay</span>
-                      <span className="font-black text-green-600">Rs.{grandTotal.toLocaleString('en-IN')} + transport</span>
+                      <span className="font-black text-green-600">Rs.{grandTotal.toLocaleString('en-IN')}</span>
                     </div>
                   </div>
 

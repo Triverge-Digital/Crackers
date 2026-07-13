@@ -457,45 +457,50 @@ export default function HomeView({
         </div>
       </section>
 
-      {/* ── OUR PRODUCTS (CIRCULAR CARDS) ── */}
+      {/* ── OUR PRODUCTS (ALL PRODUCTS, EVERY CATEGORY) ── */}
       <section id="categories" className="py-16 bg-gray-50 border-t border-brand-magenta/5 scroll-mt-28">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black text-brand-magenta uppercase tracking-tighter mb-2 italic font-display">Our Products</h2>
             <div className="w-24 h-1.5 bg-brand-gold mx-auto rounded-full" />
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-10 md:gap-16">
-            {pricelist.slice(0, 6).map((cat, idx) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
+            {pricelist.flatMap(cat => cat.products.map(p => ({ ...p, categoryName: cat.name }))).map(p => (
               <motion.div
-                key={idx}
-                whileHover={{ scale: 1.04 }}
-                onClick={() => { setSelectedCategory(cat.id); setActiveView('order'); }}
-                className="relative flex flex-col items-center cursor-pointer group"
+                key={p.code}
+                whileHover={{ y: -4 }}
+                className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col"
               >
-                <div className="absolute -right-2 top-0 z-20 bg-brand-gold text-brand-purple p-2 rounded-xl shadow-xl border-2 border-white rotate-12 flex flex-col items-center font-black scale-75 group-hover:scale-100 transition-transform">
-                  <span className="text-[8px] uppercase">{cat.products.length}</span>
-                  <span className="text-xs uppercase leading-none">Items</span>
+                <div className="aspect-square bg-gray-50 overflow-hidden">
+                  {p.showImage === false ? (
+                    <div className="w-full h-full bg-gradient-to-br from-brand-purple to-brand-magenta flex items-center justify-center text-white font-black text-2xl">{p.name.charAt(0)}</div>
+                  ) : (
+                    <img
+                      src={p.image || FALLBACK_IMG}
+                      alt={p.name}
+                      onError={e => { e.currentTarget.src = FALLBACK_IMG; }}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
                 </div>
-                <div className="absolute -left-2 bottom-1/4 z-20 bg-red-600 text-white px-2 py-0.5 rounded-lg shadow-xl border-2 border-white -rotate-12 flex items-center font-black scale-75 group-hover:scale-100 transition-transform">
-                  <span className="text-[9px] uppercase italic">Shop Now!</span>
-                </div>
-                <div className="ornate-frame w-40 h-40 sm:w-56 sm:h-56 md:w-64 md:h-64 shadow-2xl">
-                  <div className="ornate-frame-inner">
-                    <div className="w-full h-full rounded-full overflow-hidden">
-                      <img
-                        src={cat.products[0]?.image || FALLBACK_IMG}
-                        alt={cat.name}
-                        onError={e => { e.currentTarget.src = FALLBACK_IMG; }}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      />
+                <div className="p-3 flex-1 flex flex-col">
+                  <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wide truncate">{p.categoryName}</span>
+                  <h3 className="font-black text-xs text-brand-purple uppercase tracking-tight leading-tight mt-0.5 truncate">{p.name}</h3>
+                  <div className="mt-auto pt-2 flex items-center justify-between">
+                    <div>
+                      <p className="font-black text-sm text-brand-purple leading-none">₹{p.discountPrice}</p>
+                      <p className="text-[9px] text-gray-400 line-through leading-none mt-0.5">₹{p.mrp}</p>
                     </div>
+                    {cart[p.code] ? (
+                      <div className="flex items-center gap-1 bg-[#1A1A4E] rounded-lg px-1 py-1">
+                        <button onClick={() => updateQty(p.code, -1)} className="w-6 h-6 rounded-md bg-white/10 text-white flex items-center justify-center active:scale-90"><Minus size={11} /></button>
+                        <span className="w-5 text-center text-xs font-black text-white">{cart[p.code]}</span>
+                        <button onClick={() => updateQty(p.code, 1)} className="w-6 h-6 rounded-md bg-pink-500 text-white flex items-center justify-center active:scale-90"><Plus size={11} /></button>
+                      </div>
+                    ) : (
+                      <button onClick={() => updateQty(p.code, 1)} className="w-8 h-8 rounded-lg bg-pink-500 text-white flex items-center justify-center shadow active:scale-90"><Plus size={14} /></button>
+                    )}
                   </div>
-                </div>
-                <div className="mt-5 text-center">
-                  <h3 className="font-black text-base md:text-xl uppercase tracking-tighter text-brand-magenta group-hover:scale-105 transition-transform">{cat.name}</h3>
-                  <p className="text-[10px] text-gray-400 font-bold uppercase mt-1">
-                    {cat.products.length} varieties · from Rs.{Math.min(...cat.products.map(p => p.discountPrice))}
-                  </p>
                 </div>
               </motion.div>
             ))}

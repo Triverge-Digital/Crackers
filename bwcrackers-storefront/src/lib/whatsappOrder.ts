@@ -48,10 +48,9 @@ export function buildWhatsAppOrderUrl(
       '',
       `Items Total: Rs.${total.toLocaleString('en-IN')}`,
       `Packing Fee (2%): Rs.${packingFee.toLocaleString('en-IN')}`,
-      `Transport Charges: To be confirmed`,
-      `Grand Total: Rs.${grandTotal.toLocaleString('en-IN')} + transport`,
+      `Total Amount: Rs.${grandTotal.toLocaleString('en-IN')}`,
       '',
-      'Please confirm availability, transport charges, and delivery. Thank you!',
+      'Please confirm availability and delivery. Thank you!',
     ].join('\n');
   }
 

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, ShieldCheck, ShoppingCart, ChevronDown, ChevronUp, Plus, Minus } from 'lucide-react';
 import { pricelist, Product } from '../data/pricelist';
 import { MIN_ORDER, FALLBACK_IMG, Totals } from '../constants';
-import OrderModal from './OrderModal';
+import OrderModal, { CustomerForm } from './OrderModal';
 
 type StoreProduct = Product & { categoryId: number; categoryName: string };
 
@@ -26,6 +26,7 @@ export default function StoreView({
   totals, cart, updateQty
 }: StoreViewProps) {
   const [modalOpen, setModalOpen] = useState(false);
+  const [customerForm, setCustomerForm] = useState<CustomerForm>({ name: '', phone: '', address: '' });
   const [openCategories, setOpenCategories] = useState<Set<number>>(
     new Set(pricelist.map(c => c.id))
   );
@@ -255,7 +256,7 @@ export default function StoreView({
         </div>
       )}
 
-      <OrderModal open={modalOpen} onClose={() => setModalOpen(false)} cart={cart} totals={totals} />
+      <OrderModal open={modalOpen} onClose={() => setModalOpen(false)} cart={cart} totals={totals} form={customerForm} setForm={setCustomerForm} />
 
       {/* ── FLOATING ORDER BUTTON (when cart has items) ── */}
       <AnimatePresence>
