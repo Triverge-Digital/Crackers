@@ -11,7 +11,8 @@ export function buildWhatsAppOrderUrl(
   cart: Record<string, number>,
   total: number,
   packingFee: number,
-  customer?: CustomerDetails
+  customer?: CustomerDetails,
+  referenceNumber?: string
 ): string {
   const lines: string[] = [];
 
@@ -28,6 +29,8 @@ export function buildWhatsAppOrderUrl(
   if (lines.length === 0) {
     message = "Hi BW Crackers, I'd like to know more about your products.";
   } else {
+    const refBlock = referenceNumber ? [`Order Ref: ${referenceNumber}`] : [];
+
     const customerBlock = customer
       ? [
           `Name: ${customer.name}`,
@@ -42,6 +45,7 @@ export function buildWhatsAppOrderUrl(
     message = [
       'Hi BW Crackers! I would like to place the following order:',
       '',
+      ...refBlock,
       ...customerBlock,
       'Items Ordered:',
       ...lines,
@@ -54,5 +58,19 @@ export function buildWhatsAppOrderUrl(
     ].join('\n');
   }
 
+  return `https://wa.me/${PRIMARY_PHONE_INTL}?text=${encodeURIComponent(message)}`;
+}
+
+// Derives a short, customer-facing reference code from the backend's ULID id.
+export function deriveReferenceNumber(id?: string | null): string {
+  return id ? `#${id.slice(-8).toUpperCase()}` : '';
+}
+
+// wa.me link used on the post-payment screen — browsers can't auto-attach an
+// image to a WhatsApp message, so this just opens a chat with pre-filled text
+// the customer can send along with their manually-attached payment screenshot.
+export function buildPaymentShareWhatsAppUrl(referenceNumber: string, amount: number): string {
+  const ref = referenceNumber ? ` for Order ${referenceNumber}` : '';
+  const message = `Hi BW Crackers, I have completed the payment${ref} (Rs.${amount.toLocaleString('en-IN')}). Sharing the payment screenshot below.`;
   return `https://wa.me/${PRIMARY_PHONE_INTL}?text=${encodeURIComponent(message)}`;
 }

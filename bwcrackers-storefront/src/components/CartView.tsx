@@ -168,7 +168,7 @@ export default function CartView({ setActiveView, totals, cart, setCart, updateQ
               )}
 
               <div className="mt-4 p-3 bg-amber-50 border border-amber-100 rounded-xl">
-                <p className="text-xs text-amber-700 font-bold text-center">Payment upon delivery only — no online payment</p>
+                <p className="text-xs text-amber-700 font-bold text-center">Pay in advance via UPI/QR/Bank Transfer, or on delivery</p>
               </div>
             </div>
           </aside>

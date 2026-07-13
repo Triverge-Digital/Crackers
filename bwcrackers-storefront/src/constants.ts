@@ -35,3 +35,22 @@ export const WHATSAPP_LINK = `https://wa.me/${PRIMARY_PHONE_INTL}?text=${encodeU
 
 export type Totals = { total: number; count: number };
 export type Brand = { name: string; logo_url: string };
+
+// Bank / UPI details shown on the post-order payment screen (OrderModal + OrderEnquiryForm).
+export const BANK = {
+  name: 'WAHIDH HUSSAIN S',
+  account: '003100050344099',
+  branch: 'Sivakasi',
+  type: 'Savings Account',
+  ifsc: 'TMBL0000003',
+  bank: 'TamilNadu Mercantile Bank',
+  upi: '7867036289',
+};
+
+// Category header colors, shared between HomeView and StoreView so the same
+// category doesn't show a different color depending on which page you're on.
+export const CATEGORY_COLORS: Record<number, string> = {
+  1: 'bg-red-600', 2: 'bg-blue-600', 3: 'bg-green-600', 4: 'bg-purple-600',
+  5: 'bg-orange-500', 6: 'bg-pink-600', 7: 'bg-indigo-600', 8: 'bg-yellow-600',
+  9: 'bg-teal-600', 10: 'bg-rose-600', 11: 'bg-cyan-600', 12: 'bg-amber-600',
+};

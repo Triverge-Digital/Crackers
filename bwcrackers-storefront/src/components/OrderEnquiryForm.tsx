@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { User, Mail, MapPin, Check, Send } from 'lucide-react';
 import { pricelist } from '../data/pricelist';
 import { Totals } from '../constants';
+import { buildWhatsAppOrderUrl, deriveReferenceNumber, buildPaymentShareWhatsAppUrl } from '../lib/whatsappOrder';
+import PaymentDetails from './PaymentDetails';
 
 type OrderEnquiryFormProps = {
   cart: Record<string, number>;
@@ -23,6 +25,10 @@ export default function OrderEnquiryForm({ cart, totals, pricelist: pl }: OrderE
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+  const [reference, setReference] = useState('');
+
+  const packingFee = Math.ceil(totals.total * 0.02);
+  const grandTotal = totals.total + packingFee;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -77,10 +83,24 @@ export default function OrderEnquiryForm({ cart, totals, pricelist: pl }: OrderE
         }),
       });
 
+      const data = await response.json().catch(() => ({}));
+
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data.message || 'Failed to place order');
       }
+
+      const ref = deriveReferenceNumber(data?.order_enquiry?.id);
+      setReference(ref);
+
+      const combinedAddress = [formData.address, formData.city, formData.state, formData.pincode]
+        .filter(Boolean)
+        .join(', ');
+      const waUrl = buildWhatsAppOrderUrl(cart, totals.total, packingFee, {
+        name: formData.customer_name.trim(),
+        phone: formData.phone.trim(),
+        address: combinedAddress,
+      }, ref);
+      window.open(waUrl, '_blank', 'noopener,noreferrer');
 
       setSubmitted(true);
     } catch (err: any) {
@@ -92,20 +112,27 @@ export default function OrderEnquiryForm({ cart, totals, pricelist: pl }: OrderE
 
   if (submitted) {
     return (
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
-          <Check className="w-8 h-8 text-green-600" />
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+        <div className="text-center mb-6">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+            <Check className="w-8 h-8 text-green-600" />
+          </div>
+          <h3 className="text-xl font-black text-brand-purple mb-2 font-display">Order Placed Successfully!</h3>
+          <p className="text-gray-500 mb-1">
+            Thank you, <span className="text-brand-magenta font-bold">{formData.customer_name}</span>!
+          </p>
+          <p className="text-gray-400 text-sm max-w-md mx-auto">
+            Our team will contact you at <span className="text-brand-magenta font-bold">+91 {formData.phone}</span> to confirm your order and arrange delivery.
+          </p>
         </div>
-        <h3 className="text-xl font-black text-brand-purple mb-2 font-display">Order Placed Successfully!</h3>
-        <p className="text-gray-500 mb-1">
-          Thank you, <span className="text-brand-magenta font-bold">{formData.customer_name}</span>!
-        </p>
-        <p className="text-gray-400 text-sm max-w-md mx-auto">
-          Our team will contact you at <span className="text-brand-magenta font-bold">+91 {formData.phone}</span> to confirm your order and arrange delivery.
-        </p>
-        <div className="mt-4 p-3 bg-amber-50 border border-amber-100 rounded-xl max-w-xs mx-auto">
-          <p className="text-xs text-amber-700 font-bold">No payment charged. Payment upon delivery.</p>
-        </div>
+
+        <PaymentDetails
+          referenceNumber={reference}
+          itemsTotal={totals.total}
+          packingFee={packingFee}
+          amountToPay={grandTotal}
+          whatsappShareUrl={buildPaymentShareWhatsAppUrl(reference, grandTotal)}
+        />
       </div>
     );
   }
@@ -213,7 +240,7 @@ export default function OrderEnquiryForm({ cart, totals, pricelist: pl }: OrderE
         </button>
 
         <p className="text-[11px] text-gray-400 text-center">
-          By placing this order, you agree to be contacted regarding your order. No online payment will be charged.
+          By placing this order, you agree to be contacted regarding your order. You can pay in advance via UPI/QR/Bank Transfer, or on delivery — whichever suits you.
         </p>
       </form>
     </div>

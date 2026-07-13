@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, MapPin, Copy, Check } from 'lucide-react';
-import { buildWhatsAppOrderUrl } from '../lib/whatsappOrder';
+import { X, User, MapPin } from 'lucide-react';
+import { buildWhatsAppOrderUrl, deriveReferenceNumber, buildPaymentShareWhatsAppUrl } from '../lib/whatsappOrder';
 import { pricelist } from '../data/pricelist';
 import { Totals } from '../constants';
+import PaymentDetails from './PaymentDetails';
 
 export type CustomerForm = { name: string; phone: string; address: string };
 
@@ -16,20 +17,10 @@ type OrderModalProps = {
   setForm: React.Dispatch<React.SetStateAction<CustomerForm>>;
 };
 
-const BANK = {
-  name: 'WAHIDH HUSSAIN S',
-  account: '003100050344099',
-  branch: 'Sivakasi',
-  type: 'Savings Account',
-  ifsc: 'TMBL0000003',
-  bank: 'TamilNadu Mercantile Bank',
-  upi: '7867036289',
-};
-
 export default function OrderModal({ open, onClose, cart, totals, form, setForm }: OrderModalProps) {
   const [step, setStep] = useState<'details' | 'payment'>('details');
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [copied, setCopied] = useState<string | null>(null);
+  const [reference, setReference] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
@@ -87,16 +78,20 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
         }),
       });
 
+      const data = await response.json().catch(() => ({}));
+
       if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
         throw new Error(data.message || 'Failed to place order. Please try again.');
       }
+
+      const ref = deriveReferenceNumber(data?.order_enquiry?.id);
+      setReference(ref);
 
       const url = buildWhatsAppOrderUrl(cart, totals.total, packingFee, {
         name: form.name.trim(),
         phone: form.phone.trim(),
         address: form.address.trim(),
-      });
+      }, ref);
       window.open(url, '_blank', 'noopener,noreferrer');
       setStep('payment');
     } catch (err: any) {
@@ -104,13 +99,6 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const copyToClipboard = (text: string, key: string) => {
-    navigator.clipboard.writeText(text).then(() => {
-      setCopied(key);
-      setTimeout(() => setCopied(null), 2000);
-    });
   };
 
   const handleClose = () => {
@@ -243,89 +231,14 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
                     <p className="text-green-600 text-xs mt-0.5">We will confirm your order shortly.</p>
                   </div>
 
-                  {/* Order total */}
-                  <div className="bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 space-y-1.5">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500 font-medium">Items Total</span>
-                      <span className="font-black text-[#1A1A4E]">Rs.{totals.total.toLocaleString('en-IN')}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500 font-medium">Packing Fee (2%)</span>
-                      <span className="font-black text-[#1A1A4E]">Rs.{packingFee.toLocaleString('en-IN')}</span>
-                    </div>
-                    <div className="border-t border-gray-200 pt-1.5 flex justify-between">
-                      <span className="font-black text-sm text-[#1A1A4E]">Amount to Pay</span>
-                      <span className="font-black text-green-600">Rs.{grandTotal.toLocaleString('en-IN')}</span>
-                    </div>
-                  </div>
-
-                  {/* Payment heading */}
-                  <div className="text-center">
-                    <p className="font-black text-[#1A1A4E] text-sm uppercase tracking-wide">Pay via GPay / PhonePe / Bank Transfer</p>
-                    <p className="text-xs text-gray-400 mt-0.5">Pay after receiving order confirmation from us</p>
-                  </div>
-
-                  {/* QR Code */}
-                  <div className="flex justify-center">
-                    <div className="border-2 border-gray-100 rounded-2xl p-3 bg-white shadow-sm">
-                      <img src="/gpay-qr.jpeg" alt="GPay QR Code" className="w-40 h-40 object-contain" />
-                      <p className="text-center text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2">Scan to Pay</p>
-                    </div>
-                  </div>
-
-                  {/* UPI */}
-                  <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 flex items-center justify-between">
-                    <div>
-                      <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest">GPay / PhonePe UPI</p>
-                      <p className="font-black text-[#1A1A4E] text-sm mt-0.5">{BANK.upi}</p>
-                    </div>
-                    <button onClick={() => copyToClipboard(BANK.upi, 'upi')} className="flex items-center gap-1 text-xs font-black text-blue-500 hover:text-blue-700 transition-colors">
-                      {copied === 'upi' ? <Check size={14} className="text-green-500" /> : <Copy size={14} />}
-                      {copied === 'upi' ? 'Copied!' : 'Copy'}
-                    </button>
-                  </div>
-
-                  {/* Bank details */}
-                  <div className="border border-gray-100 rounded-xl overflow-hidden">
-                    <div className="bg-[#1A1A4E] px-4 py-2.5">
-                      <p className="text-white font-black text-xs uppercase tracking-widest">Bank Transfer Details</p>
-                    </div>
-                    <div className="px-4 py-3 space-y-2.5 bg-white">
-                      {[
-                        { label: 'Account Name', value: BANK.name },
-                        { label: 'Account Number', value: BANK.account, copyKey: 'account' },
-                        { label: 'Bank', value: BANK.bank },
-                        { label: 'Branch', value: BANK.branch },
-                        { label: 'Account Type', value: BANK.type },
-                        { label: 'IFSC Code', value: BANK.ifsc, copyKey: 'ifsc' },
-                      ].map(({ label, value, copyKey }) => (
-                        <div key={label} className="flex items-center justify-between">
-                          <div>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{label}</p>
-                            <p className="font-black text-[#1A1A4E] text-xs mt-0.5">{value}</p>
-                          </div>
-                          {copyKey && (
-                            <button onClick={() => copyToClipboard(value, copyKey)} className="flex items-center gap-1 text-xs font-black text-pink-400 hover:text-pink-600 transition-colors ml-2 flex-shrink-0">
-                              {copied === copyKey ? <Check size={13} className="text-green-500" /> : <Copy size={13} />}
-                              {copied === copyKey ? 'Copied!' : 'Copy'}
-                            </button>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Unboxing policy */}
-                  <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
-                    <p className="font-black text-amber-700 text-xs uppercase tracking-wide mb-1.5">Important — Unboxing Policy</p>
-                    <p className="text-xs text-amber-800 font-medium leading-relaxed">
-                      Claims for damaged or missing items will be accepted <span className="font-black">only if an unboxing video is provided</span> at the time of opening the package. The company will not be responsible for any claims if an unboxing video is not provided.
-                    </p>
-                  </div>
-
-                  <button onClick={handleClose} className="w-full bg-[#1A1A4E] hover:bg-[#2D1B6B] text-white font-black py-3.5 rounded-xl transition-colors text-sm">
-                    Done
-                  </button>
+                  <PaymentDetails
+                    referenceNumber={reference}
+                    itemsTotal={totals.total}
+                    packingFee={packingFee}
+                    amountToPay={grandTotal}
+                    whatsappShareUrl={buildPaymentShareWhatsAppUrl(reference, grandTotal)}
+                    onDone={handleClose}
+                  />
                 </div>
               )}
             </div>

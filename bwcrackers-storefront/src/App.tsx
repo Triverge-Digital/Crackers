@@ -6,6 +6,7 @@ import Header from './components/Header';
 import HomeView from './components/HomeView';
 import StoreView from './components/StoreView';
 import CartView from './components/CartView';
+import CollectionsView from './components/CollectionsView';
 import WhatsAppButton from './components/WhatsAppButton';
 
 export default function App() {
@@ -66,6 +67,12 @@ export default function App() {
       const timer = setInterval(() => setCurrentPoster(p => (p + 1) % POSTERS.length), 5000);
       return () => clearInterval(timer);
     }
+  }, [activeView]);
+
+  // Land at the top of whichever page we just switched to, instead of
+  // carrying over the previous page's scroll position.
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
   }, [activeView]);
 
   // Brands are managed in the Medusa admin and fetched from the backend.
@@ -132,6 +139,9 @@ export default function App() {
             setCart={setCart}
             updateQty={updateQty}
           />
+        )}
+        {activeView === 'collections' && (
+          <CollectionsView setActiveView={setActiveView} setSelectedCategory={setSelectedCategory} />
         )}
       </AnimatePresence>
 

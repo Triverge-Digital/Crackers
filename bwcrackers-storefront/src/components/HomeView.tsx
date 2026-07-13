@@ -3,11 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ChevronLeft, ChevronRight, ShieldCheck, Truck,
   Headphones, Award, Instagram, MessageCircle,
-  Facebook, Mail, Phone, MapPin, Plus, Minus, ChevronDown, ChevronUp,
+  Mail, Phone, MapPin, Plus, Minus, ChevronDown, ChevronUp,
   Search, X
 } from 'lucide-react';
 import { pricelist } from '../data/pricelist';
-import { POSTERS, FALLBACK_IMG, MIN_ORDER, Brand, CONTACT, WHATSAPP_LINK, PRIMARY_PHONE_INTL, Totals } from '../constants';
+import { POSTERS, FALLBACK_IMG, MIN_ORDER, Brand, CONTACT, WHATSAPP_LINK, PRIMARY_PHONE_INTL, Totals, CATEGORY_COLORS } from '../constants';
 import OrderModal, { CustomerForm } from './OrderModal';
 
 type HomeViewProps = {
@@ -72,12 +72,6 @@ export default function HomeView({
 
   const progress = Math.min((totals.total / MIN_ORDER) * 100, 100);
   const remaining = Math.max(MIN_ORDER - totals.total, 0);
-
-  const catColors: Record<number, string> = {
-    1: 'bg-red-600', 2: 'bg-blue-600', 3: 'bg-green-600', 4: 'bg-purple-600',
-    5: 'bg-orange-500', 6: 'bg-pink-600', 7: 'bg-indigo-600', 8: 'bg-yellow-600',
-    9: 'bg-teal-600', 10: 'bg-rose-600', 11: 'bg-cyan-600', 12: 'bg-amber-600',
-  };
 
   return (
     <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col">
@@ -304,7 +298,7 @@ export default function HomeView({
           <div className="space-y-3">
             {filteredPricelist.map((cat, catIdx) => {
               const isOpen = openCategories.has(cat.id);
-              const headerColor = catColors[cat.id] || 'bg-gray-700';
+              const headerColor = CATEGORY_COLORS[cat.id] || 'bg-gray-700';
               return (
                 <motion.div
                   key={cat.id}
@@ -512,8 +506,14 @@ export default function HomeView({
       <section className="py-16 bg-gray-50 border-t border-brand-magenta/5">
         <div className="container mx-auto px-4">
           <div className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-black text-brand-magenta uppercase tracking-tighter italic mb-2 font-display">Festive Collections</h2>
-            <div className="w-16 h-1 bg-brand-gold mx-auto rounded-full" />
+            <h2 className="text-2xl md:text-3xl font-black text-brand-magenta uppercase tracking-tighter italic mb-2 font-display">Collections</h2>
+            <div className="w-16 h-1 bg-brand-gold mx-auto rounded-full mb-4" />
+            <button
+              onClick={() => { setActiveView('collections'); window.scrollTo({ top: 0, behavior: 'auto' }); }}
+              className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-widest text-brand-magenta hover:text-brand-purple transition-colors"
+            >
+              View All Collections <ChevronRight size={14} />
+            </button>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {[
@@ -606,9 +606,8 @@ export default function HomeView({
             <img src="/logo.png" alt="B&W Crackers" className="h-14 w-auto object-contain drop-shadow-lg mb-4" />
             <p className="text-gray-400 font-bold text-sm leading-relaxed mb-6">Premium quality fireworks directly from Sivakasi, with our signature 80% discount on MRP.</p>
             <div className="flex gap-3">
-              <a href="#" className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-magenta transition-colors"><Instagram size={18} /></a>
+              <a href="https://www.instagram.com/bwcrackers/" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center hover:bg-brand-magenta transition-colors"><Instagram size={18} /></a>
               <a href={WHATSAPP_LINK} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center hover:bg-[#25D366] transition-colors"><MessageCircle size={18} /></a>
-              <a href="#" className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center hover:bg-[#1877F2] transition-colors"><Facebook size={18} /></a>
             </div>
           </div>
 
@@ -617,6 +616,7 @@ export default function HomeView({
             <ul className="space-y-3 text-gray-400 font-bold text-sm">
               <li><button onClick={() => setActiveView('home')} className="hover:text-white transition-colors">Home</button></li>
               <li><button onClick={() => setActiveView('order')} className="hover:text-white transition-colors">Browse by Category</button></li>
+              <li><button onClick={() => setActiveView('collections')} className="hover:text-white transition-colors">Collections</button></li>
               <li><button onClick={() => setActiveView('cart')} className="hover:text-white transition-colors">My Cart</button></li>
             </ul>
           </div>
@@ -624,7 +624,7 @@ export default function HomeView({
           <div>
             <h4 className="text-brand-gold font-black uppercase tracking-widest text-xs mb-6">Categories</h4>
             <ul className="space-y-2 text-gray-400 font-bold text-sm">
-              {pricelist.slice(0, 6).map(cat => (
+              {pricelist.map(cat => (
                 <li key={cat.id}>
                   <button onClick={() => goToCategory(cat.id)} className="text-left hover:text-white transition-colors capitalize">{cat.name.toLowerCase()}</button>
                 </li>

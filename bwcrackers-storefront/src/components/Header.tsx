@@ -12,19 +12,15 @@ type HeaderProps = {
 };
 
 export default function Header({ activeView, setActiveView, isMenuOpen, setIsMenuOpen, totals }: HeaderProps) {
-  // Scroll-spy: highlight Home / Collections / About based on scroll position while on the home view.
-  const [activeSection, setActiveSection] = React.useState<'home' | 'collections' | 'about'>('home');
+  // Scroll-spy: highlight Home / About based on scroll position while on the home view.
+  const [activeSection, setActiveSection] = React.useState<'home' | 'about'>('home');
 
   React.useEffect(() => {
     if (activeView !== 'home') return;
     const onScroll = () => {
       const offset = 140; // sticky header height
-      const catsTop = document.getElementById('categories')?.getBoundingClientRect().top ?? Infinity;
       const aboutTop = document.getElementById('about')?.getBoundingClientRect().top ?? Infinity;
-      // #about appears above #categories in the DOM, so check categories (lower) first.
-      if (catsTop <= offset) setActiveSection('collections');
-      else if (aboutTop <= offset) setActiveSection('about');
-      else setActiveSection('home');
+      setActiveSection(aboutTop <= offset ? 'about' : 'home');
     };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -32,7 +28,7 @@ export default function Header({ activeView, setActiveView, isMenuOpen, setIsMen
   }, [activeView]);
 
   const navActive = (key: 'home' | 'order' | 'collections' | 'about') => {
-    if (key === 'order') return activeView === 'order';
+    if (key === 'order' || key === 'collections') return activeView === key;
     return activeView === 'home' && activeSection === key;
   };
 
@@ -99,7 +95,7 @@ export default function Header({ activeView, setActiveView, isMenuOpen, setIsMen
           <nav className="hidden lg:flex items-center gap-8">
             <button onClick={() => setActiveView('home')} className={`text-xs font-black uppercase tracking-widest hover:text-brand-gold transition-colors ${navActive('home') ? 'text-brand-gold' : 'text-white/70'}`}>Home</button>
             <button onClick={() => setActiveView('order')} className={`text-xs font-black uppercase tracking-widest hover:text-brand-gold transition-colors ${navActive('order') ? 'text-brand-gold' : 'text-white/70'}`}>Store</button>
-            <button onClick={() => { setActiveView('home'); setTimeout(() => document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className={`text-xs font-black uppercase tracking-widest hover:text-brand-gold transition-colors ${navActive('collections') ? 'text-brand-gold' : 'text-white/70'}`}>Collections</button>
+            <button onClick={() => setActiveView('collections')} className={`text-xs font-black uppercase tracking-widest hover:text-brand-gold transition-colors ${navActive('collections') ? 'text-brand-gold' : 'text-white/70'}`}>Collections</button>
             <button onClick={() => { setActiveView('home'); setTimeout(() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className={`text-xs font-black uppercase tracking-widest hover:text-brand-gold transition-colors ${navActive('about') ? 'text-brand-gold' : 'text-white/70'}`}>About</button>
           </nav>
 
@@ -141,7 +137,7 @@ export default function Header({ activeView, setActiveView, isMenuOpen, setIsMen
                 {[
                   { label: 'Home', view: 'home' },
                   { label: 'Store', view: 'order' },
-                  { label: 'Collections', action: () => { setActiveView('home'); setTimeout(() => document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' }), 100); } },
+                  { label: 'Collections', view: 'collections' },
                   { label: 'About', action: () => { setActiveView('home'); setTimeout(() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }), 100); } }
                 ].map((item) => (
                   <button

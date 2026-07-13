@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, ShieldCheck, ShoppingCart, ChevronDown, ChevronUp, Plus, Minus } from 'lucide-react';
+import { Search, ShieldCheck, ShoppingCart, ChevronDown, ChevronUp, Plus, Minus, List, LayoutGrid } from 'lucide-react';
 import { pricelist, Product } from '../data/pricelist';
-import { MIN_ORDER, FALLBACK_IMG, Totals } from '../constants';
+import { MIN_ORDER, FALLBACK_IMG, Totals, CATEGORY_COLORS } from '../constants';
 import OrderModal, { CustomerForm } from './OrderModal';
 
 type StoreProduct = Product & { categoryId: number; categoryName: string };
@@ -30,6 +30,7 @@ export default function StoreView({
   const [openCategories, setOpenCategories] = useState<Set<number>>(
     new Set(pricelist.map(c => c.id))
   );
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
 
   const toggleCategory = (id: number) => {
     setOpenCategories(prev => {
@@ -80,6 +81,18 @@ export default function StoreView({
           <span className="flex items-center bg-white border border-gray-200 rounded-xl px-4 text-sm font-bold text-gray-500 shadow-sm whitespace-nowrap">
             {totalProducts} items
           </span>
+          <div className="flex items-center bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex-shrink-0">
+            <button
+              onClick={() => setViewMode('list')}
+              aria-label="List view"
+              className={`p-2.5 transition-colors ${viewMode === 'list' ? 'bg-[#1A1A4E] text-white' : 'text-gray-400 hover:text-gray-600'}`}
+            ><List size={16} /></button>
+            <button
+              onClick={() => setViewMode('grid')}
+              aria-label="Grid view"
+              className={`p-2.5 transition-colors ${viewMode === 'grid' ? 'bg-[#1A1A4E] text-white' : 'text-gray-400 hover:text-gray-600'}`}
+            ><LayoutGrid size={16} /></button>
+          </div>
         </div>
 
         {/* Category pills */}
@@ -145,12 +158,7 @@ export default function StoreView({
         <div className="space-y-4">
           {filteredPricelist.map((cat, catIdx) => {
             const isOpen = openCategories.has(cat.id);
-            const catColors: Record<number, string> = {
-              1: 'bg-red-600', 2: 'bg-blue-600', 3: 'bg-green-600', 4: 'bg-purple-600',
-              5: 'bg-orange-500', 6: 'bg-pink-600', 7: 'bg-indigo-600', 8: 'bg-yellow-500',
-              9: 'bg-teal-600', 10: 'bg-rose-600', 11: 'bg-cyan-600', 12: 'bg-amber-600',
-            };
-            const headerColor = catColors[cat.id] || 'bg-gray-700';
+            const headerColor = CATEGORY_COLORS[cat.id] || 'bg-gray-700';
 
             return (
               <motion.div
@@ -184,69 +192,115 @@ export default function StoreView({
                       transition={{ duration: 0.2 }}
                       className="overflow-hidden"
                     >
-                      {/* Table header */}
-                      <div className="grid grid-cols-[1fr_auto_auto] sm:grid-cols-[2fr_auto_auto_auto] gap-2 px-4 py-2 bg-gray-50 border-b border-gray-100 text-[10px] font-black uppercase tracking-widest text-gray-400">
-                        <span>Product</span>
-                        <span className="hidden sm:block text-right">Unit</span>
-                        <span className="text-right">Price</span>
-                        <span className="text-right">Qty</span>
-                      </div>
-
-                      {cat.products.map((p, idx) => (
-                        <div
-                          key={p.code}
-                          className={`grid grid-cols-[1fr_auto_auto] sm:grid-cols-[2fr_auto_auto_auto] gap-2 items-center px-4 py-3 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/60'} border-b border-gray-100 last:border-0`}
-                        >
-                          {/* Name + image */}
-                          <div className="flex items-center gap-3 min-w-0">
-                            {p.showImage !== false && (
-                              <img
-                                src={p.image || FALLBACK_IMG}
-                                alt={p.name}
-                                onError={e => { e.currentTarget.src = FALLBACK_IMG; }}
-                                className="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-gray-100"
-                              />
-                            )}
-                            <div className="min-w-0">
-                              <p className="font-black text-[13px] text-[#1A1A4E] leading-tight truncate">{p.name}</p>
-                              {p.isPremium && (
-                                <span className="text-[9px] font-black uppercase text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Premium</span>
-                              )}
-                            </div>
+                      {viewMode === 'list' ? (
+                        <>
+                          {/* Table header */}
+                          <div className="grid grid-cols-[1fr_auto_auto] sm:grid-cols-[2fr_auto_auto_auto] gap-2 px-4 py-2 bg-gray-50 border-b border-gray-100 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                            <span>Product</span>
+                            <span className="hidden sm:block text-right">Unit</span>
+                            <span className="text-right">Price</span>
+                            <span className="text-right">Qty</span>
                           </div>
 
-                          {/* Unit */}
-                          <span className="hidden sm:block text-[11px] text-gray-400 font-semibold text-right whitespace-nowrap">{p.unit}</span>
-
-                          {/* Price */}
-                          <div className="text-right">
-                            <p className="font-black text-base text-[#1A1A4E] leading-none">₹{p.discountPrice}</p>
-                            <p className="text-[10px] text-gray-400 line-through leading-none mt-0.5">₹{p.mrp}</p>
-                          </div>
-
-                          {/* Qty control */}
-                          <div className="flex items-center justify-end gap-1">
-                            {cart[p.code] ? (
-                              <div className="flex items-center gap-1 bg-[#1A1A4E] rounded-xl px-1.5 py-1">
-                                <button
-                                  onClick={() => updateQty(p.code, -1)}
-                                  className="w-7 h-7 rounded-lg bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors active:scale-90"
-                                ><Minus size={12} /></button>
-                                <span className="w-6 text-center text-sm font-black text-white">{cart[p.code]}</span>
-                                <button
-                                  onClick={() => updateQty(p.code, 1)}
-                                  className="w-7 h-7 rounded-lg bg-pink-500 text-white flex items-center justify-center hover:bg-pink-400 transition-colors active:scale-90"
-                                ><Plus size={12} /></button>
+                          {cat.products.map((p, idx) => (
+                            <div
+                              key={p.code}
+                              className={`grid grid-cols-[1fr_auto_auto] sm:grid-cols-[2fr_auto_auto_auto] gap-2 items-center px-4 py-3 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/60'} border-b border-gray-100 last:border-0`}
+                            >
+                              {/* Name + image */}
+                              <div className="flex items-center gap-3 min-w-0">
+                                {p.showImage !== false ? (
+                                  <img
+                                    src={p.image || FALLBACK_IMG}
+                                    alt={p.name}
+                                    onError={e => { e.currentTarget.src = FALLBACK_IMG; }}
+                                    className="w-10 h-10 rounded-lg object-cover flex-shrink-0 border border-gray-100"
+                                  />
+                                ) : (
+                                  <div className="w-10 h-10 rounded-lg flex-shrink-0 bg-gradient-to-br from-brand-purple to-brand-magenta flex items-center justify-center text-white font-black text-sm">{p.name.charAt(0)}</div>
+                                )}
+                                <div className="min-w-0">
+                                  <p className="font-black text-[13px] text-[#1A1A4E] leading-tight truncate">{p.name}</p>
+                                  {p.isPremium && (
+                                    <span className="text-[9px] font-black uppercase text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Premium</span>
+                                  )}
+                                </div>
                               </div>
-                            ) : (
-                              <button
-                                onClick={() => updateQty(p.code, 1)}
-                                className="w-9 h-9 rounded-xl bg-pink-500 text-white flex items-center justify-center hover:bg-pink-400 transition-colors shadow active:scale-90"
-                              ><Plus size={16} /></button>
-                            )}
-                          </div>
+
+                              {/* Unit */}
+                              <span className="hidden sm:block text-[11px] text-gray-400 font-semibold text-right whitespace-nowrap">{p.unit}</span>
+
+                              {/* Price */}
+                              <div className="text-right">
+                                <p className="font-black text-base text-[#1A1A4E] leading-none">₹{p.discountPrice}</p>
+                                <p className="text-[10px] text-gray-400 line-through leading-none mt-0.5">₹{p.mrp}</p>
+                              </div>
+
+                              {/* Qty control */}
+                              <div className="flex items-center justify-end gap-1">
+                                {cart[p.code] ? (
+                                  <div className="flex items-center gap-1 bg-[#1A1A4E] rounded-xl px-1.5 py-1">
+                                    <button
+                                      onClick={() => updateQty(p.code, -1)}
+                                      className="w-7 h-7 rounded-lg bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors active:scale-90"
+                                    ><Minus size={12} /></button>
+                                    <span className="w-6 text-center text-sm font-black text-white">{cart[p.code]}</span>
+                                    <button
+                                      onClick={() => updateQty(p.code, 1)}
+                                      className="w-7 h-7 rounded-lg bg-pink-500 text-white flex items-center justify-center hover:bg-pink-400 transition-colors active:scale-90"
+                                    ><Plus size={12} /></button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => updateQty(p.code, 1)}
+                                    className="w-9 h-9 rounded-xl bg-pink-500 text-white flex items-center justify-center hover:bg-pink-400 transition-colors shadow active:scale-90"
+                                  ><Plus size={16} /></button>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </>
+                      ) : (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 p-3">
+                          {cat.products.map(p => (
+                            <div key={p.code} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+                              <div className="aspect-square bg-gray-50 overflow-hidden">
+                                {p.showImage === false ? (
+                                  <div className="w-full h-full bg-gradient-to-br from-brand-purple to-brand-magenta flex items-center justify-center text-white font-black text-2xl">{p.name.charAt(0)}</div>
+                                ) : (
+                                  <img
+                                    src={p.image || FALLBACK_IMG}
+                                    alt={p.name}
+                                    onError={e => { e.currentTarget.src = FALLBACK_IMG; }}
+                                    className="w-full h-full object-cover"
+                                  />
+                                )}
+                              </div>
+                              <div className="p-3 flex-1 flex flex-col">
+                                <h3 className="font-black text-xs text-[#1A1A4E] uppercase tracking-tight leading-tight truncate">{p.name}</h3>
+                                {p.isPremium && (
+                                  <span className="text-[9px] font-black uppercase text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full mt-1 self-start">Premium</span>
+                                )}
+                                <div className="mt-auto pt-2 flex items-center justify-between">
+                                  <div>
+                                    <p className="font-black text-sm text-[#1A1A4E] leading-none">₹{p.discountPrice}</p>
+                                    <p className="text-[9px] text-gray-400 line-through leading-none mt-0.5">₹{p.mrp}</p>
+                                  </div>
+                                  {cart[p.code] ? (
+                                    <div className="flex items-center gap-1 bg-[#1A1A4E] rounded-lg px-1 py-1">
+                                      <button onClick={() => updateQty(p.code, -1)} className="w-6 h-6 rounded-md bg-white/10 text-white flex items-center justify-center active:scale-90"><Minus size={11} /></button>
+                                      <span className="w-5 text-center text-xs font-black text-white">{cart[p.code]}</span>
+                                      <button onClick={() => updateQty(p.code, 1)} className="w-6 h-6 rounded-md bg-pink-500 text-white flex items-center justify-center active:scale-90"><Plus size={11} /></button>
+                                    </div>
+                                  ) : (
+                                    <button onClick={() => updateQty(p.code, 1)} className="w-8 h-8 rounded-lg bg-pink-500 text-white flex items-center justify-center shadow active:scale-90"><Plus size={14} /></button>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      )}
                     </motion.div>
                   )}
                 </AnimatePresence>
