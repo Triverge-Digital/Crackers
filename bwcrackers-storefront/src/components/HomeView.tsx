@@ -199,7 +199,7 @@ export default function HomeView({
             {[
               { step: '1', title: 'Browse & Add', desc: 'Tap + on any item you want' },
               { step: '2', title: 'Check Total', desc: 'Min. order Rs.3,000' },
-              { step: '3', title: 'WhatsApp Order', desc: 'Green button sends your list' },
+              { step: '3', title: 'Place Order', desc: 'Fill details & confirm your order' },
             ].map(({ step, title, desc }) => (
               <div key={step} className="bg-white/10 rounded-xl p-3 flex flex-col items-center text-center gap-1.5">
                 <div className="w-8 h-8 rounded-full bg-brand-magenta text-white font-black text-base flex items-center justify-center flex-shrink-0">{step}</div>
@@ -397,42 +397,77 @@ export default function HomeView({
               className="inline-flex items-center gap-2 bg-green-500 hover:bg-green-400 disabled:opacity-40 disabled:cursor-not-allowed text-white font-black px-8 py-3.5 rounded-xl transition-colors shadow-lg"
             >
               <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.533 5.855L.057 23.882l6.173-1.616A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.8 9.8 0 01-5.005-1.366l-.358-.213-3.714.974 1.01-3.61-.234-.373A9.783 9.783 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
-              Place Order via WhatsApp
+              Place Order
             </button>
           </div>
         </div>
       </section>
 
-      {/* ── ABOUT / 80% DISCOUNT IMAGE ── */}
-      <section id="about" className="w-full bg-white border-t border-gray-100 md:grid md:grid-cols-2 scroll-mt-28">
-        <div className="bg-[#1A1A4E] flex items-center justify-center p-0">
+      {/* ── ABOUT ── */}
+      <section id="about" className="relative overflow-hidden scroll-mt-28 flex flex-col md:flex-row">
+
+        {/* LEFT — poster fills column, object-cover centers on the 1:1 image with minimal trim */}
+        <div className="w-full md:w-[45%] flex-shrink-0 self-stretch">
           <img
             src="/discount.webp"
             alt="80% Discount on MRP"
-            onError={e => { e.currentTarget.style.display = 'none'; }}
-            className="w-full h-auto block"
+            onError={e => { (e.currentTarget.parentElement as HTMLElement).style.display = 'none'; }}
+            className="w-full h-full object-cover object-center block"
           />
         </div>
-        <div className="bg-[#FDF0F6] p-8 md:p-14 flex flex-col justify-center items-center md:items-start text-center md:text-left">
-          <h2 className="text-4xl md:text-5xl text-brand-magenta uppercase tracking-wide leading-none mb-6 font-brand">
-            BW CRACKERS<br /><span className="text-2xl md:text-3xl">SIVAKASI PATTASU</span>
-          </h2>
-          <div className="space-y-4 text-gray-700 font-bold text-sm leading-relaxed">
-            <p>Welcome to BW Crackers, your premier destination for high-quality firecrackers and fireworks. Based in Sivakasi, the fireworks capital of India, we have been bringing joy and light to celebrations for over a decade.</p>
-            <p>Our commitment to safety, quality, and customer satisfaction sets us apart. All our products are certified and tested to ensure a spectacular yet safe experience for your family and loved ones.</p>
-            <p>We source directly from the finest manufacturers in Sivakasi, ensuring that every product meets the highest standards of quality while offering the best prices in the market with our signature <span className="text-brand-magenta font-black">80% discount on MRP</span>.</p>
-          </div>
-          <div className="mt-6 flex gap-3">
-            <div className="bg-brand-magenta text-white rounded-2xl px-5 py-3 text-center">
-              <p className="font-black text-2xl leading-none">80%</p>
-              <p className="text-[10px] font-bold uppercase tracking-wider mt-1">Discount on MRP</p>
+
+        {/* RIGHT — Dark content panel */}
+        <div className="relative flex-1 flex flex-col justify-center px-8 md:px-12 py-12 md:py-16" style={{ background: '#05050F' }}>
+          {/* Radial glow */}
+          <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 80% 70% at 30% 50%, rgba(236,72,153,0.10) 0%, transparent 70%)' }} />
+
+          <div className="relative">
+            {/* Label + heading */}
+            <span className="text-brand-gold text-[10px] font-black uppercase tracking-[5px]">Sivakasi · Tamil Nadu</span>
+            <h2 className="text-4xl md:text-5xl font-black uppercase leading-none tracking-tighter mt-3">
+              <span className="text-white">BW </span>
+              <span className="text-brand-magenta">CRACKERS</span>
+            </h2>
+            <p className="text-white/40 text-xs font-black uppercase tracking-[5px] mt-2 mb-8">Sivakasi Pattasu</p>
+
+            {/* Stats grid — 2×2 */}
+            <div className="grid grid-cols-2 gap-3 mb-8">
+              {[
+                { num: '80%',  label: 'Discount on MRP',  hex: '#EC4899' },
+                { num: '100%', label: 'Sivakasi Direct',  hex: '#3B82F6' },
+                { num: '10+',  label: 'Years Experience', hex: '#F59E0B' },
+                { num: '500+', label: 'Happy Customers',  hex: '#22C55E' },
+              ].map(stat => (
+                <div
+                  key={stat.label}
+                  className="rounded-2xl p-4 border"
+                  style={{
+                    background: `${stat.hex}14`,
+                    borderColor: `${stat.hex}40`,
+                    boxShadow: `0 0 20px ${stat.hex}1A`,
+                  }}
+                >
+                  <div className="font-black text-3xl leading-none" style={{ color: stat.hex }}>{stat.num}</div>
+                  <div className="text-white/55 text-[10px] font-bold uppercase tracking-widest mt-1.5">{stat.label}</div>
+                </div>
+              ))}
             </div>
-            <div className="bg-[#1A1A4E] text-white rounded-2xl px-5 py-3 text-center">
-              <p className="font-black text-2xl leading-none">100%</p>
-              <p className="text-[10px] font-bold uppercase tracking-wider mt-1">Sivakasi Direct</p>
+
+            {/* Description */}
+            <div className="space-y-3">
+              <p className="text-white/55 text-sm leading-relaxed font-medium">
+                Welcome to BW Crackers, your premier destination for high-quality firecrackers and fireworks. Based in Sivakasi, the fireworks capital of India, we have been bringing joy and light to celebrations for over a decade.
+              </p>
+              <p className="text-white/55 text-sm leading-relaxed font-medium">
+                Our commitment to safety, quality, and customer satisfaction sets us apart. All our products are certified and tested to ensure a spectacular yet safe experience for your family and loved ones.
+              </p>
+              <p className="text-white/55 text-sm leading-relaxed font-medium">
+                We source directly from the finest manufacturers in Sivakasi, ensuring that every product meets the highest standards of quality while offering the best prices in the market with our signature <span className="text-brand-magenta font-black">80% discount on MRP</span>.
+              </p>
             </div>
           </div>
         </div>
+
       </section>
 
       {/* ── UNBOXING POLICY ── */}
@@ -537,88 +572,85 @@ export default function HomeView({
         </div>
       </section>
 
-      {/* ── OUR PRODUCTS (GROUPED BY CATEGORY) ── */}
-      <section id="categories" className="py-16 bg-gray-50 border-t border-gray-200 scroll-mt-28">
+      {/* ── OUR PRODUCTS (THEMED POSTER CARDS) ── */}
+      <section id="categories" className="py-16 bg-[#05050F] border-t border-white/5 scroll-mt-28">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-black text-brand-magenta uppercase tracking-tighter mb-2 italic font-display">Our Products</h2>
-            <div className="w-24 h-1.5 bg-brand-gold mx-auto rounded-full" />
+            <p className="text-brand-gold text-[10px] font-black uppercase tracking-[4px] mb-3">Sivakasi Direct</p>
+            <h2 className="text-3xl md:text-4xl font-black text-white uppercase tracking-tighter mb-2 italic font-display">Our Products</h2>
+            <p className="text-white/40 text-sm font-medium">Flat 80% off on MRP — every item, every category</p>
+            <div className="flex items-center justify-center gap-3 mt-4">
+              <div className="h-px w-16 bg-gradient-to-r from-transparent to-brand-gold/60" />
+              <div className="w-1.5 h-1.5 rounded-full bg-brand-gold" />
+              <div className="h-px w-16 bg-gradient-to-l from-transparent to-brand-gold/60" />
+            </div>
           </div>
 
-          <div className="space-y-12">
-            {pricelist.map(cat => (
-              <div key={cat.id}>
-                {/* Category header */}
-                <div className="flex items-center gap-3 mb-5">
-                  <div className={`h-7 w-1.5 rounded-full ${cat.color}`} />
-                  <h3 className="text-base md:text-lg font-black text-[#1A1A4E] uppercase tracking-widest">{cat.name}</h3>
-                  <div className="flex-1 h-px bg-gray-200" />
-                  <span className="text-xs font-bold text-gray-400">{cat.products.length} items</span>
-                </div>
-
-                {/* Product grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
-                  {cat.products.map(p => (
-                    <motion.div
-                      key={p.code}
-                      whileHover={{ y: -3 }}
-                      className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col group"
+          <div className="grid grid-cols-3 gap-3 md:gap-5 max-w-4xl mx-auto">
+            {(() => {
+              const catMeta: Record<number, { hex: string; num: string; desc: string }> = {
+                1: { hex: '#ef4444', num: '01', desc: 'Lakshmi, Chorsa & sound crackers' },
+                2: { hex: '#3b82f6', num: '02', desc: 'Premium 24, 50 & 100-count packets' },
+                3: { hex: '#22c55e', num: '03', desc: 'Vibrant red & striped bijili' },
+                4: { hex: '#a855f7', num: '04', desc: 'Sky-high rockets with effects' },
+                5: { hex: '#f97316', num: '05', desc: 'Magic pencil & aerial candles' },
+                6: { hex: '#ec4899', num: '06', desc: 'Coloured pencils for dazzling shows' },
+              };
+              return pricelist
+                .filter(cat => cat.id <= 6)
+                .map(cat => {
+                  const repImage = cat.products.find(p => p.showImage !== false)?.image || FALLBACK_IMG;
+                  const { hex, num, desc } = catMeta[cat.id];
+                  return (
+                    <div
+                      key={cat.id}
+                      className="relative rounded-2xl overflow-hidden aspect-[3/4] group transition-transform duration-300 hover:-translate-y-1"
+                      style={{ boxShadow: `0 0 0 1.5px ${hex}55, 0 8px 40px ${hex}20` }}
                     >
-                      {/* Image */}
-                      <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
-                        {p.showImage === false ? (
-                          <div className="w-full h-full bg-gradient-to-br from-brand-purple to-brand-magenta flex items-center justify-center text-white font-black text-3xl">
-                            {p.name.charAt(0)}
-                          </div>
-                        ) : (
-                          <img
-                            src={p.image || FALLBACK_IMG}
-                            alt={p.name}
-                            onError={e => { e.currentTarget.src = FALLBACK_IMG; }}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        )}
-                        {/* Discount badge */}
-                        <div className="absolute top-2 left-2 bg-brand-magenta text-white text-[10px] font-black px-2 py-0.5 rounded-full">
+                      {/* Full-bleed image */}
+                      <img
+                        src={repImage}
+                        alt={cat.name}
+                        onError={e => { e.currentTarget.src = FALLBACK_IMG; }}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      {/* Category-coloured gradient overlay */}
+                      <div
+                        className="absolute inset-0"
+                        style={{ background: `linear-gradient(to top, ${hex}99 0%, ${hex}22 45%, transparent 100%)` }}
+                      />
+                      {/* Dark layer for text contrast */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+
+                      {/* Faded large number — decorative */}
+                      <div
+                        className="absolute right-2 bottom-12 font-black leading-none pointer-events-none select-none text-7xl md:text-8xl"
+                        style={{ color: `${hex}18` }}
+                      >
+                        {num}
+                      </div>
+
+                      {/* Top row */}
+                      <div className="absolute top-3 inset-x-3 flex items-center justify-between">
+                        <div className="bg-brand-magenta text-white text-[8px] md:text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg">
                           80% OFF
                         </div>
-                        {p.isPremium && (
-                          <div className="absolute top-2 right-2 bg-brand-gold text-[#1A1A4E] text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wide">
-                            Premium
-                          </div>
-                        )}
+                        {/* 4-point sparkle star */}
+                        <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M8 0 L9.4 6.6 L16 8 L9.4 9.4 L8 16 L6.6 9.4 L0 8 L6.6 6.6 Z" fill={hex} opacity="0.75"/>
+                        </svg>
                       </div>
 
-                      {/* Info */}
-                      <div className="p-3 flex-1 flex flex-col gap-2">
-                        <div>
-                          <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">{p.unit}</p>
-                          <h3 className="font-black text-sm text-[#1A1A4E] leading-tight mt-0.5 line-clamp-2">{p.name}</h3>
-                        </div>
-
-                        <div className="mt-auto flex items-end justify-between gap-1">
-                          <div>
-                            <p className="font-black text-base text-brand-magenta leading-none">₹{p.discountPrice}</p>
-                            <p className="text-[10px] text-gray-400 line-through mt-0.5">₹{p.mrp}</p>
-                          </div>
-                          {cart[p.code] ? (
-                            <div className="flex items-center gap-1 bg-[#1A1A4E] rounded-xl px-1.5 py-1.5">
-                              <button onClick={() => updateQty(p.code, -1)} className="w-6 h-6 rounded-lg bg-white/10 text-white flex items-center justify-center active:scale-90 transition-transform"><Minus size={11} /></button>
-                              <span className="w-5 text-center text-xs font-black text-white">{cart[p.code]}</span>
-                              <button onClick={() => updateQty(p.code, 1)} className="w-6 h-6 rounded-lg bg-brand-magenta text-white flex items-center justify-center active:scale-90 transition-transform"><Plus size={11} /></button>
-                            </div>
-                          ) : (
-                            <button onClick={() => updateQty(p.code, 1)} className="w-9 h-9 rounded-xl bg-brand-magenta text-white flex items-center justify-center shadow-md active:scale-90 transition-transform hover:bg-pink-600">
-                              <Plus size={16} />
-                            </button>
-                          )}
-                        </div>
+                      {/* Bottom text */}
+                      <div className="absolute bottom-0 left-0 right-0 p-3 md:p-4">
+                        <div className="w-7 h-0.5 rounded-full mb-2" style={{ background: hex }} />
+                        <h3 className="font-black text-[11px] md:text-sm text-white uppercase tracking-wide leading-tight">{cat.name}</h3>
+                        <p className="text-white/60 text-[9px] md:text-[11px] font-medium mt-1 leading-snug">{desc}</p>
                       </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            ))}
+                    </div>
+                  );
+                });
+            })()}
           </div>
         </div>
       </section>
@@ -675,26 +707,19 @@ export default function HomeView({
           <h2 className="text-2xl font-black text-brand-magenta uppercase tracking-tighter italic mb-2 font-display">Our Brands</h2>
           <div className="w-16 h-1 bg-brand-gold mx-auto rounded-full" />
         </div>
-        <div className="relative flex overflow-hidden">
-          {(() => {
-            const reps = Math.max(2, Math.ceil(12 / (brands.length || 1)));
-            const track = Array.from({ length: reps }).flatMap(() => brands);
-            return [0, 1].map(t => (
-              <motion.div
-                key={t}
-                aria-hidden={t === 1}
-                animate={{ x: ["0%", "-100%"] }}
-                transition={{ repeat: Infinity, duration: track.length * 4, ease: "linear" }}
-                className="flex gap-12 items-center pr-12 shrink-0"
-              >
-                {track.map((brand, i) => (
-                  <div key={i} className="w-28 h-16 flex-shrink-0">
-                    <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-contain" />
-                  </div>
-                ))}
-              </motion.div>
-            ));
-          })()}
+        <div className="overflow-hidden">
+          <motion.div
+            animate={{ x: "-50%" }}
+            transition={{ repeat: Infinity, duration: Math.max(20, brands.length * 5), ease: "linear" }}
+            className="flex gap-12 items-center"
+            style={{ width: "max-content" }}
+          >
+            {[...brands, ...brands].map((brand, i) => (
+              <div key={i} className="w-28 h-16 flex-shrink-0">
+                <img src={brand.logo_url} alt={brand.name} className="w-full h-full object-contain" />
+              </div>
+            ))}
+          </motion.div>
         </div>
       </div>
 
