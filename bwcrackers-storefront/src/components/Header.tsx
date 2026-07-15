@@ -27,9 +27,14 @@ export default function Header({ activeView, setActiveView, isMenuOpen, setIsMen
     return () => window.removeEventListener('scroll', onScroll);
   }, [activeView]);
 
-  const navActive = (key: 'home' | 'order' | 'collections' | 'about') => {
+  const navActive = (key: 'home' | 'order' | 'collections' | 'about' | 'payment') => {
     if (key === 'order' || key === 'collections') return activeView === key;
     return activeView === 'home' && activeSection === key;
+  };
+
+  const scrollToPayment = () => {
+    setActiveView('home');
+    setTimeout(() => document.getElementById('payment-info')?.scrollIntoView({ behavior: 'smooth' }), 100);
   };
 
   return (
@@ -97,6 +102,7 @@ export default function Header({ activeView, setActiveView, isMenuOpen, setIsMen
             <button onClick={() => setActiveView('order')} className={`text-xs font-black uppercase tracking-widest hover:text-brand-gold transition-colors ${navActive('order') ? 'text-brand-gold' : 'text-white/70'}`}>Store</button>
             <button onClick={() => setActiveView('collections')} className={`text-xs font-black uppercase tracking-widest hover:text-brand-gold transition-colors ${navActive('collections') ? 'text-brand-gold' : 'text-white/70'}`}>Collections</button>
             <button onClick={() => { setActiveView('home'); setTimeout(() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className={`text-xs font-black uppercase tracking-widest hover:text-brand-gold transition-colors ${navActive('about') ? 'text-brand-gold' : 'text-white/70'}`}>About</button>
+            <button onClick={scrollToPayment} className={`text-xs font-black uppercase tracking-widest hover:text-brand-gold transition-colors ${navActive('payment') ? 'text-brand-gold' : 'text-white/70'}`}>How to Pay</button>
           </nav>
 
           <div className="flex items-center gap-3">
@@ -138,7 +144,8 @@ export default function Header({ activeView, setActiveView, isMenuOpen, setIsMen
                   { label: 'Home', view: 'home' },
                   { label: 'Store', view: 'order' },
                   { label: 'Collections', view: 'collections' },
-                  { label: 'About', action: () => { setActiveView('home'); setTimeout(() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }), 100); } }
+                  { label: 'About', action: () => { setActiveView('home'); setTimeout(() => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }), 100); } },
+                  { label: 'How to Pay', action: scrollToPayment }
                 ].map((item) => (
                   <button
                     key={item.label}
