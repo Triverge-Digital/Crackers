@@ -451,6 +451,92 @@ export default function HomeView({
         </div>
       </section>
 
+      {/* ── PAYMENT INFO ── */}
+      <section id="payment-info" className="py-12 px-4 bg-white border-t border-gray-100 scroll-mt-28">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-black text-[#1A1A4E] uppercase tracking-tight mb-2">How to Pay</h2>
+            <p className="text-gray-500 text-sm font-medium">Pay after receiving order confirmation from us</p>
+            <div className="w-20 h-1.5 bg-brand-gold mx-auto rounded-full mt-3" />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            {/* GPay / PhonePe card */}
+            <div className="rounded-2xl overflow-hidden shadow-sm border border-green-200">
+              <div className="bg-gradient-to-r from-green-500 to-emerald-600 px-5 py-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                  <svg viewBox="0 0 24 24" fill="white" className="w-5 h-5"><path d="M21.805 10.023H12.02v3.955h5.636c-.243 1.418-1.456 4.148-5.636 4.148-3.39 0-6.157-2.808-6.157-6.267s2.767-6.267 6.157-6.267c1.93 0 3.225.822 3.965 1.532l2.698-2.602C16.83 3.124 14.61 2 12.02 2 6.478 2 2 6.477 2 12s4.478 10 10.02 10c5.786 0 9.625-4.064 9.625-9.786 0-.658-.072-1.161-.16-1.664l-.02-.527z"/></svg>
+                </div>
+                <div>
+                  <p className="text-white font-black text-sm">GPay / PhonePe</p>
+                  <p className="text-white/70 text-xs">Pay via UPI instantly</p>
+                </div>
+              </div>
+              <div className="bg-white p-5 space-y-4">
+                <div className="bg-green-50 border border-green-100 rounded-xl px-4 py-3 flex items-center justify-between">
+                  <div>
+                    <p className="text-[10px] font-black text-green-600 uppercase tracking-widest">UPI ID</p>
+                    <p className="font-black text-[#1A1A4E] text-lg mt-0.5">7867036289</p>
+                  </div>
+                  <button
+                    onClick={() => navigator.clipboard.writeText('7867036289')}
+                    className="text-xs font-black text-green-600 border border-green-200 rounded-lg px-3 py-1.5 hover:bg-green-50 transition-colors"
+                  >
+                    Copy
+                  </button>
+                </div>
+                <div className="flex justify-center">
+                  <div className="border-2 border-gray-100 rounded-2xl p-3 bg-white shadow-sm inline-block">
+                    <img src="/gpay-qr.jpeg" alt="GPay QR Code" className="w-36 h-36 object-contain" />
+                    <p className="text-center text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2">Scan to Pay</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bank Transfer card */}
+            <div className="rounded-2xl overflow-hidden shadow-sm border border-[#1A1A4E]/20">
+              <div className="bg-gradient-to-r from-[#1A1A4E] to-[#2D1B6B] px-5 py-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                  <svg viewBox="0 0 24 24" fill="white" className="w-5 h-5"><path d="M11.5 1L2 6v2h19V6L11.5 1zm0 2.236L18.056 6H4.944L11.5 3.236zM3 9v11H1v2h21v-2h-2V9h-2v11h-3V9h-2v11h-3V9h-2v11H7V9H3z"/></svg>
+                </div>
+                <div>
+                  <p className="text-white font-black text-sm">Bank Transfer</p>
+                  <p className="text-white/70 text-xs">NEFT / IMPS / RTGS</p>
+                </div>
+              </div>
+              <div className="bg-white p-5 space-y-3">
+                {[
+                  { label: 'Account Name', value: 'WAHIDH HUSSAIN S' },
+                  { label: 'Account Number', value: '003100050344099' },
+                  { label: 'Bank', value: 'TamilNadu Mercantile Bank' },
+                  { label: 'Branch', value: 'Sivakasi' },
+                  { label: 'Account Type', value: 'Savings Account' },
+                  { label: 'IFSC Code', value: 'TMBL0000003' },
+                ].map(({ label, value }) => (
+                  <div key={label} className="flex items-center justify-between py-1.5 border-b border-gray-50 last:border-0">
+                    <div>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{label}</p>
+                      <p className="font-black text-[#1A1A4E] text-xs mt-0.5">{value}</p>
+                    </div>
+                    {(label === 'Account Number' || label === 'IFSC Code') && (
+                      <button
+                        onClick={() => navigator.clipboard.writeText(value)}
+                        className="text-[11px] font-black text-pink-400 border border-pink-100 rounded-lg px-2 py-1 hover:bg-pink-50 transition-colors ml-2 flex-shrink-0"
+                      >
+                        Copy
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
       {/* ── OUR PRODUCTS (ALL PRODUCTS, EVERY CATEGORY) ── */}
       <section id="categories" className="py-16 bg-gray-50 border-t border-brand-magenta/5 scroll-mt-28">
         <div className="container mx-auto px-4">
