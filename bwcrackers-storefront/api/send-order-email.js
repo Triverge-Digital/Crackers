@@ -1,8 +1,8 @@
 import nodemailer from 'nodemailer';
 
-const GMAIL_USER = process.env.GMAIL_USER;         // e.g. admin@bwcrackers.com
-const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD; // 16-char app password from Google
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || GMAIL_USER;
+const GMAIL_USER = 'athiban.p2015@gmail.com';
+const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
+const ADMIN_EMAIL = 'athiban.p2015@gmail.com';
 
 function buildEmailHtml({ customer, items, itemsTotal, packingFee, grandTotal, reference }) {
   const now = new Date();
