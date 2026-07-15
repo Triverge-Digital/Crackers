@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, User, MapPin } from 'lucide-react';
-import { buildWhatsAppOrderUrl, deriveReferenceNumber, buildPaymentShareWhatsAppUrl } from '../lib/whatsappOrder';
+import { deriveReferenceNumber, buildPaymentShareWhatsAppUrl } from '../lib/whatsappOrder';
 import { pricelist } from '../data/pricelist';
 import { Totals } from '../constants';
+import { generateEstimatePDF } from '../lib/generateEstimatePDF';
 import PaymentDetails from './PaymentDetails';
 
 export type CustomerForm = { name: string; phone: string; address: string };
@@ -87,12 +88,15 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
       const ref = deriveReferenceNumber(data?.order_enquiry?.id);
       setReference(ref);
 
-      const url = buildWhatsAppOrderUrl(cart, totals.total, packingFee, {
-        name: form.name.trim(),
-        phone: form.phone.trim(),
-        address: form.address.trim(),
-      }, ref);
-      window.open(url, '_blank', 'noopener,noreferrer');
+      generateEstimatePDF(
+        cart,
+        pricelist,
+        { name: form.name.trim(), phone: form.phone.trim(), address: form.address.trim() },
+        ref,
+        totals.total,
+        packingFee,
+        grandTotal,
+      );
       setStep('payment');
     } catch (err: any) {
       setSubmitError(err.message || 'Something went wrong. Please try again.');
@@ -228,8 +232,17 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
                   {/* Success banner */}
                   <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-center">
                     <p className="text-green-700 font-black text-sm">Order placed successfully!</p>
-                    <p className="text-green-600 text-xs mt-0.5">We will confirm your order shortly.</p>
+                    <p className="text-green-600 text-xs mt-0.5">Your estimate PDF has been opened. We will confirm your order shortly.</p>
                   </div>
+
+                  {/* Re-download estimate */}
+                  <button
+                    onClick={() => generateEstimatePDF(cart, pricelist, { name: form.name.trim(), phone: form.phone.trim(), address: form.address.trim() }, reference, totals.total, packingFee, grandTotal)}
+                    className="w-full bg-[#1A1A4E] hover:bg-[#2D1B6B] active:scale-95 text-white font-black py-3 rounded-xl flex items-center justify-center gap-2 transition-all text-sm"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Download Estimate PDF
+                  </button>
 
                   <PaymentDetails
                     referenceNumber={reference}
