@@ -95,15 +95,26 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
     }
 
     setReference(ref);
-    generateEstimatePDF(
-      cart,
-      pricelist,
-      { name: form.name.trim(), phone: form.phone.trim(), email: form.email.trim(), address: form.address.trim() },
-      ref,
-      totals.total,
-      packingFee,
-      grandTotal,
-    );
+
+    const customer = { name: form.name.trim(), phone: form.phone.trim(), email: form.email.trim(), address: form.address.trim() };
+
+    // Build items list for email
+    const emailItems: { name: string; unit: string; qty: number; price: number; total: number }[] = [];
+    pricelist.forEach(cat => {
+      cat.products.forEach(p => {
+        const qty = cart[p.code];
+        if (qty) emailItems.push({ name: p.name, unit: p.unit, qty, price: p.discountPrice, total: p.discountPrice * qty });
+      });
+    });
+
+    // Send confirmation email (best-effort, non-blocking)
+    fetch('/api/send-order-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ customer, items: emailItems, itemsTotal: totals.total, packingFee, grandTotal, reference: ref }),
+    }).catch(() => {});
+
+    generateEstimatePDF(cart, pricelist, customer, ref, totals.total, packingFee, grandTotal);
     setStep('payment');
     setSubmitting(false);
   };

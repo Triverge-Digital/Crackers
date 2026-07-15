@@ -2,5 +2,10 @@
   "framework": "vite",
   "buildCommand": "yarn build",
   "installCommand": "yarn install",
-  "outputDirectory": "dist"
+  "outputDirectory": "dist",
+  "functions": {
+    "api/*.js": {
+      "runtime": "nodejs20.x"
+    }
+  }
 }
