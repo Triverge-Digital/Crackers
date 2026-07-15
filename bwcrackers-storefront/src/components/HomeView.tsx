@@ -537,52 +537,87 @@ export default function HomeView({
         </div>
       </section>
 
-      {/* ── OUR PRODUCTS (ALL PRODUCTS, EVERY CATEGORY) ── */}
-      <section id="categories" className="py-16 bg-gray-50 border-t border-brand-magenta/5 scroll-mt-28">
+      {/* ── OUR PRODUCTS (GROUPED BY CATEGORY) ── */}
+      <section id="categories" className="py-16 bg-gray-50 border-t border-gray-200 scroll-mt-28">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black text-brand-magenta uppercase tracking-tighter mb-2 italic font-display">Our Products</h2>
             <div className="w-24 h-1.5 bg-brand-gold mx-auto rounded-full" />
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6">
-            {pricelist.flatMap(cat => cat.products.map(p => ({ ...p, categoryName: cat.name }))).map(p => (
-              <motion.div
-                key={p.code}
-                whileHover={{ y: -4 }}
-                className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col"
-              >
-                <div className="aspect-square bg-gray-50 overflow-hidden">
-                  {p.showImage === false ? (
-                    <div className="w-full h-full bg-gradient-to-br from-brand-purple to-brand-magenta flex items-center justify-center text-white font-black text-2xl">{p.name.charAt(0)}</div>
-                  ) : (
-                    <img
-                      src={p.image || FALLBACK_IMG}
-                      alt={p.name}
-                      onError={e => { e.currentTarget.src = FALLBACK_IMG; }}
-                      className="w-full h-full object-cover"
-                    />
-                  )}
+
+          <div className="space-y-12">
+            {pricelist.map(cat => (
+              <div key={cat.id}>
+                {/* Category header */}
+                <div className="flex items-center gap-3 mb-5">
+                  <div className={`h-7 w-1.5 rounded-full ${cat.color}`} />
+                  <h3 className="text-base md:text-lg font-black text-[#1A1A4E] uppercase tracking-widest">{cat.name}</h3>
+                  <div className="flex-1 h-px bg-gray-200" />
+                  <span className="text-xs font-bold text-gray-400">{cat.products.length} items</span>
                 </div>
-                <div className="p-3 flex-1 flex flex-col">
-                  <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wide truncate">{p.categoryName}</span>
-                  <h3 className="font-black text-xs text-brand-purple uppercase tracking-tight leading-tight mt-0.5 truncate">{p.name}</h3>
-                  <div className="mt-auto pt-2 flex items-center justify-between">
-                    <div>
-                      <p className="font-black text-sm text-brand-purple leading-none">₹{p.discountPrice}</p>
-                      <p className="text-[9px] text-gray-400 line-through leading-none mt-0.5">₹{p.mrp}</p>
-                    </div>
-                    {cart[p.code] ? (
-                      <div className="flex items-center gap-1 bg-[#1A1A4E] rounded-lg px-1 py-1">
-                        <button onClick={() => updateQty(p.code, -1)} className="w-6 h-6 rounded-md bg-white/10 text-white flex items-center justify-center active:scale-90"><Minus size={11} /></button>
-                        <span className="w-5 text-center text-xs font-black text-white">{cart[p.code]}</span>
-                        <button onClick={() => updateQty(p.code, 1)} className="w-6 h-6 rounded-md bg-pink-500 text-white flex items-center justify-center active:scale-90"><Plus size={11} /></button>
+
+                {/* Product grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+                  {cat.products.map(p => (
+                    <motion.div
+                      key={p.code}
+                      whileHover={{ y: -3 }}
+                      className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col group"
+                    >
+                      {/* Image */}
+                      <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
+                        {p.showImage === false ? (
+                          <div className="w-full h-full bg-gradient-to-br from-brand-purple to-brand-magenta flex items-center justify-center text-white font-black text-3xl">
+                            {p.name.charAt(0)}
+                          </div>
+                        ) : (
+                          <img
+                            src={p.image || FALLBACK_IMG}
+                            alt={p.name}
+                            onError={e => { e.currentTarget.src = FALLBACK_IMG; }}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        )}
+                        {/* Discount badge */}
+                        <div className="absolute top-2 left-2 bg-brand-magenta text-white text-[10px] font-black px-2 py-0.5 rounded-full">
+                          80% OFF
+                        </div>
+                        {p.isPremium && (
+                          <div className="absolute top-2 right-2 bg-brand-gold text-[#1A1A4E] text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wide">
+                            Premium
+                          </div>
+                        )}
                       </div>
-                    ) : (
-                      <button onClick={() => updateQty(p.code, 1)} className="w-8 h-8 rounded-lg bg-pink-500 text-white flex items-center justify-center shadow active:scale-90"><Plus size={14} /></button>
-                    )}
-                  </div>
+
+                      {/* Info */}
+                      <div className="p-3 flex-1 flex flex-col gap-2">
+                        <div>
+                          <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">{p.unit}</p>
+                          <h3 className="font-black text-sm text-[#1A1A4E] leading-tight mt-0.5 line-clamp-2">{p.name}</h3>
+                        </div>
+
+                        <div className="mt-auto flex items-end justify-between gap-1">
+                          <div>
+                            <p className="font-black text-base text-brand-magenta leading-none">₹{p.discountPrice}</p>
+                            <p className="text-[10px] text-gray-400 line-through mt-0.5">₹{p.mrp}</p>
+                          </div>
+                          {cart[p.code] ? (
+                            <div className="flex items-center gap-1 bg-[#1A1A4E] rounded-xl px-1.5 py-1.5">
+                              <button onClick={() => updateQty(p.code, -1)} className="w-6 h-6 rounded-lg bg-white/10 text-white flex items-center justify-center active:scale-90 transition-transform"><Minus size={11} /></button>
+                              <span className="w-5 text-center text-xs font-black text-white">{cart[p.code]}</span>
+                              <button onClick={() => updateQty(p.code, 1)} className="w-6 h-6 rounded-lg bg-brand-magenta text-white flex items-center justify-center active:scale-90 transition-transform"><Plus size={11} /></button>
+                            </div>
+                          ) : (
+                            <button onClick={() => updateQty(p.code, 1)} className="w-9 h-9 rounded-xl bg-brand-magenta text-white flex items-center justify-center shadow-md active:scale-90 transition-transform hover:bg-pink-600">
+                              <Plus size={16} />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
