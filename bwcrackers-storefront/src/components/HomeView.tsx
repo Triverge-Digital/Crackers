@@ -29,7 +29,7 @@ export default function HomeView({
     new Set(pricelist.map(c => c.id))
   );
   const [modalOpen, setModalOpen] = useState(false);
-  const [customerForm, setCustomerForm] = useState<CustomerForm>({ name: '', phone: '', address: '' });
+  const [customerForm, setCustomerForm] = useState<CustomerForm>({ name: '', phone: '', email: '', address: '' });
   const [searchQuery, setSearchQuery] = useState('');
   const [bannerDismissed, setBannerDismissed] = useState(false);
 

@@ -3,6 +3,7 @@ import { Category } from '../data/pricelist';
 interface CustomerInfo {
   name: string;
   phone: string;
+  email: string;
   address: string;
 }
 
@@ -95,7 +96,8 @@ export function generateEstimatePDF(
       <td style="vertical-align:top;">
         <div style="font-size:10px;color:#999;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">Estimate To</div>
         <div style="font-size:15px;font-weight:800;color:#1A1A4E;">${customer.name}</div>
-        <div style="font-size:12px;color:#555;margin-top:3px;">Phone : +91${customer.phone}</div>
+        ${customer.email ? `<div style="font-size:12px;color:#555;margin-top:2px;">Email : ${customer.email}</div>` : ''}
+        <div style="font-size:12px;color:#555;margin-top:2px;">Phone : +91${customer.phone}</div>
         <div style="font-size:12px;color:#555;margin-top:2px;">Delivery point : ${customer.address}</div>
       </td>
       <td style="text-align:right;vertical-align:top;">

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, MapPin } from 'lucide-react';
+import { X, User, MapPin, Mail } from 'lucide-react';
 import { deriveReferenceNumber, buildPaymentShareWhatsAppUrl } from '../lib/whatsappOrder';
 import { pricelist } from '../data/pricelist';
 import { Totals } from '../constants';
 import { generateEstimatePDF } from '../lib/generateEstimatePDF';
 import PaymentDetails from './PaymentDetails';
 
-export type CustomerForm = { name: string; phone: string; address: string };
+export type CustomerForm = { name: string; phone: string; email: string; address: string };
 
 type OrderModalProps = {
   open: boolean;
@@ -23,10 +23,21 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [reference, setReference] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState('');
 
   const packingFee = Math.ceil(totals.total * 0.02);
   const grandTotal = totals.total + packingFee;
+
+  // Build ordered items list from cart + pricelist
+  const orderedItems = React.useMemo(() => {
+    const result: Array<{ name: string; unit: string; qty: number; price: number; total: number }> = [];
+    pricelist.forEach(cat => {
+      cat.products.forEach(p => {
+        const qty = cart[p.code];
+        if (qty) result.push({ name: p.name, unit: p.unit, qty, price: p.discountPrice, total: p.discountPrice * qty });
+      });
+    });
+    return result;
+  }, [cart]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -44,14 +55,11 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
 
   const handleOrder = async () => {
     if (!validate()) return;
-    setSubmitError('');
     setSubmitting(true);
 
-    // Generate a local reference immediately as fallback
     const localRef = `BW${Date.now().toString(36).toUpperCase().slice(-6)}`;
     let ref = localRef;
 
-    // Try to record the order on the backend — silently proceed if unavailable
     try {
       const items: { title: string; quantity: number; unit_price: number }[] = [];
       pricelist.forEach(cat => {
@@ -83,14 +91,14 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
         ref = deriveReferenceNumber(data?.order_enquiry?.id) || localRef;
       }
     } catch {
-      // Backend unavailable — proceed with local reference number
+      // Backend unavailable — proceed with local reference
     }
 
     setReference(ref);
     generateEstimatePDF(
       cart,
       pricelist,
-      { name: form.name.trim(), phone: form.phone.trim(), address: form.address.trim() },
+      { name: form.name.trim(), phone: form.phone.trim(), email: form.email.trim(), address: form.address.trim() },
       ref,
       totals.total,
       packingFee,
@@ -132,7 +140,7 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
                     {step === 'details' ? 'Place Your Order' : 'Order Confirmed!'}
                   </p>
                   <p className="text-white/60 text-xs mt-0.5">
-                    {step === 'details' ? 'Enter your details to place your order' : 'Now complete your payment below'}
+                    {step === 'details' ? 'Enter your details to place your order' : 'Choose a payment method below'}
                   </p>
                 </div>
                 <button onClick={handleClose} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors text-white flex-shrink-0">
@@ -143,19 +151,37 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
               {/* ── STEP 1: DETAILS ── */}
               {step === 'details' && (
                 <div className="px-6 pt-4 pb-6 space-y-4">
-                  {/* Summary */}
-                  <div className="bg-gray-50 border border-gray-100 rounded-xl px-4 py-3 space-y-1.5">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500 font-medium">Items Total</span>
-                      <span className="font-black text-[#1A1A4E]">Rs.{totals.total.toLocaleString('en-IN')}</span>
+
+                  {/* Ordered Items */}
+                  <div className="border border-gray-100 rounded-xl overflow-hidden">
+                    <div className="bg-[#1A1A4E]/5 px-4 py-2 border-b border-gray-100">
+                      <p className="text-[11px] font-black text-[#1A1A4E] uppercase tracking-widest">Your Order ({orderedItems.length} item{orderedItems.length !== 1 ? 's' : ''})</p>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500 font-medium">Packing Fee (2%)</span>
-                      <span className="font-black text-[#1A1A4E]">Rs.{packingFee.toLocaleString('en-IN')}</span>
+                    <div className="divide-y divide-gray-50 max-h-40 overflow-y-auto">
+                      {orderedItems.map((item, i) => (
+                        <div key={i} className="flex items-center justify-between px-4 py-2.5">
+                          <div className="flex-1 min-w-0 pr-3">
+                            <p className="text-xs font-black text-[#1A1A4E] truncate">{item.name}</p>
+                            <p className="text-[10px] text-gray-400 font-medium">{item.unit} × {item.qty}</p>
+                          </div>
+                          <p className="text-xs font-black text-[#1A1A4E] flex-shrink-0">Rs.{item.total.toLocaleString('en-IN')}</p>
+                        </div>
+                      ))}
                     </div>
-                    <div className="border-t border-gray-200 pt-1.5 flex justify-between">
-                      <span className="font-black text-sm text-[#1A1A4E]">Total Amount</span>
-                      <span className="font-black text-green-600">Rs.{grandTotal.toLocaleString('en-IN')}</span>
+                    {/* Totals */}
+                    <div className="bg-gray-50 px-4 py-3 space-y-1.5 border-t border-gray-100">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-gray-500 font-medium">Items Total</span>
+                        <span className="font-black text-[#1A1A4E]">Rs.{totals.total.toLocaleString('en-IN')}</span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span className="text-gray-500 font-medium">Packing Fee (2%)</span>
+                        <span className="font-black text-[#1A1A4E]">Rs.{packingFee.toLocaleString('en-IN')}</span>
+                      </div>
+                      <div className="border-t border-gray-200 pt-1.5 flex justify-between">
+                        <span className="font-black text-sm text-[#1A1A4E]">Total Amount</span>
+                        <span className="font-black text-green-600 text-sm">Rs.{grandTotal.toLocaleString('en-IN')}</span>
+                      </div>
                     </div>
                   </div>
 
@@ -184,6 +210,15 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
                     {errors.phone && <p className="text-xs text-red-500 font-medium mt-1">{errors.phone}</p>}
                   </div>
 
+                  {/* Email */}
+                  <div>
+                    <label className="text-xs font-black text-gray-500 uppercase tracking-wider block mb-1.5">Email ID <span className="text-gray-300 font-medium normal-case tracking-normal">(optional)</span></label>
+                    <div className="relative">
+                      <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="e.g. ravi@gmail.com" className={inputClass('email')} />
+                      <Mail size={15} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300" />
+                    </div>
+                  </div>
+
                   {/* Address */}
                   <div>
                     <label className="text-xs font-black text-gray-500 uppercase tracking-wider block mb-1.5">Delivery Address <span className="text-red-400">*</span></label>
@@ -194,12 +229,6 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
                     {errors.address && <p className="text-xs text-red-500 font-medium mt-1">{errors.address}</p>}
                   </div>
 
-                  {/* Submit */}
-                  {submitError && (
-                    <div className="p-3 bg-red-50 border border-red-100 rounded-xl">
-                      <p className="text-sm text-red-500 font-medium">{submitError}</p>
-                    </div>
-                  )}
                   <button
                     onClick={handleOrder}
                     disabled={submitting}
@@ -224,15 +253,14 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
               {/* ── STEP 2: PAYMENT ── */}
               {step === 'payment' && (
                 <div className="px-6 pt-4 pb-6 space-y-4">
-                  {/* Success banner */}
                   <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-center">
                     <p className="text-green-700 font-black text-sm">Order placed successfully!</p>
-                    <p className="text-green-600 text-xs mt-0.5">Your estimate PDF has been opened. We will confirm your order shortly.</p>
+                    <p className="text-green-600 text-xs mt-0.5">Your estimate PDF has been opened. We will confirm shortly.</p>
                   </div>
 
                   {/* Re-download estimate */}
                   <button
-                    onClick={() => generateEstimatePDF(cart, pricelist, { name: form.name.trim(), phone: form.phone.trim(), address: form.address.trim() }, reference, totals.total, packingFee, grandTotal)}
+                    onClick={() => generateEstimatePDF(cart, pricelist, { name: form.name.trim(), phone: form.phone.trim(), email: form.email.trim(), address: form.address.trim() }, reference, totals.total, packingFee, grandTotal)}
                     className="w-full bg-[#1A1A4E] hover:bg-[#2D1B6B] active:scale-95 text-white font-black py-3 rounded-xl flex items-center justify-center gap-2 transition-all text-sm"
                   >
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
