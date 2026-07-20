@@ -26,7 +26,7 @@ export default function StoreView({
   totals, cart, updateQty
 }: StoreViewProps) {
   const [modalOpen, setModalOpen] = useState(false);
-  const [customerForm, setCustomerForm] = useState<CustomerForm>({ name: '', phone: '', address: '' });
+  const [customerForm, setCustomerForm] = useState<CustomerForm>({ name: '', phone: '', email: '', address: '' });
   const [openCategories, setOpenCategories] = useState<Set<number>>(
     new Set(pricelist.map(c => c.id))
   );
