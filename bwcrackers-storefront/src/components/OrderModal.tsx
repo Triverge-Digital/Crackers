@@ -109,15 +109,16 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
       });
     });
 
-    // Send confirmation email (best-effort, non-blocking)
+    const url = await generateEstimatePDF(cart, pricelist, customer, ref, totals.total, packingFee, grandTotal);
+    setPdfUrl(url);
+
+    // Send confirmation email (best-effort, non-blocking), with the PDF attached when available
     fetch('/api/send-order-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ customer, items: emailItems, itemsTotal: totals.total, packingFee, grandTotal, reference: ref }),
+      body: JSON.stringify({ customer, items: emailItems, itemsTotal: totals.total, packingFee, grandTotal, reference: ref, pdfUrl: url }),
     }).catch(() => {});
 
-    const url = await generateEstimatePDF(cart, pricelist, customer, ref, totals.total, packingFee, grandTotal);
-    setPdfUrl(url);
     setStep('payment');
     setSubmitting(false);
   };

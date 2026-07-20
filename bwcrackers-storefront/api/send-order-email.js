@@ -1,8 +1,30 @@
-import nodemailer from 'nodemailer';
+// Order notification emails via Resend (https://resend.com).
+// Set RESEND_API_KEY in Vercel → Settings → Environment Variables.
+// ORDER_EMAIL_FROM / ORDER_EMAIL_TO are optional overrides (safe defaults below).
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const ORDER_EMAIL_FROM = process.env.ORDER_EMAIL_FROM || 'B&W Crackers <orders@bwcrackers.com>';
+const ADMIN_EMAILS = (process.env.ORDER_EMAIL_TO || 'gmhussainnsui@gmail.com,bwcrackers@gmail.com')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
 
-const GMAIL_USER = 'athiban.p2015@gmail.com';
-const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
-const ADMIN_EMAIL = 'athiban.p2015@gmail.com';
+async function sendViaResend({ to, subject, html, attachments }) {
+  const payload = { from: ORDER_EMAIL_FROM, to, subject, html };
+  if (attachments && attachments.length) payload.attachments = attachments;
+  const resp = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!resp.ok) {
+    const detail = await resp.text().catch(() => '');
+    throw new Error(`Resend ${resp.status}: ${detail}`);
+  }
+  return resp.json().catch(() => ({}));
+}
 
 function buildEmailHtml({ customer, items, itemsTotal, packingFee, grandTotal, reference }) {
   const now = new Date();
@@ -119,39 +141,36 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  if (!GMAIL_USER || !GMAIL_APP_PASSWORD) {
+  if (!RESEND_API_KEY) {
     // Email not configured yet — silently succeed so order still works
-    return res.status(200).json({ success: true, note: 'Email not configured' });
+    return res.status(200).json({ success: true, note: 'RESEND_API_KEY not set' });
   }
 
-  const { customer, items, itemsTotal, packingFee, grandTotal, reference } = req.body;
-
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: GMAIL_USER,
-      pass: GMAIL_APP_PASSWORD,
-    },
-  });
+  const { customer, items, itemsTotal, packingFee, grandTotal, reference, pdfUrl } = req.body;
 
   const html = buildEmailHtml({ customer, items, itemsTotal, packingFee, grandTotal, reference });
 
+  // Attach the hosted estimate PDF when available (Resend fetches it from the URL)
+  const attachments = pdfUrl
+    ? [{ path: pdfUrl, filename: `BW-Crackers-Estimate-${reference}.pdf` }]
+    : undefined;
+
   try {
-    // Always notify admin
-    await transporter.sendMail({
-      from: `"B&W Crackers" <${GMAIL_USER}>`,
-      to: ADMIN_EMAIL,
+    // Always notify admin(s)
+    await sendViaResend({
+      to: ADMIN_EMAILS,
       subject: `New Order ${reference} — ${customer.name} (Rs.${Number(grandTotal).toLocaleString('en-IN')})`,
       html,
+      attachments,
     });
 
     // Send to customer if they provided an email
     if (customer.email) {
-      await transporter.sendMail({
-        from: `"B&W Crackers" <${GMAIL_USER}>`,
-        to: customer.email,
+      await sendViaResend({
+        to: [customer.email],
         subject: `Your Order is Confirmed! ${reference} — B&W Crackers`,
         html,
+        attachments,
       });
     }
 
