@@ -28,8 +28,9 @@ async function sendViaResend({ to, subject, html, attachments }) {
 
 function buildEmailHtml({ customer, items, itemsTotal, packingFee, grandTotal, reference }) {
   const now = new Date();
-  const dateStr = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })
-    + ' at ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+  // Force IST — the serverless function runs on UTC, so a timeZone must be specified explicitly.
+  const dateStr = now.toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'long', year: 'numeric' })
+    + ' at ' + now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: true });
 
   const rowsHtml = items.map((item, idx) => `
     <tr>
@@ -146,14 +147,15 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true, note: 'RESEND_API_KEY not set' });
   }
 
-  const { customer, items, itemsTotal, packingFee, grandTotal, reference, pdfUrl } = req.body;
+  const { customer, items, itemsTotal, packingFee, grandTotal, reference, pdfBase64, pdfFilename, pdfUrl } = req.body;
 
   const html = buildEmailHtml({ customer, items, itemsTotal, packingFee, grandTotal, reference });
 
-  // Attach the hosted estimate PDF when available (Resend fetches it from the URL)
-  const attachments = pdfUrl
-    ? [{ path: pdfUrl, filename: `BW-Crackers-Estimate-${reference}.pdf` }]
-    : undefined;
+  // Attach the estimate PDF: prefer inline base64 (generated client-side), fall back to a hosted URL.
+  const filename = pdfFilename || `BW-Crackers-Estimate-${reference}.pdf`;
+  let attachments;
+  if (pdfBase64) attachments = [{ content: pdfBase64, filename }];
+  else if (pdfUrl) attachments = [{ path: pdfUrl, filename }];
 
   try {
     // Always notify admin(s)

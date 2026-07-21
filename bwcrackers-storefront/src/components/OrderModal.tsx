@@ -4,7 +4,7 @@ import { X, User, MapPin, Mail } from 'lucide-react';
 import { deriveReferenceNumber, buildPaymentShareWhatsAppUrl } from '../lib/whatsappOrder';
 import { pricelist } from '../data/pricelist';
 import { Totals } from '../constants';
-import { generateEstimatePDF } from '../lib/generateEstimatePDF';
+import { generateEstimatePDF, downloadEstimatePdf, EstimatePdf } from '../lib/generateEstimatePDF';
 import PaymentDetails from './PaymentDetails';
 
 export type CustomerForm = { name: string; phone: string; email: string; address: string };
@@ -23,8 +23,7 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [reference, setReference] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [pdf, setPdf] = useState<EstimatePdf | null>(null);
 
   const packingFee = Math.ceil(totals.total * 0.02);
   const grandTotal = totals.total + packingFee;
@@ -109,14 +108,26 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
       });
     });
 
-    const url = await generateEstimatePDF(cart, pricelist, customer, ref, totals.total, packingFee, grandTotal);
-    setPdfUrl(url);
+    const generatedPdf = await generateEstimatePDF(cart, pricelist, customer, ref, totals.total, packingFee, grandTotal);
+    setPdf(generatedPdf);
+
+    // Auto-download the estimate for the customer
+    if (generatedPdf) downloadEstimatePdf(generatedPdf);
 
     // Send confirmation email (best-effort, non-blocking), with the PDF attached when available
     fetch('/api/send-order-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ customer, items: emailItems, itemsTotal: totals.total, packingFee, grandTotal, reference: ref, pdfUrl: url }),
+      body: JSON.stringify({
+        customer,
+        items: emailItems,
+        itemsTotal: totals.total,
+        packingFee,
+        grandTotal,
+        reference: ref,
+        pdfBase64: generatedPdf?.base64,
+        pdfFilename: generatedPdf?.filename,
+      }),
     }).catch(() => {});
 
     setStep('payment');
@@ -125,15 +136,7 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
 
   const handleClose = () => {
     onClose();
-    setTimeout(() => { setStep('details'); setErrors({}); setPdfUrl(null); setCopied(false); }, 400);
-  };
-
-  const copyPdfUrl = () => {
-    if (!pdfUrl) return;
-    navigator.clipboard.writeText(pdfUrl).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
+    setTimeout(() => { setStep('details'); setErrors({}); setPdf(null); }, 400);
   };
 
   const inputClass = (field: string) =>
@@ -281,44 +284,19 @@ export default function OrderModal({ open, onClose, cart, totals, form, setForm 
                     <p className="text-green-600 text-xs mt-0.5">We will confirm your order and contact you shortly.</p>
                   </div>
 
-                  {/* PDF URL card or fallback download */}
-                  {pdfUrl ? (
-                    <div className="border border-[#1A1A4E]/20 rounded-xl overflow-hidden">
-                      <div className="bg-[#1A1A4E] px-4 py-2.5 flex items-center gap-2">
-                        <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-red-400 flex-shrink-0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v7h7v9H6z"/></svg>
-                        <span className="text-white font-black text-xs uppercase tracking-wider">Your Estimate PDF</span>
-                      </div>
-                      <div className="px-4 py-3 bg-gray-50">
-                        <p className="text-[11px] text-gray-400 font-medium mb-2">Shareable link — forward to anyone</p>
-                        <div className="flex gap-2">
-                          <div className="flex-1 bg-white border border-gray-200 rounded-lg px-3 py-2 text-[11px] text-gray-600 font-mono truncate">
-                            {pdfUrl}
-                          </div>
-                          <button
-                            onClick={copyPdfUrl}
-                            className="flex-shrink-0 bg-[#1A1A4E] hover:bg-[#2D1B6B] text-white text-[11px] font-black px-3 py-2 rounded-lg transition-colors"
-                          >
-                            {copied ? '✓ Copied' : 'Copy'}
-                          </button>
-                        </div>
-                        <button
-                          onClick={() => window.open(pdfUrl, '_blank')}
-                          className="mt-2.5 w-full bg-white border border-[#1A1A4E]/30 hover:border-[#1A1A4E] text-[#1A1A4E] font-black py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all text-xs"
-                        >
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                          Open &amp; Download PDF
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => generateEstimatePDF(cart, pricelist, { name: form.name.trim(), phone: form.phone.trim(), email: form.email.trim(), address: form.address.trim() }, reference, totals.total, packingFee, grandTotal)}
-                      className="w-full bg-[#1A1A4E] hover:bg-[#2D1B6B] active:scale-95 text-white font-black py-3 rounded-xl flex items-center justify-center gap-2 transition-all text-sm"
-                    >
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                      Download Estimate PDF
-                    </button>
-                  )}
+                  {/* Estimate PDF — auto-downloaded on order; button re-downloads / regenerates */}
+                  <button
+                    onClick={async () => {
+                      if (pdf) { downloadEstimatePdf(pdf); return; }
+                      const customer = { name: form.name.trim(), phone: form.phone.trim(), email: form.email.trim(), address: form.address.trim() };
+                      const regenerated = await generateEstimatePDF(cart, pricelist, customer, reference, totals.total, packingFee, grandTotal);
+                      if (regenerated) { setPdf(regenerated); downloadEstimatePdf(regenerated); }
+                    }}
+                    className="w-full bg-[#1A1A4E] hover:bg-[#2D1B6B] active:scale-95 text-white font-black py-3 rounded-xl flex items-center justify-center gap-2 transition-all text-sm"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Download Estimate PDF
+                  </button>
 
                   <PaymentDetails
                     referenceNumber={reference}

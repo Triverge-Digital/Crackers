@@ -1,5 +1,73 @@
 import { Category } from '../data/pricelist';
 
+export interface EstimatePdf {
+  blob: Blob;
+  /** base64 (no data: prefix) — for emailing as a Resend attachment */
+  base64: string;
+  filename: string;
+}
+
+/** Render the invoice HTML fully client-side into a single-page PDF (no server needed). */
+async function renderPdfFromHtml(html: string, reference: string): Promise<EstimatePdf> {
+  // Loaded on demand so the PDF libraries stay out of the main bundle
+  const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
+    import('jspdf'),
+    import('html2canvas'),
+  ]);
+
+  const iframe = document.createElement('iframe');
+  iframe.setAttribute('aria-hidden', 'true');
+  iframe.style.position = 'fixed';
+  iframe.style.left = '-10000px';
+  iframe.style.top = '0';
+  iframe.style.width = '820px';
+  iframe.style.height = '1200px';
+  iframe.style.border = '0';
+  document.body.appendChild(iframe);
+
+  try {
+    const doc = iframe.contentDocument!;
+    doc.open();
+    doc.write(html);
+    doc.close();
+
+    // Wait for the document (and the logo image) to be ready
+    await new Promise<void>((resolve) => {
+      if (doc.readyState === 'complete') resolve();
+      else iframe.onload = () => resolve();
+    });
+    const logo = doc.querySelector('img');
+    if (logo && !logo.complete) {
+      await new Promise<void>((resolve) => {
+        logo.onload = () => resolve();
+        logo.onerror = () => resolve();
+      });
+    }
+    await new Promise((r) => setTimeout(r, 120));
+
+    const target = (doc.querySelector('.page') as HTMLElement) || doc.body;
+    const canvas = await html2canvas(target, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      windowWidth: target.scrollWidth,
+      windowHeight: target.scrollHeight,
+    });
+
+    const imgData = canvas.toDataURL('image/jpeg', 0.92);
+    const pdfWidth = 760;
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'px', format: [pdfWidth, pdfHeight] });
+    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+
+    const blob = pdf.output('blob');
+    const base64 = pdf.output('datauristring').split(',')[1] || '';
+    return { blob, base64, filename: `BW-Crackers-Estimate-${reference}.pdf` };
+  } finally {
+    document.body.removeChild(iframe);
+  }
+}
+
 interface CustomerInfo {
   name: string;
   phone: string;
@@ -36,9 +104,15 @@ function buildEstimateHTML(
   const discountPct = subTotalMrp > 0 ? Math.round((discountAmount / subTotalMrp) * 100) : 80;
 
   const now = new Date();
-  const pad = (n: number) => String(n).padStart(2, '0');
-  const dateStr = `${pad(now.getDate())}-${pad(now.getMonth() + 1)}-${now.getFullYear()}`;
-  const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+  // Always stamp the invoice in IST, regardless of the customer's device timezone.
+  const istParts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Asia/Kolkata',
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit', hour12: true,
+  }).formatToParts(now);
+  const ist = (type: string) => istParts.find(p => p.type === type)?.value || '';
+  const dateStr = `${ist('day')}-${ist('month')}-${ist('year')}`;
+  const timeStr = `${ist('hour')}:${ist('minute')} ${ist('dayPeriod')}`;
 
   const logoUrl = window.location.origin + '/logo.png';
   const fmt = (n: number) => n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -303,31 +377,31 @@ export async function generateEstimatePDF(
   itemsTotal: number,
   packingFee: number,
   grandTotal: number,
-): Promise<string | null> {
+): Promise<EstimatePdf | null> {
   try {
     const html = buildEstimateHTML(cart, pricelist, customer, reference, itemsTotal, packingFee, grandTotal, false);
-
-    const res = await fetch('/api/generate-pdf', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ html, reference }),
-    });
-
-    if (res.ok) {
-      const { url } = await res.json();
-      return url as string;
-    }
+    return await renderPdfFromHtml(html, reference);
   } catch {
-    // fall through to print window
+    // Fallback: open a print window so the customer can still save/print the estimate
+    const html = buildEstimateHTML(cart, pricelist, customer, reference, itemsTotal, packingFee, grandTotal, true);
+    const win = window.open('', '_blank', 'width=820,height=960,scrollbars=yes');
+    if (win) {
+      win.document.write(html);
+      win.document.close();
+      win.focus();
+    }
+    return null;
   }
+}
 
-  // Fallback: open print window
-  const html = buildEstimateHTML(cart, pricelist, customer, reference, itemsTotal, packingFee, grandTotal, true);
-  const win = window.open('', '_blank', 'width=820,height=960,scrollbars=yes');
-  if (win) {
-    win.document.write(html);
-    win.document.close();
-    win.focus();
-  }
-  return null;
+/** Trigger a browser download of a generated estimate PDF. */
+export function downloadEstimatePdf(pdf: EstimatePdf): void {
+  const url = URL.createObjectURL(pdf.blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = pdf.filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
