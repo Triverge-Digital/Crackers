@@ -105,6 +105,26 @@
           "nullable": false,
           "mappedType": "float"
         },
+        "packing_fee": {
+          "name": "packing_fee",
+          "type": "real",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "0",
+          "mappedType": "float"
+        },
+        "grand_total": {
+          "name": "grand_total",
+          "type": "real",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "0",
+          "mappedType": "float"
+        },
         "currency_code": {
           "name": "currency_code",
           "type": "text",
@@ -123,6 +143,24 @@
           "primary": false,
           "nullable": false,
           "default": "'pending'",
+          "mappedType": "text"
+        },
+        "tracking_number": {
+          "name": "tracking_number",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "text"
+        },
+        "admin_notes": {
+          "name": "admin_notes",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
           "mappedType": "text"
         },
         "created_at": {

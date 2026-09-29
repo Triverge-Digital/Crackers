@@ -1,6 +1,7 @@
 import { Resend } from "resend"
 
 type OrderEnquiryItem = {
+  code?: string
   title: string
   quantity: number
   unit_price: number
@@ -8,6 +9,7 @@ type OrderEnquiryItem = {
 
 export type OrderEnquiryEmailData = {
   id?: string
+  reference?: string
   customer_name: string
   phone: string
   email?: string | null
@@ -18,7 +20,17 @@ export type OrderEnquiryEmailData = {
   notes?: string | null
   items: OrderEnquiryItem[]
   subtotal: number
+  packing_fee?: number
+  grand_total?: number
   currency_code?: string
+}
+
+function escapeHtml(value: unknown): string {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
 }
 
 const FROM = process.env.ORDER_EMAIL_FROM || "orders@bwcrackers.com"
@@ -36,7 +48,7 @@ function buildHtml(data: OrderEnquiryEmailData) {
     .map(
       (it) => `
         <tr>
-          <td style="padding:8px 12px;border-bottom:1px solid #eee;">${it.title}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #eee;">${it.code ? `<span style="color:#999;">${escapeHtml(it.code)}</span> ` : ""}${escapeHtml(it.title)}</td>
           <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center;">${it.quantity}</td>
           <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:right;">${inr(it.unit_price)}</td>
           <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:right;">${inr(it.unit_price * it.quantity)}</td>
@@ -46,20 +58,25 @@ function buildHtml(data: OrderEnquiryEmailData) {
 
   const addressParts = [data.address, data.city, data.state, data.pincode]
     .filter(Boolean)
+    .map(escapeHtml)
     .join(", ")
+
+  const packingFee = data.packing_fee ?? 0
+  const grandTotal = data.grand_total ?? data.subtotal + packingFee
+  const waNumber = data.phone.replace(/[^\d]/g, "")
 
   return `
   <div style="font-family:Arial,Helvetica,sans-serif;max-width:640px;margin:0 auto;color:#1a1a4e;">
-    <h2 style="color:#c2185b;margin-bottom:4px;">New Order Enquiry</h2>
-    <p style="color:#555;margin-top:0;">A customer has placed an order on B&amp;W Crackers.</p>
+    <h2 style="color:#c2185b;margin-bottom:4px;">New Order ${data.reference ? `#${escapeHtml(data.reference)}` : "Enquiry"}</h2>
+    <p style="color:#555;margin-top:0;">A customer has placed an order on B&amp;W Crackers. Payment is collected manually after confirmation.</p>
 
     <h3 style="margin-bottom:6px;">Customer</h3>
     <table style="width:100%;border-collapse:collapse;font-size:14px;">
-      <tr><td style="padding:4px 0;width:140px;color:#777;">Name</td><td>${data.customer_name}</td></tr>
-      <tr><td style="padding:4px 0;color:#777;">Phone</td><td>${data.phone}</td></tr>
-      ${data.email ? `<tr><td style="padding:4px 0;color:#777;">Email</td><td>${data.email}</td></tr>` : ""}
+      <tr><td style="padding:4px 0;width:140px;color:#777;">Name</td><td>${escapeHtml(data.customer_name)}</td></tr>
+      <tr><td style="padding:4px 0;color:#777;">Phone</td><td><a href="https://wa.me/${waNumber}" style="color:#1a1a4e;">${escapeHtml(data.phone)}</a></td></tr>
+      ${data.email ? `<tr><td style="padding:4px 0;color:#777;">Email</td><td>${escapeHtml(data.email)}</td></tr>` : ""}
       ${addressParts ? `<tr><td style="padding:4px 0;color:#777;">Address</td><td>${addressParts}</td></tr>` : ""}
-      ${data.notes ? `<tr><td style="padding:4px 0;color:#777;">Notes</td><td>${data.notes}</td></tr>` : ""}
+      ${data.notes ? `<tr><td style="padding:4px 0;color:#777;">Notes</td><td>${escapeHtml(data.notes)}</td></tr>` : ""}
     </table>
 
     <h3 style="margin-bottom:6px;margin-top:24px;">Order Items</h3>
@@ -75,11 +92,13 @@ function buildHtml(data: OrderEnquiryEmailData) {
       <tbody>${rows}</tbody>
     </table>
 
-    <p style="text-align:right;font-size:16px;font-weight:bold;margin-top:16px;">
-      Subtotal: ${inr(data.subtotal)}
-    </p>
+    <table style="margin-left:auto;margin-top:16px;font-size:14px;border-collapse:collapse;">
+      <tr><td style="padding:2px 12px;color:#777;">Items total</td><td style="text-align:right;">${inr(data.subtotal)}</td></tr>
+      <tr><td style="padding:2px 12px;color:#777;">Packing &amp; handling (2%)</td><td style="text-align:right;">${inr(packingFee)}</td></tr>
+      <tr><td style="padding:6px 12px;font-size:16px;font-weight:bold;">Grand total</td><td style="text-align:right;font-size:16px;font-weight:bold;">${inr(grandTotal)}</td></tr>
+    </table>
 
-    ${data.id ? `<p style="color:#999;font-size:12px;">Enquiry ID: ${data.id}</p>` : ""}
+    ${data.id ? `<p style="color:#999;font-size:12px;">Enquiry ID: ${escapeHtml(data.id)}</p>` : ""}
   </div>`
 }
 
@@ -101,7 +120,9 @@ export async function sendOrderEnquiryEmail(data: OrderEnquiryEmailData): Promis
     from: `B&W Crackers <${FROM}>`,
     to: TO,
     replyTo: data.email || undefined,
-    subject: `New Order Enquiry — ${data.customer_name} (${inr(data.subtotal)})`,
+    subject: `New Order ${data.reference ? `#${data.reference} ` : ""}— ${data.customer_name} (${inr(
+      data.grand_total ?? data.subtotal
+    )})`,
     html: buildHtml(data),
   })
 
