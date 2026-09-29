@@ -32,6 +32,9 @@ export default function HomeView({
   const [customerForm, setCustomerForm] = useState<CustomerForm>({ name: '', phone: '', email: '', address: '' });
   const [searchQuery, setSearchQuery] = useState('');
   const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [underlayPoster, setUnderlayPoster] = useState(currentPoster);
+  const [bannersReady, setBannersReady] = useState(false);
+  const isPaused = useRef(false);
 
   const filteredPricelist = pricelist.map(cat => ({
     ...cat,
@@ -40,19 +43,57 @@ export default function HomeView({
     )
   })).filter(cat => cat.products.length > 0);
 
-  // Auto-play carousel every 5 seconds
+  // Prefetch every banner so slides never flash empty navy.
   useEffect(() => {
-    const timer = setInterval(() => setCurrentPoster(p => (p + 1) % POSTERS.length), 5000);
-    return () => clearInterval(timer);
-  }, [setCurrentPoster]);
+    let cancelled = false;
+    Promise.all(
+      POSTERS.map(
+        (src) =>
+          new Promise<void>((resolve) => {
+            const img = new Image();
+            img.onload = () => resolve();
+            img.onerror = () => resolve();
+            img.src = src;
+          })
+      )
+    ).then(() => {
+      if (!cancelled) setBannersReady(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Keep the previous slide underneath during the crossfade.
+  useEffect(() => {
+    if (currentPoster === underlayPoster) return;
+    const t = window.setTimeout(() => setUnderlayPoster(currentPoster), 900);
+    return () => window.clearTimeout(t);
+  }, [currentPoster, underlayPoster]);
+
+  // Single autoplay loop — 6s between slides; restarts after each change.
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      if (isPaused.current) return;
+      setCurrentPoster((p) => (p + 1) % POSTERS.length);
+    }, 6000);
+    return () => window.clearInterval(timer);
+  }, [currentPoster, setCurrentPoster]);
+
+  const goToPoster = (next: number | ((p: number) => number)) => {
+    setCurrentPoster((p) => {
+      const value = typeof next === 'function' ? next(p) : next;
+      return ((value % POSTERS.length) + POSTERS.length) % POSTERS.length;
+    });
+  };
 
   const touchStartX = useRef<number | null>(null);
   const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartX.current === null) return;
     const dx = e.changedTouches[0].clientX - touchStartX.current;
-    if (dx > 50) setCurrentPoster(p => (p - 1 + POSTERS.length) % POSTERS.length);
-    else if (dx < -50) setCurrentPoster(p => (p + 1) % POSTERS.length);
+    if (dx > 50) goToPoster((p) => p - 1);
+    else if (dx < -50) goToPoster((p) => p + 1);
     touchStartX.current = null;
   };
 
@@ -78,37 +119,51 @@ export default function HomeView({
 
       {/* ── HERO CAROUSEL ── */}
       <section
-        className="relative w-full overflow-hidden bg-[#1A1A4E] touch-pan-y aspect-[5/2] md:aspect-[1983/793]"
+        className="relative w-full overflow-hidden touch-pan-y aspect-[5/2] md:aspect-[1983/793]"
+        style={{
+          // First banner paints immediately via CSS so navy never flashes on load.
+          backgroundColor: '#0f0f2e',
+          backgroundImage: `url(${POSTERS[0]})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
+        onMouseEnter={() => { isPaused.current = true; }}
+        onMouseLeave={() => { isPaused.current = false; }}
       >
-        {/* Base image always visible — prevents background from ever showing */}
+        {/* Previous slide stays underneath — no gap / solid color during fade */}
         <img
-          src={POSTERS[currentPoster]}
-          alt="B&W Crackers Diwali banner"
+          src={POSTERS[underlayPoster]}
+          alt=""
+          aria-hidden="true"
+          draggable={false}
           onError={e => { e.currentTarget.src = FALLBACK_IMG; }}
-          className="absolute inset-0 w-full h-full object-cover object-center"
+          className="absolute inset-0 w-full h-full object-cover object-center select-none"
           style={{ zIndex: 0 }}
         />
-        <AnimatePresence initial={false}>
+        <AnimatePresence initial={false} mode="sync">
           <motion.img
             key={currentPoster}
             src={POSTERS[currentPoster]}
-            alt="B&W Crackers Diwali banner"
+            alt={`B&W Crackers Diwali banner ${currentPoster + 1}`}
+            draggable={false}
             onError={e => { e.currentTarget.src = FALLBACK_IMG; }}
-            initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "-100%" }}
-            transition={{ type: "tween", ease: "easeInOut", duration: 0.6 }}
-            className="absolute inset-0 w-full h-full object-cover object-center"
+            initial={{ opacity: bannersReady ? 0 : 1 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.85, ease: [0.4, 0, 0.2, 1] }}
+            className="absolute inset-0 w-full h-full object-cover object-center select-none"
             style={{ zIndex: 1 }}
           />
         </AnimatePresence>
         <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 px-4 hidden md:flex justify-between z-20">
-          <button onClick={() => setCurrentPoster(p => (p - 1 + POSTERS.length) % POSTERS.length)} className="w-10 h-10 bg-black/40 backdrop-blur-sm text-white rounded-full flex items-center justify-center hover:bg-brand-magenta transition-colors shadow-lg" aria-label="Previous banner"><ChevronLeft size={24} /></button>
-          <button onClick={() => setCurrentPoster(p => (p + 1) % POSTERS.length)} className="w-10 h-10 bg-black/40 backdrop-blur-sm text-white rounded-full flex items-center justify-center hover:bg-brand-magenta transition-colors shadow-lg" aria-label="Next banner"><ChevronRight size={24} /></button>
+          <button onClick={() => goToPoster((p) => p - 1)} className="w-10 h-10 bg-black/40 backdrop-blur-sm text-white rounded-full flex items-center justify-center hover:bg-brand-magenta transition-colors shadow-lg" aria-label="Previous banner"><ChevronLeft size={24} /></button>
+          <button onClick={() => goToPoster((p) => p + 1)} className="w-10 h-10 bg-black/40 backdrop-blur-sm text-white rounded-full flex items-center justify-center hover:bg-brand-magenta transition-colors shadow-lg" aria-label="Next banner"><ChevronRight size={24} /></button>
         </div>
         <div className="absolute bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
           {POSTERS.map((_, i) => (
-            <button key={i} type="button" aria-label={`Go to banner ${i + 1}`} onClick={() => setCurrentPoster(i)} className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full border border-white cursor-pointer transition-all ${i === currentPoster ? 'bg-brand-gold scale-110' : 'bg-white/40'}`} />
+            <button key={i} type="button" aria-label={`Go to banner ${i + 1}`} onClick={() => goToPoster(i)} className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full border border-white cursor-pointer transition-all duration-300 ${i === currentPoster ? 'bg-brand-gold scale-110' : 'bg-white/40'}`} />
           ))}
         </div>
       </section>

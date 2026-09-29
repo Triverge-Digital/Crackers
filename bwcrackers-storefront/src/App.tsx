@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { pricelist, Product } from './data/pricelist';
-import { POSTERS, FALLBACK_BRANDS, Brand } from './constants';
+import { FALLBACK_BRANDS, Brand } from './constants';
 import Header from './components/Header';
 import HomeView from './components/HomeView';
 import StoreView from './components/StoreView';
@@ -61,13 +61,6 @@ export default function App() {
     });
     return { total, count };
   }, [cart]);
-
-  useEffect(() => {
-    if (activeView === 'home') {
-      const timer = setInterval(() => setCurrentPoster(p => (p + 1) % POSTERS.length), 5000);
-      return () => clearInterval(timer);
-    }
-  }, [activeView]);
 
   // Land at the top of whichever page we just switched to, instead of
   // carrying over the previous page's scroll position.
