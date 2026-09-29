@@ -1,144 +1,43 @@
-import { useState, useMemo, useEffect } from 'react';
-import { AnimatePresence } from 'framer-motion';
-import { pricelist, Product } from './data/pricelist';
-import { FALLBACK_BRANDS, Brand } from './constants';
-import Header from './components/Header';
-import HomeView from './components/HomeView';
-import StoreView from './components/StoreView';
-import CartView from './components/CartView';
-import CollectionsView from './components/CollectionsView';
-import WhatsAppButton from './components/WhatsAppButton';
+import { Routes, Route } from 'react-router-dom';
+import { CartProvider } from './context/CartContext';
+import Header from './components/layout/Header';
+import Footer from './components/layout/Footer';
+import FloatingOrderBar from './components/layout/FloatingOrderBar';
+import WhatsAppButton from './components/layout/WhatsAppButton';
+import CheckoutModal from './components/checkout/CheckoutModal';
+import ScrollManager from './components/ui/ScrollManager';
+import HomePage from './pages/HomePage';
+import StorePage from './pages/StorePage';
+import CollectionsPage from './pages/CollectionsPage';
+import CartPage from './pages/CartPage';
+import TrackOrderPage from './pages/TrackOrderPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 export default function App() {
-  const [activeView, setActiveView] = useState('home');
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [cart, setCart] = useState<Record<string, number>>({});
-  const [searchQuery, setSearchQuery] = useState('');
-  const [currentPoster, setCurrentPoster] = useState(0);
-  const [selectedCategory, setSelectedCategory] = useState<string | number>('all');
-  const [sortBy, setSortBy] = useState('new');
-
-  const allProducts = useMemo(() => {
-    const flattened: (Product & { categoryId: number; categoryName: string })[] = [];
-    pricelist.forEach(cat => {
-      cat.products.forEach(p => {
-        if (selectedCategory === 'all' || selectedCategory === cat.id) {
-          if (!searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-            flattened.push({ ...p, categoryId: cat.id, categoryName: cat.name });
-          }
-        }
-      });
-    });
-
-    if (sortBy === 'price-asc') flattened.sort((a, b) => a.discountPrice - b.discountPrice);
-    if (sortBy === 'price-desc') flattened.sort((a, b) => b.discountPrice - a.discountPrice);
-
-    return flattened;
-  }, [selectedCategory, sortBy, searchQuery]);
-
-  const updateQty = (code: string, delta: number) => {
-    setCart(prev => {
-      const current = prev[code] || 0;
-      const next = Math.max(0, current + delta);
-      if (next === 0) {
-        const { [code]: _, ...rest } = prev;
-        return rest;
-      }
-      return { ...prev, [code]: next };
-    });
-  };
-
-  const totals = useMemo(() => {
-    let total = 0;
-    let count = 0;
-    pricelist.forEach(cat => {
-      cat.products.forEach(p => {
-        if (cart[p.code]) {
-          total += p.discountPrice * cart[p.code];
-          count += cart[p.code];
-        }
-      });
-    });
-    return { total, count };
-  }, [cart]);
-
-  // Land at the top of whichever page we just switched to, instead of
-  // carrying over the previous page's scroll position.
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'auto' });
-  }, [activeView]);
-
-  // Brands are managed in the Medusa admin and fetched from the backend.
-  // Falls back to the static list if the request fails.
-  const [brands, setBrands] = useState<Brand[]>(FALLBACK_BRANDS);
-  useEffect(() => {
-    const backendUrl = (import.meta as any).env?.VITE_MEDUSA_BACKEND_URL || 'http://localhost:9000';
-    const apiKey = (import.meta as any).env?.VITE_MEDUSA_PUBLISHABLE_KEY || '';
-    fetch(`${backendUrl}/store/brands`, {
-      headers: apiKey ? { 'x-publishable-api-key': apiKey } : {},
-    })
-      .then(r => (r.ok ? r.json() : Promise.reject(r.status)))
-      .then(data => {
-        const list = (data?.brands || [])
-          .filter((b: any) => b?.logo_url)
-          .map((b: any) => ({ name: b.name, logo_url: b.logo_url }));
-        if (list.length) setBrands(list);
-      })
-      .catch(() => { /* keep fallback brands */ });
-  }, []);
-
   return (
-    <div className="min-h-screen bg-[#FDF0F6] flex flex-col font-sans selection:bg-brand-magenta selection:text-white">
-      <Header
-        activeView={activeView}
-        setActiveView={setActiveView}
-        isMenuOpen={isMenuOpen}
-        setIsMenuOpen={setIsMenuOpen}
-        totals={totals}
-      />
-
-      <AnimatePresence mode="wait">
-        {activeView === 'home' && (
-          <HomeView
-            setActiveView={setActiveView}
-            currentPoster={currentPoster}
-            setCurrentPoster={setCurrentPoster}
-            setSelectedCategory={setSelectedCategory}
-            brands={brands}
-            cart={cart}
-            updateQty={updateQty}
-            totals={totals}
-          />
-        )}
-        {activeView === 'order' && (
-          <StoreView
-            sortBy={sortBy}
-            setSortBy={setSortBy}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            allProducts={allProducts}
-            totals={totals}
-            cart={cart}
-            updateQty={updateQty}
-          />
-        )}
-        {activeView === 'cart' && (
-          <CartView
-            setActiveView={setActiveView}
-            totals={totals}
-            cart={cart}
-            setCart={setCart}
-            updateQty={updateQty}
-          />
-        )}
-        {activeView === 'collections' && (
-          <CollectionsView setActiveView={setActiveView} setSelectedCategory={setSelectedCategory} />
-        )}
-      </AnimatePresence>
-
-      <WhatsAppButton />
-    </div>
+    <CartProvider>
+      <ScrollManager />
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:text-brand-navy focus:px-4 focus:py-2 focus:rounded-lg focus:font-black">
+        Skip to content
+      </a>
+      <div className="min-h-screen bg-brand-cream flex flex-col font-sans selection:bg-brand-magenta selection:text-white">
+        <Header />
+        <main id="main" className="flex-1 flex flex-col">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/store" element={<StorePage />} />
+            <Route path="/store/:categorySlug" element={<StorePage />} />
+            <Route path="/collections" element={<CollectionsPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/track" element={<TrackOrderPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </main>
+        <Footer />
+        <FloatingOrderBar />
+        <WhatsAppButton />
+        <CheckoutModal />
+      </div>
+    </CartProvider>
   );
 }

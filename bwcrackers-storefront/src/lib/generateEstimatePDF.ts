@@ -1,4 +1,5 @@
-import { Category } from '../data/pricelist';
+import { CartLine } from './catalog';
+import { BANK, CONTACT, SITE_URL } from '../constants';
 
 export interface EstimatePdf {
   blob: Blob;
@@ -68,7 +69,7 @@ async function renderPdfFromHtml(html: string, reference: string): Promise<Estim
   }
 }
 
-interface CustomerInfo {
+export interface CustomerInfo {
   name: string;
   phone: string;
   email: string;
@@ -76,8 +77,7 @@ interface CustomerInfo {
 }
 
 function buildEstimateHTML(
-  cart: Record<string, number>,
-  pricelist: Category[],
+  lines: CartLine[],
   customer: CustomerInfo,
   reference: string,
   itemsTotal: number,
@@ -85,20 +85,8 @@ function buildEstimateHTML(
   grandTotal: number,
   withPrintScript = true,
 ): string {
-  const items: Array<{ name: string; unit: string; qty: number; price: number; lineTotal: number; lineMrp: number }> = [];
-  let subTotalMrp = 0;
-
-  pricelist.forEach(cat => {
-    cat.products.forEach(p => {
-      const qty = cart[p.code];
-      if (qty) {
-        const lineTotal = p.discountPrice * qty;
-        const lineMrp = p.mrp * qty;
-        items.push({ name: p.name, unit: p.unit, qty, price: p.discountPrice, lineTotal, lineMrp });
-        subTotalMrp += lineMrp;
-      }
-    });
-  });
+  const items = lines.map(l => ({ name: l.product.name, unit: l.product.unit, qty: l.qty, price: l.product.discountPrice, lineTotal: l.lineTotal, lineMrp: l.lineMrp }));
+  const subTotalMrp = items.reduce((sum, it) => sum + it.lineMrp, 0);
 
   const discountAmount = subTotalMrp - itemsTotal;
   const discountPct = subTotalMrp > 0 ? Math.round((discountAmount / subTotalMrp) * 100) : 80;
@@ -114,7 +102,8 @@ function buildEstimateHTML(
   const dateStr = `${ist('day')}-${ist('month')}-${ist('year')}`;
   const timeStr = `${ist('hour')}:${ist('minute')} ${ist('dayPeriod')}`;
 
-  const logoUrl = window.location.origin + '/logo.png';
+  const logoUrl = window.location.origin + '/logo.webp';
+  const siteHost = SITE_URL.replace(/^https?:\/\//, '');
   const fmt = (n: number) => n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   const rowsHtml = items.map((item, idx) => `
@@ -177,8 +166,8 @@ function buildEstimateHTML(
             <div style="color:#FFD700;font-size:20px;font-weight:900;letter-spacing:2px;line-height:1;">B&amp;W CRACKERS</div>
             <div style="width:40px;height:2.5px;background:linear-gradient(90deg,#FFD700,transparent);margin:7px 0;border-radius:2px;"></div>
             <div style="color:rgba(255,255,255,0.55);font-size:10.5px;line-height:2;">
-              Ph: +91 7867036289<br/>
-              www.bwcrackers.com<br/>
+              Ph: +91 ${CONTACT.primaryPhone}<br/>
+              www.${siteHost}<br/>
               Sivakasi, Tamil Nadu
             </div>
           </div>
@@ -306,22 +295,22 @@ function buildEstimateHTML(
             <div style="font-size:9.5px;font-weight:800;color:rgba(255,255,255,0.75);text-transform:uppercase;letter-spacing:1.5px;">Bank Transfer</div>
           </div>
           <div style="padding:14px 16px;background:#f8f8fb;">
-            <div style="font-size:13px;font-weight:900;color:#1A1A4E;margin-bottom:10px;">WAHIDH HUSSAIN S</div>
+            <div style="font-size:13px;font-weight:900;color:#1A1A4E;margin-bottom:10px;">${BANK.name}</div>
             <table cellpadding="0" cellspacing="0" style="width:100%;">
               <tr>
                 <td style="font-size:10.5px;color:#999;font-weight:600;padding:3px 0;width:44px;">Bank</td>
                 <td style="font-size:10.5px;color:#999;padding:3px 8px;">:</td>
-                <td style="font-size:10.5px;color:#444;font-weight:600;padding:3px 0;">TamilNadu Mercantile Bank</td>
+                <td style="font-size:10.5px;color:#444;font-weight:600;padding:3px 0;">${BANK.bank}</td>
               </tr>
               <tr>
                 <td style="font-size:10.5px;color:#999;font-weight:600;padding:3px 0;">A/C</td>
                 <td style="font-size:10.5px;color:#999;padding:3px 8px;">:</td>
-                <td style="font-size:10.5px;color:#444;font-weight:600;padding:3px 0;">003100050344099</td>
+                <td style="font-size:10.5px;color:#444;font-weight:600;padding:3px 0;">${BANK.account}</td>
               </tr>
               <tr>
                 <td style="font-size:10.5px;color:#999;font-weight:600;padding:3px 0;">IFSC</td>
                 <td style="font-size:10.5px;color:#999;padding:3px 8px;">:</td>
-                <td style="font-size:10.5px;color:#444;font-weight:600;padding:3px 0;">TMBL0000003 &middot; Sivakasi</td>
+                <td style="font-size:10.5px;color:#444;font-weight:600;padding:3px 0;">${BANK.ifsc} &middot; ${BANK.branch}</td>
               </tr>
             </table>
           </div>
@@ -336,7 +325,7 @@ function buildEstimateHTML(
             <div style="font-size:9.5px;font-weight:800;color:rgba(255,255,255,0.85);text-transform:uppercase;letter-spacing:1.5px;">UPI / Instant Pay</div>
           </div>
           <div style="padding:16px;background:#fffde8;display:flex;flex-direction:column;justify-content:center;height:calc(100% - 49px);">
-            <div style="font-size:24px;font-weight:900;color:#1A1A4E;letter-spacing:1px;line-height:1;">7867036289</div>
+            <div style="font-size:24px;font-weight:900;color:#1A1A4E;letter-spacing:1px;line-height:1;">${BANK.upi}</div>
             <div style="font-size:10px;color:#999;font-weight:600;margin-top:6px;letter-spacing:0.5px;">PhonePe &nbsp;&middot;&nbsp; GPay</div>
             <div style="margin-top:12px;display:flex;gap:8px;">
               <span style="background:#6739B7;color:white;font-size:9px;font-weight:800;padding:3px 8px;border-radius:4px;letter-spacing:0.5px;">PhonePe</span>
@@ -351,7 +340,7 @@ function buildEstimateHTML(
     <!-- ── FOOTER ── -->
     <div style="background:linear-gradient(90deg,#0E0B38,#1A1A4E);padding:12px 32px;display:flex;align-items:center;justify-content:space-between;">
       <div style="color:rgba(255,255,255,0.3);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">B&amp;W Crackers &nbsp;&middot;&nbsp; Sivakasi &nbsp;&middot;&nbsp; Tamil Nadu</div>
-      <div style="color:#FFD700;font-size:9.5px;font-weight:800;letter-spacing:1px;">www.bwcrackers.com</div>
+      <div style="color:#FFD700;font-size:9.5px;font-weight:800;letter-spacing:1px;">www.${siteHost}</div>
     </div>
 
   </div>
@@ -370,8 +359,7 @@ function buildEstimateHTML(
 }
 
 export async function generateEstimatePDF(
-  cart: Record<string, number>,
-  pricelist: Category[],
+  lines: CartLine[],
   customer: CustomerInfo,
   reference: string,
   itemsTotal: number,
@@ -379,11 +367,11 @@ export async function generateEstimatePDF(
   grandTotal: number,
 ): Promise<EstimatePdf | null> {
   try {
-    const html = buildEstimateHTML(cart, pricelist, customer, reference, itemsTotal, packingFee, grandTotal, false);
+    const html = buildEstimateHTML(lines, customer, reference, itemsTotal, packingFee, grandTotal, false);
     return await renderPdfFromHtml(html, reference);
   } catch {
     // Fallback: open a print window so the customer can still save/print the estimate
-    const html = buildEstimateHTML(cart, pricelist, customer, reference, itemsTotal, packingFee, grandTotal, true);
+    const html = buildEstimateHTML(lines, customer, reference, itemsTotal, packingFee, grandTotal, true);
     const win = window.open('', '_blank', 'width=820,height=960,scrollbars=yes');
     if (win) {
       win.document.write(html);

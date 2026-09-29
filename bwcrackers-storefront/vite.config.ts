@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  root: './', // Explicitly set root to help with workspace detection issues
+  root: './',
   server: {
     host: '0.0.0.0',
     port: 8000,
@@ -16,4 +16,18 @@ export default defineConfig({
       clientPort: 8000,
     },
   },
-})
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-router-dom'],
+          motion: ['framer-motion'],
+        },
+      },
+    },
+  },
+  test: {
+    environment: 'node',
+    include: ['src/**/*.test.ts'],
+  },
+} as any)

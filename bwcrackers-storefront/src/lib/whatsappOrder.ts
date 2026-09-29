@@ -1,58 +1,41 @@
-import { pricelist } from '../data/pricelist';
-import { PRIMARY_PHONE_INTL } from '../constants';
+import { PRIMARY_PHONE_INTL, SITE_URL } from '../constants';
+import { CartLine } from './catalog';
+import { formatRs } from './format';
 
-type CustomerDetails = {
+type CustomerSummary = {
   name: string;
   phone: string;
   address: string;
 };
 
 export function buildWhatsAppOrderUrl(
-  cart: Record<string, number>,
-  total: number,
+  lines: CartLine[],
+  subtotal: number,
   packingFee: number,
-  customer?: CustomerDetails,
+  customer?: CustomerSummary,
   referenceNumber?: string
 ): string {
-  const lines: string[] = [];
-
-  pricelist.forEach(cat => {
-    cat.products.forEach(p => {
-      const qty = cart[p.code];
-      if (qty) {
-        lines.push(`- ${p.name} (${p.unit}) x${qty} = Rs.${(p.discountPrice * qty).toLocaleString('en-IN')}`);
-      }
-    });
-  });
-
   let message: string;
   if (lines.length === 0) {
-    message = "Hi BW Crackers, I'd like to know more about your products.";
+    message = "Hi B&W Crackers, I'd like to know more about your products.";
   } else {
+    const itemLines = lines.map(l => `- ${l.product.name} (${l.product.unit}) x${l.qty} = ${formatRs(l.lineTotal)}`);
     const refBlock = referenceNumber ? [`Order Ref: ${referenceNumber}`] : [];
-
     const customerBlock = customer
-      ? [
-          `Name: ${customer.name}`,
-          `Phone: +91 ${customer.phone}`,
-          `Address: ${customer.address}`,
-          '',
-        ]
+      ? [`Name: ${customer.name}`, `Phone: +91 ${customer.phone}`, `Address: ${customer.address}`, '']
       : [];
 
-    const grandTotal = total + packingFee;
-
     message = [
-      'Hi BW Crackers! I would like to place the following order:',
+      'Hi B&W Crackers! I would like to place the following order:',
       '',
       ...refBlock,
       ...customerBlock,
       'Items Ordered:',
-      ...lines,
+      ...itemLines,
       '',
-      `Items Total: Rs.${total.toLocaleString('en-IN')}`,
-      `Packing Fee (2%): Rs.${packingFee.toLocaleString('en-IN')}`,
-      `Total Amount: Rs.${grandTotal.toLocaleString('en-IN')}`,
+      `Items Total: ${formatRs(subtotal)}`,
+      `Packing Fee (2%): ${formatRs(packingFee)}`,
+      `Total Amount: ${formatRs(subtotal + packingFee)}`,
       '',
       'Please confirm availability and delivery. Thank you!',
     ].join('\n');
@@ -71,6 +54,10 @@ export function deriveReferenceNumber(id?: string | null): string {
 // the customer can send along with their manually-attached payment screenshot.
 export function buildPaymentShareWhatsAppUrl(referenceNumber: string, amount: number): string {
   const ref = referenceNumber ? ` for Order ${referenceNumber}` : '';
-  const message = `Hi BW Crackers, I have completed the payment${ref} (Rs.${amount.toLocaleString('en-IN')}). Sharing the payment screenshot below.`;
+  const message = `Hi B&W Crackers, I have completed the payment${ref} (${formatRs(amount)}). Sharing the payment screenshot below.`;
   return `https://wa.me/${PRIMARY_PHONE_INTL}?text=${encodeURIComponent(message)}`;
+}
+
+export function buildTrackingUrl(referenceNumber: string): string {
+  return `${SITE_URL}/track?ref=${encodeURIComponent(referenceNumber.replace(/^#/, ''))}`;
 }
