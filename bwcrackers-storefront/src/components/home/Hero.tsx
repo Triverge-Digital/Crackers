@@ -1,52 +1,59 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import { POSTERS, HERO_INTERVAL_MS } from '../../constants';
 
+function Slide({ index, alt }: { index: number; alt?: string }) {
+  const p = POSTERS[index];
+  return (
+    <picture>
+      <source media="(max-width: 767px)" srcSet={p.mobile} />
+      <img
+        src={p.desktop}
+        alt={alt ?? ''}
+        draggable={false}
+        fetchPriority={index === 0 ? 'high' : 'auto'}
+        decoding="async"
+        className="absolute inset-0 w-full h-full object-cover object-center select-none"
+      />
+    </picture>
+  );
+}
+
 export default function Hero() {
-  const reduce = useReducedMotion();
   const [current, setCurrent] = useState(0);
-  const [underlay, setUnderlay] = useState(0);
-  const [ready, setReady] = useState(false);
+  const [base, setBase] = useState(0);
   const [paused, setPaused] = useState(false);
   const hovering = useRef(false);
   const touchStartX = useRef<number | null>(null);
 
-  const isMobile = () => window.matchMedia('(max-width: 767px)').matches;
-
-  // Prefetch every banner (the variant for this viewport) so slides never flash.
   useEffect(() => {
-    let cancelled = false;
-    const mobile = isMobile();
-    Promise.all(POSTERS.map(p => new Promise<void>(resolve => {
+    const mobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches;
+    POSTERS.forEach(p => {
       const img = new Image();
-      img.onload = img.onerror = () => resolve();
       img.src = mobile ? p.mobile : p.desktop;
-    }))).then(() => { if (!cancelled) setReady(true); });
-    return () => { cancelled = true; };
+    });
   }, []);
 
-  // Keep the previous slide underneath during the crossfade.
   useEffect(() => {
-    if (current === underlay) return;
-    const t = window.setTimeout(() => setUnderlay(current), 900);
-    return () => window.clearTimeout(t);
-  }, [current, underlay]);
-
-  useEffect(() => {
-    if (paused || reduce) return;
+    if (paused) return;
     const timer = window.setInterval(() => {
       if (hovering.current || document.hidden) return;
-      setCurrent(p => (p + 1) % POSTERS.length);
+      setCurrent(p => {
+        const n = (p + 1) % POSTERS.length;
+        setBase(p);
+        return n;
+      });
     }, HERO_INTERVAL_MS);
     return () => window.clearInterval(timer);
-  }, [current, paused, reduce]);
+  }, [paused]);
 
   const go = (next: number | ((p: number) => number)) => {
     setCurrent(p => {
       const v = typeof next === 'function' ? next(p) : next;
-      return ((v % POSTERS.length) + POSTERS.length) % POSTERS.length;
+      const n = ((v % POSTERS.length) + POSTERS.length) % POSTERS.length;
+      if (n !== p) setBase(p);
+      return n;
     });
   };
 
@@ -59,52 +66,27 @@ export default function Hero() {
     touchStartX.current = null;
   };
 
-  const Slide = ({ index, className, style, ariaHidden }: { index: number; className: string; style?: React.CSSProperties; ariaHidden?: boolean }) => {
-    const p = POSTERS[index];
-    return (
-      <picture aria-hidden={ariaHidden}>
-        <source media="(max-width: 767px)" srcSet={p.mobile} />
-        <img
-          src={p.desktop}
-          alt={ariaHidden ? '' : p.alt}
-          draggable={false}
-          fetchPriority={index === 0 ? 'high' : 'auto'}
-          decoding="async"
-          className={className}
-          style={style}
-        />
-      </picture>
-    );
-  };
-
   return (
     <section
       aria-roledescription="carousel"
       aria-label="Diwali offers"
-      className="relative w-full overflow-hidden touch-pan-y aspect-[3/2] md:aspect-[1920/767] bg-[#0f0f2e]"
+      className="relative w-full overflow-hidden touch-pan-y aspect-[3/2] md:aspect-[1920/767]"
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
       onMouseEnter={() => { hovering.current = true; }}
       onMouseLeave={() => { hovering.current = false; }}
     >
+      {/* Previous slide stays fully opaque underneath so a loop never reveals empty colour. */}
       <div className="absolute inset-0">
-        <Slide index={underlay} ariaHidden className="absolute inset-0 w-full h-full object-cover object-center select-none" />
+        <Slide index={base} />
       </div>
-      <AnimatePresence initial={false} mode="sync">
-        <motion.div
-          key={current}
-          className="absolute inset-0"
-          initial={{ opacity: ready && !reduce ? 0 : 1 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: reduce ? 0 : 0.85, ease: [0.4, 0, 0.2, 1] }}
-          aria-live="polite"
-        >
-          <Slide index={current} className="absolute inset-0 w-full h-full object-cover object-center select-none" />
-        </motion.div>
-      </AnimatePresence>
+      <div
+        key={current}
+        className={`absolute inset-0 ${current === base ? '' : 'animate-fade-in'}`}
+      >
+        <Slide index={current} alt={POSTERS[current].alt} />
+      </div>
 
-      {/* Invisible click target over the "Shop now" area of every creative */}
       <Link to="/store" className="absolute inset-0 z-10" aria-label="Shop the 2026 price list" />
 
       <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 px-3 hidden md:flex justify-between z-20 pointer-events-none">
