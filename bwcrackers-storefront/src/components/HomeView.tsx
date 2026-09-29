@@ -115,7 +115,7 @@ export default function HomeView({
   const remaining = Math.max(MIN_ORDER - totals.total, 0);
 
   return (
-    <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col">
+    <motion.div key="home" initial={false} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col">
 
       {/* ── HERO CAROUSEL ── */}
       <section
