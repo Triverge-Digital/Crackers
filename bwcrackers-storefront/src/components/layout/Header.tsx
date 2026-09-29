@@ -52,14 +52,18 @@ export default function Header() {
   return (
     <div className="sticky top-0 z-[60] w-full">
       {/* Announcement bar — CSS marquee (pauses under prefers-reduced-motion) */}
-      <div className="bg-brand-purple py-1.5 overflow-hidden border-b border-brand-gold/20" aria-label="Offers">
-        <div className="flex w-max animate-marquee whitespace-nowrap gap-12 text-xs font-black uppercase tracking-widest text-brand-gold">
+      <div className="bg-brand-magenta py-2 overflow-hidden" aria-label="Offers">
+        <div className="flex w-max animate-marquee whitespace-nowrap gap-10 text-[11px] sm:text-xs font-black uppercase tracking-[0.18em] text-white">
           {[0, 1].map(i => (
             <React.Fragment key={i}>
               <span aria-hidden={i === 1}>Flat 80% discount on all crackers</span>
+              <span className="text-brand-gold" aria-hidden="true">✦</span>
               <span aria-hidden={i === 1}>Direct dispatch from Sivakasi</span>
+              <span className="text-brand-gold" aria-hidden="true">✦</span>
               <span aria-hidden={i === 1}>Minimum order {formatINR(MIN_ORDER)}</span>
+              <span className="text-brand-gold" aria-hidden="true">✦</span>
               <span aria-hidden={i === 1}>Pay after order confirmation · UPI &amp; bank transfer</span>
+              <span className="text-brand-gold" aria-hidden="true">✦</span>
             </React.Fragment>
           ))}
         </div>
