@@ -1,10 +1,11 @@
 // Shared constants for the storefront.
 
+// 2026 Diwali hero carousel (full-bleed creative banners).
 export const POSTERS = [
-  "/banner1.webp",
-  "/banner2.webp",
-  "/banner3.webp",
-  "/banner4.webp"
+  "/banner1.webp", // Make Diwali Brighter
+  "/banner2.webp", // Light Up Happier Moments
+  "/banner3.webp", // 80% Discount on All Crackers
+  "/banner4.webp", // Celebrate Diwali
 ];
 
 // Fallback brand logos (used only if the backend /store/brands request fails).

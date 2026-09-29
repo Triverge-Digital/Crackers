@@ -78,89 +78,37 @@ export default function HomeView({
 
       {/* ── HERO CAROUSEL ── */}
       <section
-        className="relative w-full overflow-hidden bg-[#1A1A4E] touch-pan-y aspect-[3/1]"
+        className="relative w-full overflow-hidden bg-[#1A1A4E] touch-pan-y aspect-[5/2] md:aspect-[1983/793]"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
         {/* Base image always visible — prevents background from ever showing */}
         <img
           src={POSTERS[currentPoster]}
+          alt="B&W Crackers Diwali banner"
           onError={e => { e.currentTarget.src = FALLBACK_IMG; }}
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover object-center"
           style={{ zIndex: 0 }}
         />
-
-        {/* Sparkle doodle overlay — viewBox coords so stars scale to any screen width */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 2 }} viewBox="0 0 300 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-          {/* TOP-LEFT cluster */}
-          <g opacity="0.55" fill="none" stroke="#FFD700" strokeLinecap="round">
-            <path d="M15 18 L15 10 M15 18 L15 26 M15 18 L7 18 M15 18 L23 18" strokeWidth="0.6"/>
-            <path d="M15 18 L11 14 M15 18 L19 22 M15 18 L11 22 M15 18 L19 14" strokeWidth="0.35"/>
-            <circle cx="15" cy="18" r="1" fill="#FFD700" opacity="0.8"/>
-          </g>
-          <g opacity="0.4" fill="none" stroke="#FFD700" strokeLinecap="round">
-            <path d="M28 35 L28 29 M28 35 L28 41 M28 35 L22 35 M28 35 L34 35" strokeWidth="0.5"/>
-            <circle cx="28" cy="35" r="0.8" fill="#FFD700" opacity="0.7"/>
-          </g>
-          <g opacity="0.35" fill="none" stroke="#ffffff" strokeLinecap="round">
-            <path d="M8 55 L8 49 M8 55 L8 61 M8 55 L2 55 M8 55 L14 55" strokeWidth="0.45"/>
-            <circle cx="8" cy="55" r="0.7" fill="#ffffff" opacity="0.6"/>
-          </g>
-
-          {/* TOP-RIGHT cluster */}
-          <g opacity="0.55" fill="none" stroke="#FFD700" strokeLinecap="round">
-            <path d="M285 18 L285 10 M285 18 L285 26 M285 18 L277 18 M285 18 L293 18" strokeWidth="0.6"/>
-            <path d="M285 18 L281 14 M285 18 L289 22 M285 18 L281 22 M285 18 L289 14" strokeWidth="0.35"/>
-            <circle cx="285" cy="18" r="1" fill="#FFD700" opacity="0.8"/>
-          </g>
-          <g opacity="0.4" fill="none" stroke="#ffffff" strokeLinecap="round">
-            <path d="M272 38 L272 32 M272 38 L272 44 M272 38 L266 38 M272 38 L278 38" strokeWidth="0.5"/>
-            <circle cx="272" cy="38" r="0.8" fill="#ffffff" opacity="0.6"/>
-          </g>
-          <g opacity="0.35" fill="none" stroke="#FFD700" strokeLinecap="round">
-            <path d="M294 55 L294 49 M294 55 L294 61 M294 55 L288 55 M294 55 L300 55" strokeWidth="0.45"/>
-            <circle cx="294" cy="55" r="0.7" fill="#FFD700" opacity="0.5"/>
-          </g>
-
-          {/* BOTTOM-LEFT */}
-          <g opacity="0.3" fill="none" stroke="#ffffff" strokeLinecap="round">
-            <path d="M18 80 L18 74 M18 80 L18 86 M18 80 L12 80 M18 80 L24 80" strokeWidth="0.45"/>
-            <circle cx="18" cy="80" r="0.7" fill="#ffffff" opacity="0.5"/>
-          </g>
-
-          {/* BOTTOM-RIGHT */}
-          <g opacity="0.3" fill="none" stroke="#FFD700" strokeLinecap="round">
-            <path d="M282 80 L282 74 M282 80 L282 86 M282 80 L276 80 M282 80 L288 80" strokeWidth="0.45"/>
-            <circle cx="282" cy="80" r="0.7" fill="#FFD700" opacity="0.5"/>
-          </g>
-
-          {/* Scattered centre dots */}
-          <circle cx="75"  cy="12" r="0.8" fill="#FFD700" opacity="0.45"/>
-          <circle cx="150" cy="8"  r="0.9" fill="#ffffff" opacity="0.35"/>
-          <circle cx="225" cy="14" r="0.8" fill="#FFD700" opacity="0.4"/>
-          <circle cx="110" cy="85" r="0.7" fill="#FFD700" opacity="0.3"/>
-          <circle cx="190" cy="88" r="0.8" fill="#ffffff" opacity="0.28"/>
-          <circle cx="60"  cy="70" r="0.6" fill="#FFD700" opacity="0.25"/>
-          <circle cx="245" cy="72" r="0.6" fill="#ffffff" opacity="0.25"/>
-        </svg>
         <AnimatePresence initial={false}>
           <motion.img
             key={currentPoster}
             src={POSTERS[currentPoster]}
+            alt="B&W Crackers Diwali banner"
             onError={e => { e.currentTarget.src = FALLBACK_IMG; }}
             initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "-100%" }}
             transition={{ type: "tween", ease: "easeInOut", duration: 0.6 }}
-            className="absolute inset-0 w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover object-center"
             style={{ zIndex: 1 }}
           />
         </AnimatePresence>
         <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 px-4 hidden md:flex justify-between z-20">
-          <button onClick={() => setCurrentPoster(p => (p - 1 + POSTERS.length) % POSTERS.length)} className="w-10 h-10 bg-brand-magenta/80 text-white rounded-full flex items-center justify-center hover:bg-brand-magenta transition-colors shadow-lg"><ChevronLeft size={24} /></button>
-          <button onClick={() => setCurrentPoster(p => (p + 1) % POSTERS.length)} className="w-10 h-10 bg-brand-magenta/80 text-white rounded-full flex items-center justify-center hover:bg-brand-magenta transition-colors shadow-lg"><ChevronRight size={24} /></button>
+          <button onClick={() => setCurrentPoster(p => (p - 1 + POSTERS.length) % POSTERS.length)} className="w-10 h-10 bg-black/40 backdrop-blur-sm text-white rounded-full flex items-center justify-center hover:bg-brand-magenta transition-colors shadow-lg" aria-label="Previous banner"><ChevronLeft size={24} /></button>
+          <button onClick={() => setCurrentPoster(p => (p + 1) % POSTERS.length)} className="w-10 h-10 bg-black/40 backdrop-blur-sm text-white rounded-full flex items-center justify-center hover:bg-brand-magenta transition-colors shadow-lg" aria-label="Next banner"><ChevronRight size={24} /></button>
         </div>
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+        <div className="absolute bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
           {POSTERS.map((_, i) => (
-            <div key={i} onClick={() => setCurrentPoster(i)} className={`w-3 h-3 border border-white cursor-pointer transition-all ${i === currentPoster ? 'bg-brand-magenta scale-110' : 'bg-white/40'}`} />
+            <button key={i} type="button" aria-label={`Go to banner ${i + 1}`} onClick={() => setCurrentPoster(i)} className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full border border-white cursor-pointer transition-all ${i === currentPoster ? 'bg-brand-gold scale-110' : 'bg-white/40'}`} />
           ))}
         </div>
       </section>
