@@ -3,12 +3,13 @@
 E-commerce for a Sivakasi fireworks brand. Two apps in this repo:
 
 - **`bwcrackers/`** — Medusa v2 backend (admin + store API). Deployed on **Railway**.
-- **`bwcrackers-storefront/`** — Vite + React storefront (NOT the Next.js starter; the
-  Next.js files under `src/app/` are vestigial). Deployed on **Vercel**.
+- **`bwcrackers-storefront/`** — Vite + React storefront. Deployed on **Vercel**.
 
-The storefront is largely **hardcoded** (products in `src/data/pricelist.ts`, banners/brands
-as `public/` assets). The only homepage data it pulls from the backend is **brands**
-(`GET /store/brands`), with a static fallback in `App.tsx`.
+The storefront catalog is **hardcoded** (`src/data/pricelist.ts`, banners in `public/`).
+Live backend calls: brands (`GET /store/brands`), create enquiry
+(`POST /store/order-enquiry`), track (`GET /store/order-enquiry/track`).
+Cart lives in `localStorage`. Routes: `/`, `/store`, `/store/:slug`, `/collections`,
+`/cart`, `/track`.
 
 ## Domains
 - Storefront: **https://bwcrackers.com** (Vercel)

@@ -1,125 +1,57 @@
-<p align="center">
-  <a href="https://www.medusajs.com">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/59018053/229103275-b5e482bb-4601-46e6-8142-244f531cebdb.svg">
-    <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg">
-    <img alt="Medusa logo" src="https://user-images.githubusercontent.com/59018053/229103726-e5b529a3-9b3f-4970-8a1f-c6af37f087bf.svg">
-    </picture>
-  </a>
-</p>
+# B&W Crackers storefront
 
-<h1 align="center">
-  Medusa Next.js Starter Template
-</h1>
+Customer-facing shop for B&W Crackers (Sivakasi). Vite + React 18 + TypeScript + Tailwind.
 
-<p align="center">
-Combine Medusa's modules for your commerce backend with the newest Next.js 15 features for a performant storefront.</p>
+Catalog prices and copy live in `src/data/pricelist.ts` and `src/constants.ts`. Cart and
+customer details persist in `localStorage`. Orders are **enquiries** — no card checkout —
+saved to the Medusa backend and confirmed on WhatsApp.
 
-<p align="center">
-  <a href="https://github.com/medusajs/medusa/blob/master/CONTRIBUTING.md">
-    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat" alt="PRs welcome!" />
-  </a>
-  <a href="https://discord.gg/xpCwq3Kfn8">
-    <img src="https://img.shields.io/badge/chat-on%20discord-7289DA.svg" alt="Discord Chat" />
-  </a>
-  <a href="https://twitter.com/intent/follow?screen_name=medusajs">
-    <img src="https://img.shields.io/twitter/follow/medusajs.svg?label=Follow%20@medusajs" alt="Follow @medusajs" />
-  </a>
-</p>
+## Routes
 
-### Prerequisites
+| Path | Page |
+|------|------|
+| `/` | Home — Diwali banners, how to order, featured categories, FAQ |
+| `/store` | Full 2026 price list |
+| `/store/:categorySlug` | Category (e.g. `/store/sparklers`) |
+| `/collections` | Gift boxes and family packs |
+| `/cart` | Cart + checkout |
+| `/track` | Look up an order by 8-character reference + phone |
 
-To use the [Next.js Starter Template](https://medusajs.com/nextjs-commerce/), you should have a Medusa server running locally on port 9000.
-For a quick setup, run:
+## Run locally
 
-```shell
-npx create-medusa-app@latest
-```
+Needs the Medusa backend on port 9000 (see the repo-root README).
 
-Check out [create-medusa-app docs](https://docs.medusajs.com/learn/installation) for more details and troubleshooting.
-
-# Overview
-
-The Medusa Next.js Starter is built with:
-
-- [Next.js](https://nextjs.org/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Typescript](https://www.typescriptlang.org/)
-- [Medusa](https://medusajs.com/)
-
-Features include:
-
-- Full ecommerce support:
-  - Product Detail Page
-  - Product Overview Page
-  - Product Collections
-  - Cart
-  - Checkout with Stripe
-  - User Accounts
-  - Order Details
-- Full Next.js 15 support:
-  - App Router
-  - Next fetching/caching
-  - Server Components
-  - Server Actions
-  - Streaming
-  - Static Pre-Rendering
-
-# Quickstart
-
-### Setting up the environment variables
-
-Navigate into your projects directory and get your environment variables ready:
-
-```shell
-cd nextjs-starter-medusa/
-mv .env.template .env.local
-```
-
-### Install dependencies
-
-Use Yarn to install all dependencies.
-
-```shell
-yarn
-```
-
-### Start developing
-
-You are now ready to start up your project.
-
-```shell
+```bash
+cd bwcrackers-storefront
+yarn install
+# optional: copy .env.example values into .env
 yarn dev
 ```
 
-### Open the code and start customizing
+Opens at **http://localhost:8000**.
 
-Your site is now running at http://localhost:8000!
-
-# Payment integrations
-
-By default this starter supports the following payment integrations
-
-- [Stripe](https://stripe.com/)
-
-To enable the integrations you need to add the following to your `.env.local` file:
-
-```shell
-NEXT_PUBLIC_STRIPE_KEY=<your-stripe-public-key>
+```env
+VITE_MEDUSA_BACKEND_URL=http://localhost:9000
+VITE_MEDUSA_PUBLISHABLE_KEY=<publishable key from the Medusa DB>
 ```
 
-You'll also need to setup the integrations in your Medusa server. See the [Medusa documentation](https://docs.medusajs.com) for more information on how to configure [Stripe](https://docs.medusajs.com/resources/commerce-modules/payment/payment-provider/stripe#main).
+Production (Vercel) must set `VITE_MEDUSA_BACKEND_URL=https://admin.bwcrackers.com`.
+If that env is missing, the shop still works but orders only go out via WhatsApp.
 
-# Resources
+## Scripts
 
-## Learn more about Medusa
+```bash
+yarn test      # vitest — catalog integrity, 80% discount, totals
+yarn build     # tsc && vite build
+yarn preview   # serve the production bundle
+```
 
-- [Website](https://www.medusajs.com/)
-- [GitHub](https://github.com/medusajs)
-- [Documentation](https://docs.medusajs.com/)
+## Checkout flow
 
-## Learn more about Next.js
-
-- [Website](https://nextjs.org/)
-- [GitHub](https://github.com/vercel/next.js)
-- [Documentation](https://nextjs.org/docs)
+1. Customer adds items. Minimum order is ₹3,000 (`MIN_ORDER` in `src/constants.ts`).
+2. Checkout collects name, 10-digit mobile, address, pincode.
+3. Storefront posts `{ customer_name, phone: +91…, items: [{ code, quantity }] }` to
+   `POST /store/order-enquiry`. The **backend re-prices** from Medusa SKUs (`BW-<code>`),
+   adds 2% packing, and returns a reference (last 8 characters of the enquiry id).
+4. WhatsApp opens with the same totals. The customer can download a PDF estimate.
+5. Status is later visible at `/track` via `GET /store/order-enquiry/track?ref=&phone=`.
