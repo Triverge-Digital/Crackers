@@ -52,5 +52,9 @@ export const BANK = {
 export const CATEGORY_COLORS: Record<number, string> = {
   1: 'bg-red-600', 2: 'bg-blue-600', 3: 'bg-green-600', 4: 'bg-purple-600',
   5: 'bg-orange-500', 6: 'bg-pink-600', 7: 'bg-indigo-600', 8: 'bg-yellow-600',
-  9: 'bg-teal-600', 10: 'bg-rose-600', 11: 'bg-cyan-600', 12: 'bg-amber-600',
+  9: 'bg-amber-600', 10: 'bg-teal-600', 11: 'bg-rose-600', 12: 'bg-red-700',
+  13: 'bg-cyan-600', 14: 'bg-violet-600', 15: 'bg-sky-600', 16: 'bg-orange-700',
+  17: 'bg-lime-600', 18: 'bg-fuchsia-600', 19: 'bg-blue-700', 20: 'bg-emerald-600',
+  21: 'bg-stone-600', 22: 'bg-pink-700', 23: 'bg-yellow-700', 24: 'bg-yellow-500',
+  25: 'bg-stone-700', 26: 'bg-purple-700', 27: 'bg-fuchsia-700',
 };

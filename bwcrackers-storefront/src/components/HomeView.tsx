@@ -589,12 +589,12 @@ export default function HomeView({
           <div className="grid grid-cols-3 gap-3 md:gap-5 max-w-4xl mx-auto">
             {(() => {
               const catMeta: Record<number, { hex: string; num: string; desc: string }> = {
-                1: { hex: '#ef4444', num: '01', desc: 'Lakshmi, Chorsa & sound crackers' },
-                2: { hex: '#3b82f6', num: '02', desc: 'Premium 24, 50 & 100-count packets' },
+                1: { hex: '#ef4444', num: '01', desc: 'Kuruvi, Lakshmi, Chorsa & giant crackers' },
+                2: { hex: '#3b82f6', num: '02', desc: '24, 50 & 100 wala deluxe packets' },
                 3: { hex: '#22c55e', num: '03', desc: 'Vibrant red & striped bijili' },
-                4: { hex: '#a855f7', num: '04', desc: 'Sky-high rockets with effects' },
-                5: { hex: '#f97316', num: '05', desc: 'Magic pencil & aerial candles' },
-                6: { hex: '#ec4899', num: '06', desc: 'Coloured pencils for dazzling shows' },
+                4: { hex: '#a855f7', num: '04', desc: 'Baby, lunik, musical & 2-sound rockets' },
+                5: { hex: '#f97316', num: '05', desc: 'Magic pencil & 12" candles' },
+                6: { hex: '#ec4899', num: '06', desc: 'Ultra, popcorn, selfie & Sivakasi pencils' },
               };
               return pricelist
                 .filter(cat => cat.id <= 6)
