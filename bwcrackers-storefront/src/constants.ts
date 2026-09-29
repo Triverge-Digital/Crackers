@@ -96,7 +96,7 @@ export const COLLECTIONS = [
 export const DELIVERY_INFO = {
   dispatchWindow: '2–4 working days after payment confirmation',
   transitTime: '3–7 days depending on your city',
-  coverage: 'Tamil Nadu, Kerala, Karnataka, Andhra Pradesh, Telangana, Puducherry and most metro cities across India',
+  coverage: 'We ship by road across India. Share your city when you order and we will confirm dispatch and collection on WhatsApp.',
   restrictions: 'Crackers travel only by road via registered parcel services. Transport charges are paid by the customer directly to the parcel office on delivery and depend on distance and box count.',
   packing: `Every order is packed in sealed cartons with a ${PACKING_FEE_PCT * 100}% packing charge already included in your total.`,
 };
