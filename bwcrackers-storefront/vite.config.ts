@@ -5,4 +5,9 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   root: './', // Explicitly set root to help with workspace detection issues
+  server: {
+    host: '0.0.0.0',
+    port: 8000,
+    strictPort: true,
+  },
 })
