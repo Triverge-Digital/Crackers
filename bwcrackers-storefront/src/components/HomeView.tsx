@@ -119,7 +119,7 @@ export default function HomeView({
 
       {/* ── HERO CAROUSEL ── */}
       <section
-        className="relative w-full overflow-hidden touch-pan-y aspect-[5/2] md:aspect-[1983/793]"
+        className="relative w-full overflow-hidden touch-pan-y aspect-[5/2] md:aspect-[1983/793] -mt-px"
         style={{
           // First banner paints immediately via CSS so navy never flashes on load.
           backgroundColor: '#0f0f2e',
