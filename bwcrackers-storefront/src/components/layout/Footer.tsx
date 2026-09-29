@@ -57,9 +57,8 @@ export default function Footer() {
         </address>
       </div>
 
-      <div className="container mx-auto px-6 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 text-center">
+      <div className="container mx-auto px-6 pt-6 border-t border-white/5 flex items-center justify-center text-center">
         <span className="text-gray-400 text-xs font-black uppercase tracking-widest">© {new Date().getFullYear()} {SITE_NAME} · Sivakasi Direct</span>
-        <span className="text-gray-500 text-xs font-medium">Fireworks are sold to adults (18+) only. Follow all local safety guidelines.</span>
       </div>
     </footer>
   );
