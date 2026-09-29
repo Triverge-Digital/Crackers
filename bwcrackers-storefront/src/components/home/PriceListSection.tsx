@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronsDownUp, ChevronsUpDown } from 'lucide-react';
 import { DISCOUNT_PCT, MIN_ORDER } from '../../constants';
 import { categories, allProducts, matchesSearch } from '../../lib/catalog';
 import { formatINR } from '../../lib/format';
@@ -12,12 +11,9 @@ import OrderProgress from '../store/OrderProgress';
 import { scrollToId } from '../ui/ScrollManager';
 import WhatsAppIcon from '../icons/WhatsAppIcon';
 
-const DEFAULT_OPEN = 3;
-
 export default function PriceListSection() {
   const { totals, openCheckout } = useCart();
   const [query, setQuery] = useState('');
-  const [open, setOpen] = useState<Set<number>>(() => new Set(categories.slice(0, DEFAULT_OPEN).map(c => c.id)));
 
   const grouped = useMemo(() => {
     const q = query.trim();
@@ -27,17 +23,9 @@ export default function PriceListSection() {
   }, [query]);
 
   const searching = query.trim().length > 0;
-  const allOpen = grouped.every(c => open.has(c.id) || searching);
-
-  const toggle = (id: number) => setOpen(prev => {
-    const next = new Set(prev);
-    if (next.has(id)) next.delete(id); else next.add(id);
-    return next;
-  });
 
   const jumpTo = (id: number | 'all') => {
     if (id === 'all') return;
-    setOpen(prev => new Set(prev).add(id));
     window.setTimeout(() => scrollToId(`cat-${id}`), 30);
   };
 
@@ -58,18 +46,9 @@ export default function PriceListSection() {
           <OrderProgress compact />
         </div>
 
-        <div className="flex items-center justify-between mt-4 mb-3 text-xs font-black text-gray-500">
-          <span>{searching ? `${grouped.reduce((n, c) => n + c.products.length, 0)} results for "${query.trim()}"` : `${categories.length} categories`}</span>
-          {!searching && (
-            <button
-              type="button"
-              onClick={() => setOpen(allOpen ? new Set() : new Set(categories.map(c => c.id)))}
-              className="inline-flex items-center gap-1 text-brand-navy hover:text-brand-magenta min-h-[36px] px-2 rounded-lg"
-            >
-              {allOpen ? <><ChevronsDownUp size={14} /> Collapse all</> : <><ChevronsUpDown size={14} /> Expand all</>}
-            </button>
-          )}
-        </div>
+        <p className="mt-4 mb-3 text-xs font-black text-gray-500">
+          {searching ? `${grouped.reduce((n, c) => n + c.products.length, 0)} results for "${query.trim()}"` : `${categories.length} categories`}
+        </p>
 
         {grouped.length === 0 ? (
           <div className="card text-center py-14 px-6">
@@ -85,8 +64,6 @@ export default function PriceListSection() {
                 id={cat.id}
                 name={cat.name}
                 products={cat.products}
-                open={searching || open.has(cat.id)}
-                onToggle={() => toggle(cat.id)}
               />
             ))}
           </div>

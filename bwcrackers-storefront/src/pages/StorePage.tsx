@@ -24,7 +24,6 @@ export default function StorePage() {
   const query = params.get('q') ?? '';
   const sort = (params.get('sort') as Sort) || 'default';
   const [view, setView] = useState<View>(() => (window.localStorage.getItem('bw-view') as View) || 'list');
-  const [collapsed, setCollapsed] = useState<Set<number>>(new Set());
 
   useEffect(() => { window.localStorage.setItem('bw-view', view); }, [view]);
 
@@ -121,8 +120,6 @@ export default function StorePage() {
               name={cat.name}
               products={cat.products}
               view={view}
-              open={!collapsed.has(cat.id)}
-              onToggle={() => setCollapsed(prev => { const n = new Set(prev); if (n.has(cat.id)) n.delete(cat.id); else n.add(cat.id); return n; })}
             />
           ))}
         </div>
