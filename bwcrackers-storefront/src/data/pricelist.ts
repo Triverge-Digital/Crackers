@@ -336,7 +336,7 @@ export const pricelist: Category[] = [
   },
   {
     id: 26,
-    name: "DIFFERENT HI FI FANCY ITEMS",
+    name: "HI FI FANCY ITEMS",
     color: "bg-purple-700",
     products: [
       { code: "136", name: "HELICOPTER (10 PCS)", unit: "1 BOX", mrp: 500, discountPrice: 100, image: "/images/products/bw-17-baby-rocket.webp", rating: 4 },

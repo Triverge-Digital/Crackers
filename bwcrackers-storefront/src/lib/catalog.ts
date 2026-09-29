@@ -30,6 +30,9 @@ const productByCode = new Map(allProducts.map(p => [p.code, p]));
 
 export function findCategoryBySlug(slug?: string) {
   if (!slug) return undefined;
+  if (slug === 'different-hi-fi-fancy-items') {
+    return categories.find(c => c.slug === 'hi-fi-fancy-items');
+  }
   return categories.find(c => c.slug === slug || String(c.id) === slug);
 }
 
