@@ -51,14 +51,27 @@ export async function createOrderEnquiry(lines: CartLine[], customer: CustomerDe
       state: customer.state.trim() || undefined,
       pincode: customer.pincode.trim() || undefined,
       notes: customer.notes.trim() || undefined,
-      items: lines.map(l => ({ code: l.product.code, quantity: l.qty })),
+      // `code` + `quantity` are all the current backend reads (it prices items itself). The
+      // title/unit/price fields and `subtotal` keep the older backend build working: it stores
+      // the items as sent and requires a subtotal.
+      items: lines.map(l => ({
+        code: l.product.code,
+        quantity: l.qty,
+        title: l.product.name,
+        variant_title: l.product.unit,
+        unit_price: l.product.discountPrice,
+      })),
+      subtotal: lines.reduce((sum, l) => sum + l.lineTotal, 0),
+      currency_code: 'inr',
     }),
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data?.message || `Order could not be saved (${res.status})`);
+  // The older backend returns only the enquiry; derive the same 8-character reference it would.
+  const ref = String(data.reference || data.order_enquiry?.id?.slice(-8) || '').replace(/^#/, '').toUpperCase();
   return {
     id: data.order_enquiry?.id,
-    reference: data.reference,
+    reference: ref ? `#${ref}` : '',
     status: data.order_enquiry?.status,
     subtotal: data.order_enquiry?.subtotal,
     packing_fee: data.packing_fee,
