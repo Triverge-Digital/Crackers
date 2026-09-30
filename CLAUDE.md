@@ -39,11 +39,21 @@ Notes:
   (cd bwcrackers && railway run npx medusa db:migrate)   # uses Railway's DATABASE_URL
   ```
   `railway run` injects Railway env, including the working Supabase **pooler** URL.
+- **Catalog must match the storefront price list.** The backend prices orders from Medusa
+  variants (SKU `BW-<code>`), so after any change to `bwcrackers-storefront/src/data/pricelist.ts`
+  regenerate `bwcrackers/src/scripts/data/pricelist-2026.ts` and sync (dry run first):
+  ```bash
+  (cd bwcrackers && DRY_RUN=1 railway run yarn sync-pricelist)   # report only
+  (cd bwcrackers && railway run yarn sync-pricelist)             # apply
+  ```
+  Do this **before** deploying a backend that uses server-side pricing.
 
-### Storefront → Vercel (git push)
-The Vercel project (`bwcrackers-storefront`) is git-connected and auto-deploys on push to
-the GitHub repo. The owner pushes/deploys the storefront. Set
-`VITE_MEDUSA_BACKEND_URL=https://admin.bwcrackers.com` in Vercel env.
+### Storefront → Vercel (CLI deploy)
+The Vercel project is `hussains-projects-528685c9/bwcrackers-storefront`. It is **not**
+git-connected: deploy with `vercel deploy --prod` from `bwcrackers-storefront/` while logged
+in as the account that owns that team. Env: `VITE_MEDUSA_PUBLISHABLE_KEY` (non-sensitive —
+`VITE_` vars are public), `RESEND_API_KEY`. The backend URL defaults to
+`https://admin.bwcrackers.com` in production (`src/lib/api.ts`).
 
 ## Database
 Supabase Postgres via the **transaction pooler**
