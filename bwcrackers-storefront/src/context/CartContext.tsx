@@ -23,6 +23,10 @@ const EMPTY_CUSTOMER: CustomerDetails = { name: '', phone: '', email: '', addres
 
 const CartContext = createContext<CartContextValue | null>(null);
 
+type CartActions = Pick<CartContextValue, 'updateQty' | 'setQty'>;
+// Stable across cart changes, so rows that only need the setters don't re-render on every add.
+const CartActionsContext = createContext<CartActions | null>(null);
+
 function readStorage<T>(key: string, fallback: T): T {
   try {
     const raw = window.localStorage.getItem(key);
@@ -101,11 +105,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     lastAdded,
   }), [cart, lines, totals, updateQty, setQty, removeItem, clearCart, customer, checkoutOpen, lastAdded]);
 
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+  const actions = useMemo<CartActions>(() => ({ updateQty, setQty }), [updateQty, setQty]);
+
+  return (
+    <CartActionsContext.Provider value={actions}>
+      <CartContext.Provider value={value}>{children}</CartContext.Provider>
+    </CartActionsContext.Provider>
+  );
 }
 
 export function useCart(): CartContextValue {
   const ctx = useContext(CartContext);
   if (!ctx) throw new Error('useCart must be used inside <CartProvider>');
+  return ctx;
+}
+
+export function useCartActions(): CartActions {
+  const ctx = useContext(CartActionsContext);
+  if (!ctx) throw new Error('useCartActions must be used inside <CartProvider>');
   return ctx;
 }

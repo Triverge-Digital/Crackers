@@ -1,17 +1,16 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { X, User, MapPin, Mail, ChevronDown, Download, CheckCircle2, AlertTriangle, PackageSearch, Loader2 } from 'lucide-react';
+import { X, User, MapPin, Mail, ChevronDown, AlertTriangle, Loader2, ShieldCheck, RotateCcw } from 'lucide-react';
 import { MIN_ORDER } from '../../constants';
 import { useCart } from '../../context/CartContext';
-import { createOrderEnquiry, sendConfirmationEmail, CustomerDetails } from '../../lib/api';
+import { BACKEND_URL, createOrderEnquiry, CustomerDetails } from '../../lib/api';
 import { formatINR, pluralize } from '../../lib/format';
-import { buildWhatsAppOrderUrl, buildPaymentShareWhatsAppUrl } from '../../lib/whatsappOrder';
-import type { EstimatePdf } from '../../lib/generateEstimatePDF';
+import { buildWhatsAppOrderUrl } from '../../lib/whatsappOrder';
+import { PlacedOrder, saveLastOrder } from '../../lib/lastOrder';
 import WhatsAppIcon from '../icons/WhatsAppIcon';
-import PaymentDetails from './PaymentDetails';
 
-type Step = 'details' | 'done';
+type Step = 'details' | 'failed';
 type Errors = Partial<Record<keyof CustomerDetails, string>>;
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -21,7 +20,8 @@ function localReference() {
 }
 
 export default function CheckoutModal() {
-  const { checkoutOpen, closeCheckout, lines, totals, customer, setCustomer, clearCart } = useCart();
+  const { checkoutOpen, closeCheckout, cart, lines, totals, customer, setCustomer, clearCart } = useCart();
+  const navigate = useNavigate();
   const reduce = useReducedMotion();
   const dialogRef = useRef<HTMLDivElement>(null);
 
@@ -29,13 +29,8 @@ export default function CheckoutModal() {
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
   const [itemsExpanded, setItemsExpanded] = useState(false);
-  const [result, setResult] = useState<{ reference: string; saved: boolean; waUrl: string; grandTotal: number; packingFee: number; subtotal: number } | null>(null);
-  const [pdf, setPdf] = useState<EstimatePdf | null>(null);
-  const [pdfBusy, setPdfBusy] = useState(false);
-  const [waOpened, setWaOpened] = useState(false);
-
-  // Snapshot of lines at the time of ordering so the "done" screen stays stable.
-  const orderedLines = useRef(lines);
+  // Order kept aside when the backend couldn't save it, so it can go by WhatsApp instead.
+  const [pending, setPending] = useState<PlacedOrder | null>(null);
 
   useEffect(() => {
     if (!checkoutOpen) return;
@@ -62,12 +57,16 @@ export default function CheckoutModal() {
 
   const handleClose = () => {
     closeCheckout();
-    window.setTimeout(() => { setStep('details'); setErrors({}); setPdf(null); setResult(null); setWaOpened(false); setItemsExpanded(false); }, 350);
+    window.setTimeout(() => { setStep('details'); setErrors({}); setPending(null); setItemsExpanded(false); }, 350);
   };
 
-  const finish = () => {
+  /** Hand the order to the thank-you page and reset the shop for the next order. */
+  const complete = (order: PlacedOrder) => {
+    saveLastOrder(order);
     clearCart();
-    handleClose();
+    closeCheckout();
+    setStep('details'); setPending(null); setItemsExpanded(false);
+    navigate('/order-success');
   };
 
   const field = (name: keyof CustomerDetails) => ({
@@ -99,85 +98,40 @@ export default function CheckoutModal() {
     e.preventDefault();
     if (!totals.meetsMinimum || !validate() || submitting) return;
     setSubmitting(true);
-    orderedLines.current = lines;
 
-    // Open the tab synchronously so mobile browsers don't treat the later
-    // navigation as a blocked popup.
-    const waWindow = window.open('', '_blank');
+    const fullAddress = [customer.address, customer.city, customer.state, customer.pincode].map(v => v.trim()).filter(Boolean).join(', ');
+    const order: PlacedOrder = {
+      reference: '',
+      placedAt: new Date().toISOString(),
+      channel: 'saved',
+      customer: { name: customer.name.trim(), phone: customer.phone.trim(), email: customer.email.trim(), address: fullAddress },
+      items: { ...cart },
+      subtotal: totals.subtotal,
+      packingFee: totals.packingFee,
+      grandTotal: totals.grandTotal,
+      savings: totals.savings,
+    };
 
-    let reference = localReference();
-    let saved = false;
     try {
       const controller = new AbortController();
-      const timeout = window.setTimeout(() => controller.abort(), 9000);
+      const timeout = window.setTimeout(() => controller.abort(), 12000);
       const res = await createOrderEnquiry(lines, customer, controller.signal);
       window.clearTimeout(timeout);
-      if (res.reference) { reference = res.reference; saved = true; }
+      if (!res.reference) throw new Error('No reference returned');
+      complete({ ...order, reference: res.reference });
     } catch {
-      // Backend unreachable — the WhatsApp message still carries the full order.
-    }
-
-    const fullAddress = [customer.address, customer.city, customer.state, customer.pincode].map(s => s.trim()).filter(Boolean).join(', ');
-    const waUrl = buildWhatsAppOrderUrl(lines, totals.subtotal, totals.packingFee, { name: customer.name.trim(), phone: customer.phone.trim(), address: fullAddress }, reference);
-
-    if (waWindow) {
-      waWindow.location.href = waUrl;
-      setWaOpened(true);
-    }
-
-    setResult({ reference, saved, waUrl, grandTotal: totals.grandTotal, packingFee: totals.packingFee, subtotal: totals.subtotal });
-    setStep('done');
-    setSubmitting(false);
-
-    // Estimate PDF + confirmation email in the background.
-    void buildPdf(reference, fullAddress).then(generated => {
-      sendConfirmationEmail({
-        customer: { name: customer.name.trim(), phone: customer.phone.trim(), email: customer.email.trim(), address: fullAddress },
-        items: lines.map(l => ({ name: l.product.name, unit: l.product.unit, qty: l.qty, price: l.product.discountPrice, total: l.lineTotal })),
-        itemsTotal: totals.subtotal,
-        packingFee: totals.packingFee,
-        grandTotal: totals.grandTotal,
-        reference,
-        pdfBase64: generated?.base64,
-        pdfFilename: generated?.filename,
-      });
-    });
-  };
-
-  const buildPdf = async (reference: string, fullAddress: string): Promise<EstimatePdf | null> => {
-    setPdfBusy(true);
-    try {
-      const { generateEstimatePDF } = await import('../../lib/generateEstimatePDF');
-      const snapshot = orderedLines.current;
-      const subtotal = snapshot.reduce((s, l) => s + l.lineTotal, 0);
-      const packingFee = Math.ceil(subtotal * 0.02);
-      const generated = await generateEstimatePDF(
-        snapshot,
-        { name: customer.name.trim(), phone: customer.phone.trim(), email: customer.email.trim(), address: fullAddress },
-        reference.replace(/^#/, ''),
-        subtotal,
-        packingFee,
-        subtotal + packingFee,
-      );
-      setPdf(generated);
-      return generated;
-    } catch {
-      return null;
+      // Not saved (backend down, not configured, or offline). Never lose the order:
+      // offer WhatsApp, which carries the full order to the shop.
+      const reference = localReference();
+      const whatsappUrl = buildWhatsAppOrderUrl(lines, totals.subtotal, totals.packingFee, { name: order.customer.name, phone: order.customer.phone, address: fullAddress }, reference);
+      setPending({ ...order, reference, channel: 'whatsapp', whatsappUrl });
+      setStep('failed');
     } finally {
-      setPdfBusy(false);
+      setSubmitting(false);
     }
   };
 
-  const downloadPdf = async () => {
-    const { downloadEstimatePdf } = await import('../../lib/generateEstimatePDF');
-    if (pdf) { downloadEstimatePdf(pdf); return; }
-    if (!result) return;
-    const fullAddress = [customer.address, customer.city, customer.state, customer.pincode].map(s => s.trim()).filter(Boolean).join(', ');
-    const generated = await buildPdf(result.reference, fullAddress);
-    if (generated) downloadEstimatePdf(generated);
-  };
-
-  const summaryLines = useMemo(() => (step === 'done' ? orderedLines.current : lines), [step, lines]);
+  const summaryLines = lines;
   const visibleLines = itemsExpanded ? summaryLines : summaryLines.slice(0, 4);
 
   return (
@@ -207,10 +161,10 @@ export default function CheckoutModal() {
               <div className="bg-brand-navy px-5 sm:px-6 py-4 flex items-center justify-between gap-3 flex-shrink-0">
                 <div>
                   <h2 id="checkout-title" className="text-white font-black text-lg leading-tight">
-                    {step === 'details' ? 'Place your order' : result?.saved ? 'Order received' : 'Order ready to send'}
+                    {step === 'details' ? 'Place your order' : 'Almost done'}
                   </h2>
                   <p className="text-white/70 text-xs mt-0.5">
-                    {step === 'details' ? `${pluralize(totals.count, 'item')} · ${formatINR(totals.grandTotal)} incl. packing` : 'Next: send on WhatsApp, then pay after confirmation'}
+                    {`${pluralize(totals.count, 'item')} · ${formatINR(totals.grandTotal)} incl. packing`}
                   </p>
                 </div>
                 <button type="button" onClick={handleClose} aria-label="Close" className="icon-btn bg-white/10 hover:bg-white/20 text-white rounded-full min-w-[40px] min-h-[40px]">
@@ -332,52 +286,46 @@ export default function CheckoutModal() {
                       </div>
                     </fieldset>
 
-                    <button type="submit" disabled={submitting || !totals.meetsMinimum} className="btn-whatsapp w-full min-h-[52px] text-base">
-                      {submitting ? (<><Loader2 className="animate-spin" size={20} /> Placing order…</>) : (<><WhatsAppIcon className="w-5 h-5" /> Place order on WhatsApp</>)}
+                    <button type="submit" disabled={submitting || !totals.meetsMinimum} className="btn-primary w-full min-h-[54px] text-base">
+                      {submitting ? (<><Loader2 className="animate-spin" size={20} /> Placing your order…</>) : (<>Place order · {formatINR(totals.grandTotal)}</>)}
                     </button>
-                    <p className="text-xs text-center text-gray-500 leading-relaxed">
-                      We save your order and open WhatsApp with the details pre-filled. Pay only after we confirm availability.
+                    <p className="text-xs text-center text-gray-500 leading-relaxed flex items-start justify-center gap-1.5">
+                      <ShieldCheck size={14} className="text-green-600 flex-shrink-0 mt-px" />
+                      <span>No payment now. We confirm your order by call or WhatsApp first — you pay only after that.</span>
                     </p>
                   </form>
                 )}
 
-                {step === 'done' && result && (
-                  <div className="px-5 sm:px-6 pt-4 pb-6 space-y-4">
-                    <div className="bg-green-50 border border-green-200 rounded-2xl px-4 py-3 flex gap-3 items-start">
-                      <CheckCircle2 className="text-green-600 flex-shrink-0 mt-0.5" size={22} />
-                      <div className="text-sm">
-                        <p className="text-green-800 font-black">{result.saved ? 'Your order is saved with us.' : 'Your order is ready to send.'}</p>
-                        <p className="text-green-700 text-xs mt-0.5">
-                          {waOpened
-                            ? 'WhatsApp opened in a new tab — tap Send there to complete your order.'
-                            : 'Tap the button below to send your order to us on WhatsApp.'}
-                        </p>
+                {step === 'failed' && pending && (
+                  <div className="px-5 sm:px-6 pt-5 pb-6 space-y-4">
+                    {BACKEND_URL ? (
+                      <div className="flex gap-3 bg-amber-50 border border-amber-200 rounded-2xl p-4">
+                        <AlertTriangle className="text-amber-600 flex-shrink-0 mt-0.5" size={20} />
+                        <div className="text-sm">
+                          <p className="font-black text-amber-900">We couldn't save your order online just now</p>
+                          <p className="text-amber-900/80 text-xs mt-1 leading-relaxed">
+                            Your details are safe. Send the order to us on WhatsApp in one tap — it's pre-filled with everything, just press <span className="font-black">Send</span>.
+                          </p>
+                        </div>
                       </div>
-                    </div>
-
-                    <a href={result.waUrl} target="_blank" rel="noopener noreferrer" onClick={() => setWaOpened(true)} className={`w-full ${waOpened ? 'btn-outline' : 'btn-whatsapp'} min-h-[50px]`}>
-                      <WhatsAppIcon className="w-5 h-5" /> {waOpened ? 'Open WhatsApp again' : 'Send order on WhatsApp'}
+                    ) : (
+                      <div className="text-sm text-gray-600 leading-relaxed">
+                        <p className="font-black text-brand-navy text-base mb-1">One last step</p>
+                        Send your order to us on WhatsApp — it's pre-filled with everything, just press <span className="font-black">Send</span>.
+                      </div>
+                    )}
+                    <a
+                      href={pending.whatsappUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => complete(pending)}
+                      className="btn-whatsapp w-full min-h-[52px] text-base"
+                    >
+                      <WhatsAppIcon className="w-5 h-5" /> Send order on WhatsApp
                     </a>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <button type="button" onClick={downloadPdf} disabled={pdfBusy} className="btn-navy min-h-[46px] text-xs sm:text-sm">
-                        {pdfBusy ? <Loader2 className="animate-spin" size={16} /> : <Download size={16} />} Estimate PDF
-                      </button>
-                      <Link to={`/track?ref=${encodeURIComponent(result.reference.replace(/^#/, ''))}`} onClick={finish} className="btn-outline min-h-[46px] text-xs sm:text-sm">
-                        <PackageSearch size={16} /> Track order
-                      </Link>
-                    </div>
-
-                    <PaymentDetails
-                      referenceNumber={result.reference}
-                      itemsTotal={result.subtotal}
-                      packingFee={result.packingFee}
-                      amountToPay={result.grandTotal}
-                      whatsappShareUrl={buildPaymentShareWhatsAppUrl(result.reference, result.grandTotal)}
-                    />
-
-                    <button type="button" onClick={finish} className="btn-outline w-full">Done — clear my cart</button>
-                    <p className="text-xs text-center text-gray-500">Closing with ✕ keeps your cart so you can come back to it.</p>
+                    <button type="button" onClick={() => { setStep('details'); setPending(null); }} className="btn-outline w-full">
+                      <RotateCcw size={16} /> Try again
+                    </button>
                   </div>
                 )}
               </div>

@@ -1,11 +1,13 @@
+import { memo } from 'react';
 import { CatalogProduct } from '../../lib/catalog';
 import ProductThumb from '../ui/ProductThumb';
 import PriceTag from '../ui/PriceTag';
-import QtyControl from '../ui/QtyControl';
+import { QtyStepper } from '../ui/QtyControl';
 
 type Props = { product: CatalogProduct; inCart?: number };
 
-export default function ProductRow({ product, inCart }: Props) {
+// Memoised: a cart change re-renders only the row whose quantity changed.
+export default memo(function ProductRow({ product, inCart }: Props) {
   return (
     <div
       className={`grid grid-cols-[1fr_auto_auto] gap-3 items-center px-3 sm:px-4 py-2.5 border-b border-gray-100 last:border-0 transition-colors ${
@@ -23,7 +25,7 @@ export default function ProductRow({ product, inCart }: Props) {
         </div>
       </div>
       <PriceTag price={product.discountPrice} mrp={product.mrp} size="sm" />
-      <QtyControl product={product} />
+      <QtyStepper product={product} qty={inCart || 0} />
     </div>
   );
-}
+});

@@ -11,6 +11,7 @@ import StorePage from './pages/StorePage';
 import CollectionsPage from './pages/CollectionsPage';
 import CartPage from './pages/CartPage';
 import TrackOrderPage from './pages/TrackOrderPage';
+import OrderSuccessPage from './pages/OrderSuccessPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 export default function App() {
@@ -30,6 +31,7 @@ export default function App() {
             <Route path="/collections" element={<CollectionsPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/track" element={<TrackOrderPage />} />
+            <Route path="/order-success" element={<OrderSuccessPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>
