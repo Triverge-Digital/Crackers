@@ -2,9 +2,8 @@ import { Brand, FALLBACK_BRANDS } from '../constants';
 import { CartLine } from './catalog';
 
 const env = (import.meta as any).env ?? {};
-// In production the backend URL must be configured explicitly; only dev falls
-// back to the local Medusa server.
-export const BACKEND_URL: string = env.VITE_MEDUSA_BACKEND_URL || (env.DEV ? 'http://localhost:9000' : '');
+// Env overrides; otherwise dev uses the local Medusa server and production the live backend.
+export const BACKEND_URL: string = env.VITE_MEDUSA_BACKEND_URL || (env.DEV ? 'http://localhost:9000' : 'https://admin.bwcrackers.com');
 const PUBLISHABLE_KEY: string = env.VITE_MEDUSA_PUBLISHABLE_KEY || '';
 
 if (!BACKEND_URL && !env.DEV) {
