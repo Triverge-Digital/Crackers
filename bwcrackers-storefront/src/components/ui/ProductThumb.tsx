@@ -1,5 +1,5 @@
 import { Sparkles } from 'lucide-react';
-import { CATEGORY_COLORS } from '../../constants';
+import { CATEGORY_HEX } from '../../constants';
 import { CatalogProduct, ownPhoto, thumb } from '../../lib/catalog';
 
 type Props = {
@@ -9,8 +9,8 @@ type Props = {
 };
 
 /**
- * Product photo when we have one for this exact SKU, otherwise a category-
- * coloured tile — never a photo of a different product.
+ * Product photo when we have one for this exact SKU, otherwise a soft tile
+ * tinted with the category accent — never a photo of a different product.
  */
 export default function ProductThumb({ product, size = 'sm', className = '' }: Props) {
   const photo = ownPhoto(product);
@@ -30,18 +30,19 @@ export default function ProductThumb({ product, size = 'sm', className = '' }: P
     );
   }
 
-  const color = CATEGORY_COLORS[product.categoryId] || 'bg-gray-600';
+  const accent = CATEGORY_HEX[product.categoryId] || '#57534e';
   return (
     <div
       aria-hidden="true"
-      className={`${base} ${color} flex-shrink-0 flex items-center justify-center text-white relative overflow-hidden ${className}`}
+      title={`Catalog no. ${product.code}`}
+      className={`${base} flex-shrink-0 flex items-center justify-center relative overflow-hidden border ${className}`}
+      style={{ backgroundColor: `${accent}14`, borderColor: `${accent}26`, color: accent }}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-white/25 to-transparent" />
       {size === 'sm' ? (
-        <span className="relative font-black text-xs leading-none" title={`Catalog no. ${product.code}`}>{product.code}</span>
+        <Sparkles size={18} strokeWidth={2.25} />
       ) : (
-        <div className="relative flex flex-col items-center gap-2 px-3 text-center">
-          <Sparkles size={28} className="opacity-90" />
+        <div className="flex flex-col items-center gap-2 px-3 text-center">
+          <Sparkles size={28} />
           <span className="font-black text-xs uppercase tracking-wide leading-tight line-clamp-2">{product.name}</span>
         </div>
       )}

@@ -18,12 +18,14 @@ export default function DeliverySection() {
           <p className="text-gray-600 text-sm font-medium mt-2 max-w-2xl mx-auto">{DELIVERY_INFO.restrictions}</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {cards.map(({ icon: Icon, title, body }) => (
-            <div key={title} className="card p-5 flex flex-col gap-3">
-              <div className="w-11 h-11 rounded-xl bg-brand-navy/5 text-brand-navy flex items-center justify-center"><Icon size={22} /></div>
-              <h3 className="font-black text-sm text-brand-navy uppercase tracking-wide">{title}</h3>
-              <p className="text-sm text-gray-600 font-medium leading-relaxed">{body}</p>
+            <div key={title} className="card p-4 sm:p-5 flex sm:flex-col gap-4 sm:gap-3 items-start">
+              <div className="w-11 h-11 rounded-xl bg-brand-magenta/10 text-brand-magenta flex items-center justify-center flex-shrink-0"><Icon size={22} /></div>
+              <div>
+                <h3 className="font-black text-sm text-brand-navy uppercase tracking-wide">{title}</h3>
+                <p className="text-sm text-gray-600 font-medium leading-relaxed mt-1 sm:mt-2">{body}</p>
+              </div>
             </div>
           ))}
         </div>

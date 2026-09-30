@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { POSTERS, HERO_INTERVAL_MS } from '../../constants';
 
 function Slide({ index, alt }: { index: number; alt?: string }) {
@@ -12,7 +12,8 @@ function Slide({ index, alt }: { index: number; alt?: string }) {
         src={p.desktop}
         alt={alt ?? ''}
         draggable={false}
-        fetchPriority={index === 0 ? 'high' : 'auto'}
+        // React 18 only forwards the lowercase attribute.
+        {...{ fetchpriority: index === 0 ? 'high' : 'auto' }}
         decoding="async"
         className="absolute inset-0 w-full h-full object-cover object-center select-none"
       />
@@ -23,7 +24,6 @@ function Slide({ index, alt }: { index: number; alt?: string }) {
 export default function Hero() {
   const [current, setCurrent] = useState(0);
   const [base, setBase] = useState(0);
-  const [paused, setPaused] = useState(false);
   const hovering = useRef(false);
   const touchStartX = useRef<number | null>(null);
 
@@ -36,7 +36,6 @@ export default function Hero() {
   }, []);
 
   useEffect(() => {
-    if (paused) return;
     const timer = window.setInterval(() => {
       if (hovering.current || document.hidden) return;
       setCurrent(p => {
@@ -46,7 +45,7 @@ export default function Hero() {
       });
     }, HERO_INTERVAL_MS);
     return () => window.clearInterval(timer);
-  }, [paused]);
+  }, []);
 
   const go = (next: number | ((p: number) => number)) => {
     setCurrent(p => {
@@ -109,15 +108,6 @@ export default function Hero() {
               <span className={`block h-2 rounded-full transition-all duration-300 ${i === current ? 'w-6 bg-brand-gold' : 'w-2 bg-white/60'}`} />
             </button>
           ))}
-          <button
-            type="button"
-            onClick={() => setPaused(v => !v)}
-            aria-label={paused ? 'Play banner slideshow' : 'Pause banner slideshow'}
-            aria-pressed={paused}
-            className="ml-1 w-7 h-7 rounded-full text-white/90 hover:bg-white/15 flex items-center justify-center"
-          >
-            {paused ? <Play size={13} /> : <Pause size={13} />}
-          </button>
         </div>
       </div>
     </section>

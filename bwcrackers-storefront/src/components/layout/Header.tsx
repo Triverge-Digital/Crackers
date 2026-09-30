@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Download, ShoppingCart, X, Menu, PackageSearch } from 'lucide-react';
@@ -21,6 +21,18 @@ export default function Header() {
   const { totals } = useCart();
   const location = useLocation();
   const navigate = useNavigate();
+  const barRef = useRef<HTMLDivElement>(null);
+
+  // Publish the real header height so sticky toolbars and scroll offsets sit flush under it.
+  useEffect(() => {
+    const el = barRef.current;
+    if (!el) return;
+    const set = () => document.documentElement.style.setProperty('--header-h', `${Math.round(el.getBoundingClientRect().height)}px`);
+    set();
+    const ro = new ResizeObserver(set);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => { setMenuOpen(false); }, [location.pathname, location.hash]);
 
@@ -50,7 +62,7 @@ export default function Header() {
     `text-xs font-black uppercase tracking-widest transition-colors py-2 ${isActive ? 'text-brand-gold' : 'text-white/75 hover:text-brand-gold'}`;
 
   return (
-    <div className="sticky top-0 z-[60] w-full">
+    <div ref={barRef} className="sticky top-0 z-[60] w-full">
       {/* Announcement bar — CSS marquee (pauses under prefers-reduced-motion) */}
       <div className="bg-brand-magenta py-2 overflow-hidden" aria-label="Offers">
         <div className="flex w-max animate-marquee whitespace-nowrap gap-10 text-[11px] sm:text-xs font-black uppercase tracking-[0.18em] text-white">
@@ -135,7 +147,7 @@ export default function Header() {
                 aria-label="Close menu"
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                 onClick={() => setMenuOpen(false)}
-                className="lg:hidden fixed inset-0 top-[104px] bg-black/50 backdrop-blur-sm z-40 cursor-default"
+                className="lg:hidden fixed inset-0 top-[var(--header-h,96px)] bg-black/50 backdrop-blur-sm z-40 cursor-default"
               />
               <motion.nav
                 id="mobile-menu"

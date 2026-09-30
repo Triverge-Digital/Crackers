@@ -1,12 +1,18 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-const HEADER_OFFSET = 96;
+/** Height pinned above `el`: the site header, plus the sticky toolbar when `el` scrolls underneath it. */
+function topOffset(el: HTMLElement) {
+  const header = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 96;
+  const toolbar = document.querySelector<HTMLElement>('[data-sticky-toolbar]');
+  const underToolbar = toolbar?.parentElement?.contains(el) && !toolbar.contains(el);
+  return header + (underToolbar ? toolbar!.getBoundingClientRect().height : 0) + 12;
+}
 
 export function scrollToId(id: string, behavior: ScrollBehavior = 'smooth') {
   const el = document.getElementById(id);
   if (!el) return false;
-  const top = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
+  const top = el.getBoundingClientRect().top + window.scrollY - topOffset(el);
   window.scrollTo({ top, behavior });
   return true;
 }

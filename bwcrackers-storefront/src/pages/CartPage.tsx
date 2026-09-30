@@ -104,6 +104,24 @@ export default function CartPage() {
             {!totals.meetsMinimum && <Link to="/store" className="btn-outline w-full mt-2">Continue shopping</Link>}
             <p className="text-xs text-gray-500 text-center mt-3 leading-relaxed">You'll enter your delivery details next. Pay by UPI or bank transfer only after we confirm your order.</p>
           </aside>
+
+          {/* Phones: keep the total and the order button in reach while reviewing the list. */}
+          <div className="lg:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur border-t border-gray-200 shadow-[0_-8px_24px_-12px_rgba(26,26,78,0.25)] safe-bottom">
+            <div className="flex items-center gap-3 px-4 py-3 max-w-5xl mx-auto">
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] font-black uppercase tracking-wider text-gray-500">Total to pay</p>
+                <p className="text-xl font-black text-brand-navy tabular-nums leading-tight">{formatINR(totals.grandTotal)}</p>
+                {!totals.meetsMinimum && <p className="text-[11px] font-bold text-amber-700 truncate">Add {formatINR(totals.remaining)} more</p>}
+              </div>
+              {totals.meetsMinimum ? (
+                <button type="button" onClick={openCheckout} className="btn-whatsapp min-h-[48px] px-5">
+                  <WhatsAppIcon className="w-5 h-5" /> Place order
+                </button>
+              ) : (
+                <Link to="/store" className="btn-primary min-h-[48px] px-5">Add more items</Link>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>

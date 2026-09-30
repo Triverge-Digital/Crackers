@@ -8,7 +8,6 @@ import Seo from '../components/ui/Seo';
 import CategoryAccordion from '../components/store/CategoryAccordion';
 import CategoryPills from '../components/store/CategoryPills';
 import SearchBox from '../components/store/SearchBox';
-import OrderProgress from '../components/store/OrderProgress';
 import WhatsAppIcon from '../components/icons/WhatsAppIcon';
 
 type Sort = 'default' | 'price-asc' | 'price-desc';
@@ -74,7 +73,7 @@ export default function StorePage() {
       </nav>
       <h1 className="section-title mb-3">{title}</h1>
 
-      <div className="sticky top-[104px] z-30 -mx-3 md:-mx-6 px-3 md:px-6 py-3 bg-brand-cream/95 backdrop-blur-sm border-b border-brand-magenta/10 space-y-3">
+      <div data-sticky-toolbar className="sticky top-[var(--header-h,96px)] z-30 -mx-3 md:-mx-6 px-3 md:px-6 pt-3 pb-2 bg-brand-cream space-y-2 shadow-[0_8px_12px_-12px_rgba(26,26,78,0.35)]">
         <div className="flex gap-2">
           <div className="flex-1"><SearchBox value={query} onChange={setQuery} /></div>
           <div className="hidden sm:flex items-center card overflow-hidden" role="group" aria-label="View mode">
@@ -95,7 +94,6 @@ export default function StorePage() {
           selected={selectedCategory?.id ?? 'all'}
           onSelect={id => navigate(id === 'all' ? `/store${params.toString() ? `?${params}` : ''}` : `/store/${categories.find(c => c.id === id)!.slug}${params.toString() ? `?${params}` : ''}`)}
         />
-        <OrderProgress compact />
       </div>
 
       <p className="text-xs font-black text-gray-500 mt-4 mb-3" aria-live="polite">

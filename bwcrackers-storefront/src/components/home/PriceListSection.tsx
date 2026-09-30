@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { ChevronsDownUp, ChevronsUpDown } from 'lucide-react';
 import { DISCOUNT_PCT, MIN_ORDER } from '../../constants';
 import { categories, allProducts, matchesSearch } from '../../lib/catalog';
 import { formatINR } from '../../lib/format';
@@ -7,13 +8,14 @@ import { useCart } from '../../context/CartContext';
 import CategoryAccordion from '../store/CategoryAccordion';
 import CategoryPills from '../store/CategoryPills';
 import SearchBox from '../store/SearchBox';
-import OrderProgress from '../store/OrderProgress';
 import { scrollToId } from '../ui/ScrollManager';
 import WhatsAppIcon from '../icons/WhatsAppIcon';
 
 export default function PriceListSection() {
   const { totals, openCheckout } = useCart();
   const [query, setQuery] = useState('');
+  // The homepage list starts as a scannable index of categories; the first one is open as a preview.
+  const [openIds, setOpenIds] = useState<Set<number>>(() => new Set([categories[0].id]));
 
   const grouped = useMemo(() => {
     const q = query.trim();
@@ -23,9 +25,17 @@ export default function PriceListSection() {
   }, [query]);
 
   const searching = query.trim().length > 0;
+  const allOpen = openIds.size === categories.length;
+
+  const toggle = (id: number) => setOpenIds(prev => {
+    const next = new Set(prev);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
 
   const jumpTo = (id: number | 'all') => {
     if (id === 'all') return;
+    setOpenIds(prev => new Set(prev).add(id));
     window.setTimeout(() => scrollToId(`cat-${id}`), 30);
   };
 
@@ -40,34 +50,51 @@ export default function PriceListSection() {
           </p>
         </div>
 
-        <div className="sticky top-[104px] z-30 -mx-3 md:-mx-6 px-3 md:px-6 py-3 bg-brand-cream/95 backdrop-blur-sm space-y-3 border-b border-brand-magenta/10">
-          <SearchBox value={query} onChange={setQuery} />
-          {!searching && <CategoryPills selected="all" showAll={false} onSelect={jumpTo} />}
-          <OrderProgress compact />
+        {/* Own wrapper so the sticky bar releases at the end of the list instead of covering the CTA below. */}
+        <div>
+          <div data-sticky-toolbar className="sticky top-[var(--header-h,96px)] z-30 -mx-3 md:-mx-6 px-3 md:px-6 pt-3 pb-2 bg-brand-cream space-y-2 shadow-[0_8px_12px_-12px_rgba(26,26,78,0.35)]">
+            <SearchBox value={query} onChange={setQuery} />
+            {!searching && <CategoryPills selected="all" showAll={false} onSelect={jumpTo} />}
+          </div>
+
+          <div className="mt-4 mb-3 flex items-center justify-between gap-3">
+            <p className="text-xs font-black text-gray-500">
+              {searching ? `${grouped.reduce((n, c) => n + c.products.length, 0)} results for "${query.trim()}"` : `${categories.length} categories · tap one to see its items`}
+            </p>
+            {!searching && (
+              <button
+                type="button"
+                onClick={() => setOpenIds(allOpen ? new Set() : new Set(categories.map(c => c.id)))}
+                className="inline-flex items-center gap-1.5 text-xs font-black text-brand-magenta hover:text-[#c9006e] min-h-[36px] px-2 -mr-2 flex-shrink-0"
+              >
+                {allOpen ? <ChevronsDownUp size={15} /> : <ChevronsUpDown size={15} />}
+                {allOpen ? 'Collapse all' : 'Expand all'}
+              </button>
+            )}
+          </div>
+
+          {grouped.length === 0 ? (
+            <div className="card text-center py-14 px-6">
+              <p className="font-black text-brand-navy">No products match "{query.trim()}"</p>
+              <p className="text-sm text-gray-500 mt-1">Try "sparkler", "rocket", "flower pot", "bomb" or "gift box".</p>
+              <button type="button" onClick={() => setQuery('')} className="btn-outline mt-4 min-h-[40px]">Clear search</button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {grouped.map(cat => (
+                <CategoryAccordion
+                  key={cat.id}
+                  id={cat.id}
+                  name={cat.name}
+                  products={cat.products}
+                  collapsible={!searching}
+                  open={openIds.has(cat.id)}
+                  onToggle={() => toggle(cat.id)}
+                />
+              ))}
+            </div>
+          )}
         </div>
-
-        <p className="mt-4 mb-3 text-xs font-black text-gray-500">
-          {searching ? `${grouped.reduce((n, c) => n + c.products.length, 0)} results for "${query.trim()}"` : `${categories.length} categories`}
-        </p>
-
-        {grouped.length === 0 ? (
-          <div className="card text-center py-14 px-6">
-            <p className="font-black text-brand-navy">No products match "{query.trim()}"</p>
-            <p className="text-sm text-gray-500 mt-1">Try "sparkler", "rocket", "flower pot", "bomb" or "gift box".</p>
-            <button type="button" onClick={() => setQuery('')} className="btn-outline mt-4 min-h-[40px]">Clear search</button>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {grouped.map(cat => (
-              <CategoryAccordion
-                key={cat.id}
-                id={cat.id}
-                name={cat.name}
-                products={cat.products}
-              />
-            ))}
-          </div>
-        )}
 
         <div className="mt-8 bg-brand-navy rounded-3xl p-6 md:p-8 text-center text-white">
           <p className="font-black text-xl mb-1">Ready to order?</p>
