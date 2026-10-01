@@ -1,9 +1,21 @@
 # BW Crackers — project guide for Claude
 
-E-commerce for a Sivakasi fireworks brand. Two apps in this repo:
+E-commerce for a Sivakasi fireworks brand.
 
-- **`bwcrackers/`** — Medusa v2 backend (admin + store API). Deployed on **Railway**.
-- **`bwcrackers-storefront/`** — Vite + React storefront. Deployed on **Vercel**.
+## LIVE APP (since 2026-10-01): `bwcrackers-web/`
+One **Next.js 15** app — storefront at `/`, shop admin at `/admin` — on a **Supabase** project
+(`jnktprbisjixgegpxfls`): products, categories, customers, orders, settings, photos (Storage
+bucket `products`). Setup, scripts and architecture: **`bwcrackers-web/README.md`**.
+- Deploy: `cd bwcrackers-web && vercel deploy --prod` (Vercel project
+  `hussains-projects-528685c9/bwcrackers-storefront`, not git-connected; CLI logged in as the
+  account that owns that team). Keys live in Vercel env, never in the repo.
+- Orders are written by `src/app/api/orders` (server-side pricing, emails with invoice PDF via Resend).
+- Admin access: Supabase Auth user + `yarn admin:grant <email>`.
+
+Everything below describes the **previous** stack, kept in the repo until it is switched off:
+
+- **`bwcrackers/`** — Medusa v2 backend (admin + store API). Deployed on **Railway**. No longer used by the live site.
+- **`bwcrackers-storefront/`** — Vite + React storefront. Replaced by `bwcrackers-web/`.
 
 The storefront catalog is **hardcoded** (`src/data/pricelist.ts`, banners in `public/`).
 Live backend calls: brands (`GET /store/brands`), create enquiry

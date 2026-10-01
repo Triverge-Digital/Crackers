@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-brand-cream text-gray-900 antialiased;
+  }
+  /* Keyboard users always get a visible focus ring; mouse users don't. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-magenta ring-offset-2 ring-offset-white rounded-md;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl font-black text-sm min-h-[44px] px-5 transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100;
+  }
+  .btn-primary {
+    @apply btn bg-brand-magenta text-white hover:bg-[#c9006e] shadow-lg shadow-brand-magenta/25;
+  }
+  .btn-whatsapp {
+    @apply btn bg-brand-whatsapp text-white hover:bg-[#1fbf5a] shadow-lg shadow-brand-whatsapp/25;
+  }
+  .btn-navy {
+    @apply btn bg-brand-navy text-white hover:bg-[#25256a];
+  }
+  .btn-ghost {
+    @apply btn bg-white/10 text-white hover:bg-white/20;
+  }
+  .btn-outline {
+    @apply btn bg-white text-brand-navy border border-gray-200 hover:border-brand-navy/40 hover:bg-gray-50;
+  }
+  .input {
+    @apply w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-medium text-gray-900 placeholder:text-gray-400 focus:outline-none focus:bg-white focus:border-brand-magenta/60 focus:ring-2 focus:ring-brand-magenta/20 transition-all min-h-[44px];
+  }
+  .input-error {
+    @apply border-red-400 focus:border-red-400 focus:ring-red-100;
+  }
+  .label {
+    @apply block text-xs font-black text-gray-600 uppercase tracking-wider mb-1.5;
+  }
+  .card {
+    @apply bg-white rounded-2xl border border-gray-100 shadow-card;
+  }
+  .section-title {
+    @apply text-2xl md:text-3xl font-black text-brand-navy uppercase tracking-tight;
+  }
+  .eyebrow {
+    @apply text-xs font-black uppercase tracking-[3px] text-brand-magenta;
+  }
+  .icon-btn {
+    @apply inline-flex items-center justify-center min-w-[44px] min-h-[44px] rounded-xl transition-colors;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  .scroll-fade-x {
+    mask-image: linear-gradient(to right, transparent, black 16px, black calc(100% - 24px), transparent);
+  }
+}
