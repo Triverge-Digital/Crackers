@@ -21,7 +21,7 @@ const NAV = [
 ];
 
 export default function Header() {
-  const { ANNOUNCEMENT } = useShopConstants();
+  const { ANNOUNCEMENT, PRICE_LIST_URL } = useShopConstants();
   const [menuOpen, setMenuOpen] = useState(false);
   const { totals } = useCart();
   const pathname = usePathname();
@@ -130,8 +130,8 @@ export default function Header() {
 
           <div className="flex items-center gap-1.5 sm:gap-2">
             <a
-              href="/BW-Crackers-Pricelist-2026.pdf"
-              download="BW-Crackers-Pricelist-2026.pdf"
+              href={PRICE_LIST_URL}
+              download="BW-Crackers-Price-List.pdf"
               className="hidden xs:inline-flex btn-ghost min-h-[44px] px-3 text-xs uppercase tracking-widest"
             >
               <Download size={16} />
@@ -186,8 +186,8 @@ export default function Header() {
                     </Link>
                   ))}
                   <a
-                    href="/BW-Crackers-Pricelist-2026.pdf"
-                    download="BW-Crackers-Pricelist-2026.pdf"
+                    href={PRICE_LIST_URL}
+                    download="BW-Crackers-Price-List.pdf"
                     className="xs:hidden flex items-center gap-3 px-4 min-h-[48px] text-sm font-black uppercase tracking-widest text-white/85 hover:text-brand-gold hover:bg-white/5 rounded-xl transition-colors"
                   >
                     <Download size={18} /> Download price list (PDF)
