@@ -19,7 +19,12 @@ export type ShopSettings = {
   bank: { name: string; account: string; bank: string; branch: string; type: string; ifsc: string; upi: string };
   delivery: { dispatchWindow: string; transitTime: string };
   orderEmails: string[];
+  /** Price list PDF uploaded in /admin/settings; null = the PDF bundled with the site. */
+  priceList: { url: string; name: string; updatedAt: string } | null;
 };
+
+/** PDF shipped in /public, used until one is uploaded in the admin panel. */
+export const BUNDLED_PRICE_LIST = '/BW-Crackers-Pricelist-2026.pdf';
 
 export const DEFAULT_SETTINGS: ShopSettings = {
   orderingEnabled: true,
@@ -39,7 +44,11 @@ export const DEFAULT_SETTINGS: ShopSettings = {
   bank: { name: 'WAHIDH HUSSAIN S', account: '003100050344099', bank: 'TamilNadu Mercantile Bank', branch: 'Sivakasi', type: 'Savings Account', ifsc: 'TMBL0000003', upi: '7867036289' },
   delivery: { dispatchWindow: '2–4 working days after payment confirmation', transitTime: '3–7 days depending on your city' },
   orderEmails: ['bwcrackers@gmail.com'],
+  priceList: null,
 };
+
+/** Where the current price list PDF lives. Storage adds a download header for ?download=<name>. */
+export const priceListFile = (s: ShopSettings) => (s.priceList ? `${s.priceList.url}?download=BW-Crackers-Price-List.pdf` : BUNDLED_PRICE_LIST);
 
 /** Deep-merges a stored settings row over the defaults. */
 export function normalizeSettings(raw: unknown): ShopSettings {
@@ -52,6 +61,7 @@ export function normalizeSettings(raw: unknown): ShopSettings {
     delivery: { ...DEFAULT_SETTINGS.delivery, ...(d.delivery ?? {}) },
     announcement: Array.isArray(d.announcement) ? d.announcement : DEFAULT_SETTINGS.announcement,
     orderEmails: Array.isArray(d.orderEmails) ? d.orderEmails : DEFAULT_SETTINGS.orderEmails,
+    priceList: d.priceList && typeof d.priceList.url === 'string' && d.priceList.url ? { url: d.priceList.url, name: String(d.priceList.name ?? 'Price list.pdf'), updatedAt: String(d.priceList.updatedAt ?? '') } : null,
     minOrder: Number(d.minOrder ?? DEFAULT_SETTINGS.minOrder),
     packingFeePct: Number(d.packingFeePct ?? DEFAULT_SETTINGS.packingFeePct),
     discountPct: Number(d.discountPct ?? DEFAULT_SETTINGS.discountPct),
@@ -100,6 +110,8 @@ export function shopConstants(s: ShopSettings) {
     WHATSAPP_INTL: whatsappIntl,
     WHATSAPP_LINK: `https://wa.me/${whatsappIntl}?text=${encodeURIComponent("Hi B&W Crackers, I'd like to know more about your products.")}`,
     BANK: { ...s.bank, qrImage: '/gpay-qr.webp' },
+    // Fixed address: /price-list.pdf looks up the current file on every click (see app/price-list.pdf).
+    PRICE_LIST_URL: '/price-list.pdf',
     DELIVERY_INFO,
     FAQS: buildFaqs(s, DELIVERY_INFO),
   };
